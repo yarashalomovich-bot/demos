@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Расчёт выездного шиномонтажа</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=PT+Sans:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: roadside instrument — hazard-yellow signal on asphalt, calculator up top, price read-out always visible, booking below. Phone-first: this is used standing next to a flat tyre. */
+:root{
+  --bg:#111315; --surface:#1a1d20; --surface-2:#23272b; --surface-3:#2e3338;
+  --ink:#f1f3f4; --ink-mid:#a7b0b7; --ink-dim:#79838b;
+  --line:#31373d;
+  --hazard:#ffd21f; --hazard-ink:#1a1500;
+  --ok:#5fc97f; --alert:#ff8a5c;
+  --font-display:'Oswald','PT Sans',system-ui,sans-serif;
+  --font-body:'PT Sans',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eceef0; --surface:#ffffff; --surface-2:#f2f4f6; --surface-3:#e2e6ea;
+    --ink:#14171a; --ink-mid:#4a545c; --ink-dim:#6d777f;
+    --line:#d3d9de;
+    --hazard:#8a6a00; --hazard-ink:#ffffff;
+    --ok:#1f7a3d; --alert:#b24a22;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#eceef0; --surface:#ffffff; --surface-2:#f2f4f6; --surface-3:#e2e6ea;
+  --ink:#14171a; --ink-mid:#4a545c; --ink-dim:#6d777f;
+  --line:#d3d9de;
+  --hazard:#8a6a00; --hazard-ink:#ffffff;
+  --ok:#1f7a3d; --alert:#b24a22;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:15px; line-height:1.55;
+  padding-inline:16px; padding-block:18px 48px;
+  display:flex; justify-content:center;
+}
+.app{width:100%; max-width:560px; display:flex; flex-direction:column; gap:16px}
+
+/* демо-плашка — обязательна, это прототип, а не сайт компании */
+.demolabel{
+  display:flex; gap:10px; align-items:flex-start;
+  background:var(--surface-2); border:1px dashed var(--line); border-radius:10px;
+  padding:11px 13px; font-size:12.5px; color:var(--ink-mid); line-height:1.45;
+}
+.demolabel b{
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  background:var(--hazard); color:var(--hazard-ink); padding:3px 7px; border-radius:5px; flex:none; margin-top:1px;
+}
+
+header{display:flex; flex-direction:column; gap:7px; animation:rise .45s ease both}
+.strip{height:5px; border-radius:3px; background:repeating-linear-gradient(135deg,var(--hazard) 0 11px,transparent 11px 22px)}
+h1{
+  font-family:var(--font-display); font-weight:600; font-size:clamp(25px,6.6vw,34px);
+  line-height:1.1; margin:0; text-transform:uppercase; letter-spacing:.005em; text-wrap:balance;
+}
+.sub{color:var(--ink-mid); font-size:14.5px; margin:0}
+.sub b{color:var(--hazard)}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:17px; display:flex; flex-direction:column; gap:15px; animation:rise .5s ease both}
+.card.c2{animation-delay:.08s}
+.card.c3{animation-delay:.16s}
+.ctitle{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--ink-dim); margin:0; display:flex; gap:9px; align-items:center;
+}
+.ctitle i{font-family:var(--font-display); font-style:normal; font-size:11px; background:var(--surface-3); color:var(--ink-mid); border-radius:4px; padding:2px 6px; letter-spacing:0}
+
+.field{display:flex; flex-direction:column; gap:7px}
+label.fl{font-size:13px; color:var(--ink-mid); font-weight:700}
+
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{
+  font-family:var(--font-body); font-size:13.5px; padding:9px 13px; border-radius:9px; cursor:pointer;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.2;
+  transition:border-color .13s, background .13s;
+}
+.chip:hover{border-color:var(--ink-dim)}
+.chip[aria-pressed="true"]{background:var(--hazard); border-color:var(--hazard); color:var(--hazard-ink); font-weight:700}
+.chip:focus-visible{outline:2px solid var(--hazard); outline-offset:2px}
+.chip.sm{font-family:var(--font-mono); font-size:12.5px; padding:8px 10px; min-width:46px; text-align:center}
+
+select,input[type="text"],input[type="tel"],input[type="number"]{
+  font-family:var(--font-body); font-size:15px; padding:11px 12px; border-radius:9px;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
+}
+select:focus,input:focus{outline:2px solid var(--hazard); outline-offset:1px; border-color:var(--hazard)}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:11px}
+
+.toggle{display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13.5px; color:var(--ink-mid); user-select:none}
+.toggle input{width:18px; height:18px; accent-color:var(--hazard); flex:none; margin:0}
+
+/* ценник */
+.readout{
+  background:var(--surface-2); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:11px;
+  border-left:4px solid var(--hazard);
+}
+.lines{display:flex; flex-direction:column; gap:6px}
+.pl{display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:var(--ink-mid)}
+.pl span:last-child{font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--ink); white-space:nowrap}
+.pl.free span:last-child{color:var(--ok)}
+.total{display:flex; justify-content:space-between; align-items:baseline; gap:12px; border-top:1px solid var(--line); padding-top:11px}
+.total .tl{font-family:var(--font-display); font-size:14px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-mid)}
+.total .tv{font-family:var(--font-display); font-weight:600; font-size:31px; color:var(--hazard); font-variant-numeric:tabular-nums; line-height:1}
+.eta{display:flex; gap:8px; align-items:center; font-family:var(--font-mono); font-size:12px; color:var(--ink-mid)}
+.eta b{color:var(--ok); font-weight:500}
+
+.btn{
+  font-family:var(--font-display); font-weight:600; font-size:16px; text-transform:uppercase; letter-spacing:.04em;
+  background:var(--hazard); color:var(--hazard-ink); border:none; border-radius:10px; padding:14px 18px;
+  cursor:pointer; width:100%; transition:filter .13s;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+.btn.ghost{background:transparent; color:var(--ink-mid); border:1.5px solid var(--line); font-size:13px}
+
+/* заявка */
+.ticket{background:var(--surface-2); border-radius:11px; padding:15px; display:flex; flex-direction:column; gap:10px; border:1px solid var(--ok)}
+.ticket .th{display:flex; gap:9px; align-items:center; font-family:var(--font-display); font-size:15px; text-transform:uppercase; letter-spacing:.03em; color:var(--ok)}
+.ticket pre{
+  font-family:var(--font-mono); font-size:12px; line-height:1.65; margin:0; white-space:pre-wrap; word-break:break-word;
+  color:var(--ink); background:var(--surface); border-radius:8px; padding:12px; border:1px solid var(--line);
+}
+.ticket .hint{font-size:12.5px; color:var(--ink-mid); margin:0}
+.copied{font-family:var(--font-mono); font-size:11.5px; color:var(--ok)}
+
+.err{font-size:13px; color:var(--alert); margin:0}
+
+footer{display:flex; flex-direction:column; gap:7px; font-size:12px; color:var(--ink-dim); line-height:1.6; border-top:1px solid var(--line); padding-top:15px}
+footer b{color:var(--ink-mid)}
+
+@keyframes rise{from{opacity:0; transform:translateY(9px)} to{opacity:1; transform:translateY(0)}}
+@media (prefers-reduced-motion: reduce){header,.card{animation:none; opacity:1}}
+@media (max-width:420px){.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+
+  <div class="demolabel">
+    <b>демо</b>
+    <span>Это прототип, собранный Ярославом Хоружим как предложение для «Службы 644». Не официальная страница компании. Цены взяты средние по рынку Москвы — в рабочей версии подставляются ваши и меняются в одном месте.</span>
+  </div>
+
+  <header>
+    <div class="strip"></div>
+    <h1>Выездной шиномонтаж<br>расчёт за 15 секунд</h1>
+    <p class="sub">Узнайте точную стоимость <b>не дожидаясь звонка диспетчера</b> и вызовите мастера на свой адрес.</p>
+  </header>
+
+  <!-- 1. РАСЧЁТ -->
+  <div class="card">
+    <p class="ctitle"><i>шаг 1</i> что случилось</p>
+
+    <div class="field">
+      <label class="fl" for="svc-prokol">Услуга</label>
+      <div class="chips" id="svc" role="group" aria-label="Услуга">
+        <button type="button" class="chip" id="svc-prokol" data-svc="prokol" aria-pressed="true">Прокол</button>
+        <button type="button" class="chip" data-svc="porez" aria-pressed="false">Порез или грыжа</button>
+        <button type="button" class="chip" data-svc="zapaska" aria-pressed="false">Поставить запаску</button>
+        <button type="button" class="chip" data-svc="sezon" aria-pressed="false">Сезонная смена</button>
+        <button type="button" class="chip" data-svc="balans" aria-pressed="false">Балансировка</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="fl" for="rad-16">Радиус колеса</label>
+      <div class="chips" id="rad" role="group" aria-label="Радиус колеса">
+        <button type="button" class="chip sm" data-r="13" aria-pressed="false">R13</button>
+        <button type="button" class="chip sm" data-r="14" aria-pressed="false">R14</button>
+        <button type="button" class="chip sm" data-r="15" aria-pressed="false">R15</button>
+        <button type="button" class="chip sm" id="rad-16" data-r="16" aria-pressed="true">R16</button>
+        <button type="button" class="chip sm" data-r="17" aria-pressed="false">R17</button>
+        <button type="button" class="chip sm" data-r="18" aria-pressed="false">R18</button>
+        <button type="button" class="chip sm" data-r="19" aria-pressed="false">R19</button>
+        <button type="button" class="chip sm" data-r="20" aria-pressed="false">R20</button>
+        <button type="button" class="chip sm" data-r="21" aria-pressed="false">R21</button>
+        <button type="button" class="chip sm" data-r="22" aria-pressed="false">R22</button>
+      </div>
+    </div>
+
+    <div class="field" id="qty-field">
+      <label class="fl" for="qty">Сколько колёс</label>
+      <div class="chips" id="qty" role="group" aria-label="Количество колёс">
+        <button type="button" class="chip sm" data-q="1" aria-pressed="true">1</button>
+        <button type="button" class="chip sm" data-q="2" aria-pressed="false">2</button>
+        <button type="button" class="chip sm" data-q="3" aria-pressed="false">3</button>
+        <button type="button" class="chip sm" data-q="4" aria-pressed="false">4</button>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label class="fl" for="zone">Где вы</label>
+        <select id="zone">
+          <option value="cao" selected>ЦАО</option>
+          <option value="vao">ВАО · Новогиреево, Перово</option>
+          <option value="sao">САО</option>
+          <option value="svao">СВАО</option>
+          <option value="uao">ЮАО</option>
+          <option value="uvao">ЮВАО</option>
+          <option value="uzao">ЮЗАО</option>
+          <option value="zao">ЗАО</option>
+          <option value="szao">СЗАО</option>
+          <option value="mkad">За МКАД</option>
+        </select>
+      </div>
+      <div class="field" id="km-field" hidden>
+        <label class="fl" for="km">Км от МКАД</label>
+        <input type="number" id="km" min="1" max="120" value="10" inputmode="numeric">
+      </div>
+    </div>
+
+    <label class="toggle" for="night">
+      <input type="checkbox" id="night">
+      <span>Ночной выезд, с 22:00 до 07:00 — надбавка 15%</span>
+    </label>
+  </div>
+
+  <!-- 2. ЦЕНА -->
+  <div class="card c2">
+    <p class="ctitle"><i>шаг 2</i> стоимость</p>
+    <div class="readout">
+      <div class="lines" id="lines"></div>
+      <div class="total"><span class="tl">Итого</span><span class="tv" id="total">—</span></div>
+      <div class="eta">⏱ мастер у вас <b id="eta">через 25 минут</b></div>
+    </div>
+    <p class="hint" style="font-size:12.5px;color:var(--ink-dim);margin:0">Окончательную стоимость мастер подтверждает на месте после осмотра — расчёт показывает цену по прайсу без скрытых доплат.</p>
+  </div>
+
+  <!-- 3. ЗАПИСЬ -->
+  <div class="card c3">
+    <p class="ctitle"><i>шаг 3</i> вызвать мастера</p>
+    <div class="row2">
+      <div class="field"><label class="fl" for="nm">Имя</label><input type="text" id="nm" placeholder="Как к вам обращаться" autocomplete="name"></div>
+      <div class="field"><label class="fl" for="ph">Телефон</label><input type="tel" id="ph" placeholder="+7 ___ ___-__-__" autocomplete="tel"></div>
+    </div>
+    <div class="field"><label class="fl" for="addr">Адрес или ориентир</label><input type="text" id="addr" placeholder="Улица, дом — или «МКАД 92 км, внешняя»"></div>
+    <div class="row2">
+      <div class="field"><label class="fl" for="car">Машина</label><input type="text" id="car" placeholder="Напр. Kia Rio"></div>
+      <div class="field"><label class="fl" for="whn">Когда</label>
+        <select id="whn">
+          <option value="Сейчас, срочно" selected>Сейчас, срочно</option>
+          <option value="В течение часа">В течение часа</option>
+          <option value="Сегодня вечером">Сегодня вечером</option>
+          <option value="Завтра утром">Завтра утром</option>
+          <option value="Завтра днём">Завтра днём</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="send" type="button">Вызвать мастера</button>
+    <p class="err" id="err" hidden></p>
+    <div id="ticket" hidden></div>
+  </div>
+
+  <footer>
+    <span><b>Что это даёт компании.</b> Клиент узнаёт цену сам и не уходит звонить конкурентам, пока ждёт ответа диспетчера. Заявка приходит мастеру готовой: услуга, радиус, адрес, машина, время — без уточняющих звонков.</span>
+    <span>Прототип. Собрал Ярослав Хоружий. Телефоны и прайс в рабочей версии — ваши.</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // Прайс — средние рыночные цены по Москве, октябрь 2026. Заменяются на цены компании.
+  var P = {
+    prokol: {13:7000,14:7000,15:7000,16:7500,17:8500,18:9000,19:10500,20:11000,21:12000,22:12000},
+    porez:  {13:9500,14:9500,15:9500,16:9500,17:10000,18:11000,19:12000,20:12500,21:13000,22:13000},
+    balans: {13:700,14:700,15:700,16:800,17:900,18:1100,19:1300,20:1400,21:1600,22:1600},
+    sezon:  {13:5500,14:5500,15:5500,16:6000,17:7000,18:8500,19:9500,20:10500,21:12000,22:12000}
+  };
+  var ZAPASKA = 3000;
+  var VYEZD = 2500;            // в пределах МКАД
+  var FREE_FROM = 15000;       // бесплатный выезд при заказе от
+  var PER_KM = 70;             // за МКАД
+  var NIGHT = 0.15;
+
+  var NAMES = {
+    prokol:"Ремонт прокола", porez:"Ремонт пореза или грыжи", zapaska:"Установка запаски",
+    sezon:"Сезонная смена шин, комплект", balans:"Балансировка"
+  };
+  var ETA = {cao:25, vao:20, sao:30, svao:30, uao:30, uvao:25, uzao:35, zao:35, szao:35, mkad:50};
+
+  var state = {svc:"prokol", r:16, q:1, zone:"cao", km:10, night:false};
+
+  function $(id){ return document.getElementById(id); }
+  function money(n){ return new Intl.NumberFormat("ru-RU").format(Math.round(n)) + " ₽"; }
+
+  // Чистая функция расчёта — её легко проверить
+  function calc(s){
+    var items = [], work = 0;
+    if (s.svc === "zapaska"){
+      work = ZAPASKA * s.q;
+      items.push({l: NAMES.zapaska + (s.q>1 ? " × "+s.q : ""), v: work});
+    } else if (s.svc === "sezon"){
+      work = P.sezon[s.r];
+      items.push({l: NAMES.sezon + ", R"+s.r, v: work});
+    } else {
+      var unit = P[s.svc][s.r];
+      work = unit * s.q;
+      items.push({l: NAMES[s.svc] + ", R"+s.r + (s.q>1 ? " × "+s.q : ""), v: work});
+    }
+
+    var night = 0;
+    if (s.night){ night = work * NIGHT; items.push({l:"Ночной выезд, +15%", v: night}); }
+
+    var base = work + night;
+
+    var vyezd = 0, free = false;
+    if (s.zone === "mkad"){
+      var km = Math.max(1, Math.min(120, s.km || 1));
+      vyezd = VYEZD + km * PER_KM;
+      items.push({l:"Выезд за МКАД: 2 500 ₽ + "+km+" км × 70 ₽", v: vyezd});
+    } else if (base >= FREE_FROM){
+      free = true;
+      items.push({l:"Выезд в пределах МКАД", v:0, free:true});
+    } else {
+      vyezd = VYEZD;
+      items.push({l:"Выезд в пределах МКАД", v: vyezd});
+    }
+
+    return {items: items, total: base + vyezd, free: free};
+  }
+
+  function render(){
+    var r = calc(state);
+    var box = $("lines");
+    box.textContent = "";
+    r.items.forEach(function(it){
+      var row = document.createElement("div");
+      row.className = "pl" + (it.free ? " free" : "");
+      var a = document.createElement("span"); a.textContent = it.l;
+      var b = document.createElement("span"); b.textContent = it.free ? "бесплатно" : money(it.v);
+      row.appendChild(a); row.appendChild(b); box.appendChild(row);
+    });
+    $("total").textContent = money(r.total);
+    var eta = ETA[state.zone] || 30;
+    if (state.night) eta += 10;
+    $("eta").textContent = "через " + eta + " минут";
+    $("qty-field").hidden = (state.svc === "sezon");
+    $("km-field").hidden = (state.zone !== "mkad");
+  }
+
+  function group(id, attr, key, cast){
+    var root = $(id);
+    if (!root) return;
+    root.addEventListener("click", function(e){
+      var b = e.target.closest("button[" + attr + "]");
+      if (!b) return;
+      Array.prototype.forEach.call(root.querySelectorAll("button[" + attr + "]"), function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      state[key] = cast(b.getAttribute(attr));
+      render();
+    });
+  }
+  group("svc","data-svc","svc",String);
+  group("rad","data-r","r",Number);
+  group("qty","data-q","q",Number);
+
+  $("zone").addEventListener("change", function(){ state.zone = this.value; render(); });
+  $("km").addEventListener("input", function(){ state.km = parseInt(this.value,10) || 1; render(); });
+  $("night").addEventListener("change", function(){ state.night = this.checked; render(); });
+
+  $("send").addEventListener("click", function(){
+    var nm = $("nm").value.trim(), ph = $("ph").value.trim(), addr = $("addr").value.trim();
+    var err = $("err");
+    if (!nm || !ph || !addr){
+      err.textContent = "Заполните имя, телефон и адрес — без них мастер не сможет выехать.";
+      err.hidden = false;
+      return;
+    }
+    err.hidden = true;
+
+    var r = calc(state);
+    var txt =
+      "НОВАЯ ЗАЯВКА\n" +
+      "Услуга: " + NAMES[state.svc] + "\n" +
+      "Колесо: R" + state.r + (state.svc === "sezon" ? " (комплект)" : " × " + state.q) + "\n" +
+      "Машина: " + ($("car").value.trim() || "не указана") + "\n" +
+      "Адрес: " + addr + "\n" +
+      "Район: " + $("zone").options[$("zone").selectedIndex].text + "\n" +
+      "Когда: " + $("whn").value + (state.night ? " (ночной выезд)" : "") + "\n" +
+      "Клиент: " + nm + ", " + ph + "\n" +
+      "Расчёт по прайсу: " + money(r.total);
+
+    var t = $("ticket");
+    t.textContent = "";
+    t.hidden = false;
+
+    var wrap = document.createElement("div");
+    wrap.className = "ticket";
+
+    var h = document.createElement("div");
+    h.className = "th";
+    h.textContent = "✓ Заявка собрана";
+    wrap.appendChild(h);
+
+    var hint1 = document.createElement("p");
+    hint1.className = "hint";
+    hint1.textContent = "В рабочей версии этот текст уходит мастеру в Telegram или MAX в момент нажатия кнопки. Здесь, в демо, он просто показан — чтобы было видно, что именно получает мастер.";
+    wrap.appendChild(hint1);
+
+    var pre = document.createElement("pre");
+    pre.textContent = txt;
+    wrap.appendChild(pre);
+
+    var cp = document.createElement("button");
+    cp.className = "btn ghost";
+    cp.type = "button";
+    cp.textContent = "Скопировать заявку";
+    cp.addEventListener("click", function(){
+      var done = document.createElement("span");
+      done.className = "copied";
+      function ok(){ done.textContent = "скопировано"; }
+      function no(){
+        done.textContent = "выделите текст заявки выше и скопируйте вручную";
+        try{
+          var sel = window.getSelection(), rg = document.createRange();
+          rg.selectNodeContents(pre); sel.removeAllRanges(); sel.addRange(rg);
+        }catch(e){}
+      }
+      try{
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(txt).then(ok, no);
+        } else { no(); }
+      }catch(e){ no(); }
+      if (!cp.nextSibling || cp.nextSibling.className !== "copied") cp.after(done);
+    });
+    wrap.appendChild(cp);
+
+    t.appendChild(wrap);
+    wrap.scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
