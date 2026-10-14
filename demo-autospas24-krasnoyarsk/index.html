@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Расчёт выездного шиномонтажа — АвтоСпас24 (Красноярск)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=PT+Sans:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: roadside instrument — hazard-yellow signal on asphalt, calculator up top, price read-out always visible, booking below. Phone-first. */
+:root{
+  --bg:#111315; --surface:#1a1d20; --surface-2:#23272b; --surface-3:#2e3338;
+  --ink:#f1f3f4; --ink-mid:#a7b0b7; --ink-dim:#79838b;
+  --line:#31373d;
+  --hazard:#ffd21f; --hazard-ink:#1a1500;
+  --ok:#5fc97f; --alert:#ff8a5c;
+  --font-display:'Oswald','PT Sans',system-ui,sans-serif;
+  --font-body:'PT Sans',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eceef0; --surface:#ffffff; --surface-2:#f2f4f6; --surface-3:#e2e6ea;
+    --ink:#14171a; --ink-mid:#4a545c; --ink-dim:#6d777f;
+    --line:#d3d9de;
+    --hazard:#8a6a00; --hazard-ink:#ffffff;
+    --ok:#1f7a3d; --alert:#b24a22;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#eceef0; --surface:#ffffff; --surface-2:#f2f4f6; --surface-3:#e2e6ea;
+  --ink:#14171a; --ink-mid:#4a545c; --ink-dim:#6d777f;
+  --line:#d3d9de;
+  --hazard:#8a6a00; --hazard-ink:#ffffff;
+  --ok:#1f7a3d; --alert:#b24a22;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:15px; line-height:1.55;
+  padding-inline:16px; padding-block:18px 48px;
+  display:flex; justify-content:center;
+}
+.app{width:100%; max-width:560px; display:flex; flex-direction:column; gap:16px}
+
+.demolabel{
+  display:flex; gap:10px; align-items:flex-start;
+  background:var(--surface-2); border:1px dashed var(--line); border-radius:10px;
+  padding:11px 13px; font-size:12.5px; color:var(--ink-mid); line-height:1.45;
+}
+.demolabel b{
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  background:var(--hazard); color:var(--hazard-ink); padding:3px 7px; border-radius:5px; flex:none; margin-top:1px;
+}
+
+header{display:flex; flex-direction:column; gap:7px; animation:rise .45s ease both}
+.strip{height:5px; border-radius:3px; background:repeating-linear-gradient(135deg,var(--hazard) 0 11px,transparent 11px 22px)}
+h1{
+  font-family:var(--font-display); font-weight:600; font-size:clamp(23px,6.2vw,32px);
+  line-height:1.12; margin:0; text-transform:uppercase; letter-spacing:.005em; text-wrap:balance;
+}
+.sub{color:var(--ink-mid); font-size:14.5px; margin:0}
+.sub b{color:var(--hazard)}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:17px; display:flex; flex-direction:column; gap:15px; animation:rise .5s ease both}
+.card.c2{animation-delay:.08s}
+.card.c3{animation-delay:.16s}
+.ctitle{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--ink-dim); margin:0; display:flex; gap:9px; align-items:center;
+}
+.ctitle i{font-family:var(--font-display); font-style:normal; font-size:11px; background:var(--surface-3); color:var(--ink-mid); border-radius:4px; padding:2px 6px; letter-spacing:0}
+
+.field{display:flex; flex-direction:column; gap:7px}
+label.fl{font-size:13px; color:var(--ink-mid); font-weight:700}
+.hintline{font-size:11.5px; color:var(--ink-dim); margin:0}
+
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{
+  font-family:var(--font-body); font-size:13.5px; padding:9px 13px; border-radius:9px; cursor:pointer;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.2;
+  transition:border-color .13s, background .13s;
+}
+.chip:hover{border-color:var(--ink-dim)}
+.chip[aria-pressed="true"]{background:var(--hazard); border-color:var(--hazard); color:var(--hazard-ink); font-weight:700}
+.chip:focus-visible{outline:2px solid var(--hazard); outline-offset:2px}
+
+select,input[type="text"],input[type="tel"],input[type="number"]{
+  font-family:var(--font-body); font-size:15px; padding:11px 12px; border-radius:9px;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
+}
+select:focus,input:focus{outline:2px solid var(--hazard); outline-offset:1px; border-color:var(--hazard)}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:11px}
+
+.readout{
+  background:var(--surface-2); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:11px;
+  border-left:4px solid var(--hazard);
+}
+.lines{display:flex; flex-direction:column; gap:6px}
+.pl{display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:var(--ink-mid)}
+.pl span:last-child{font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--ink); white-space:nowrap}
+.total{display:flex; justify-content:space-between; align-items:baseline; gap:12px; border-top:1px solid var(--line); padding-top:11px}
+.total .tl{font-family:var(--font-display); font-size:14px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-mid)}
+.total .tv{font-family:var(--font-display); font-weight:600; font-size:31px; color:var(--hazard); font-variant-numeric:tabular-nums; line-height:1}
+.badge{display:flex; gap:8px; align-items:center; font-family:var(--font-mono); font-size:12px; color:var(--ink-mid)}
+.badge b{color:var(--ok); font-weight:500}
+
+.btn{
+  font-family:var(--font-display); font-weight:600; font-size:16px; text-transform:uppercase; letter-spacing:.04em;
+  background:var(--hazard); color:var(--hazard-ink); border:none; border-radius:10px; padding:14px 18px;
+  cursor:pointer; width:100%; transition:filter .13s;
+  display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+.btn.ghost{background:transparent; color:var(--ink-mid); border:1.5px solid var(--line); font-size:13px}
+
+.ticket{background:var(--surface-2); border-radius:11px; padding:15px; display:flex; flex-direction:column; gap:10px; border:1px solid var(--ok)}
+.ticket .th{display:flex; gap:9px; align-items:center; font-family:var(--font-display); font-size:15px; text-transform:uppercase; letter-spacing:.03em; color:var(--ok)}
+.ticket pre{
+  font-family:var(--font-mono); font-size:12px; line-height:1.65; margin:0; white-space:pre-wrap; word-break:break-word;
+  color:var(--ink); background:var(--surface); border-radius:8px; padding:12px; border:1px solid var(--line);
+}
+.ticket .hint{font-size:12.5px; color:var(--ink-mid); margin:0}
+.copied{font-family:var(--font-mono); font-size:11.5px; color:var(--ok)}
+
+.err{font-size:13px; color:var(--alert); margin:0}
+
+footer{display:flex; flex-direction:column; gap:7px; font-size:12px; color:var(--ink-dim); line-height:1.6; border-top:1px solid var(--line); padding-top:15px}
+footer b{color:var(--ink-mid)}
+
+@keyframes rise{from{opacity:0; transform:translateY(9px)} to{opacity:1; transform:translateY(0)}}
+@media (prefers-reduced-motion: reduce){header,.card{animation:none; opacity:1}}
+@media (max-width:420px){.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="demolabel">
+    <b>демо</b>
+    <span>Это прототип, собранный Ярославом Хоружим как предложение для компании «АвтоСпас24» (Красноярск). Не официальная страница компании. Цены — реальный прайс с вашего сайта на 14 октября 2026 (колёса диаметром R16, самый частый случай). В рабочей версии диаметр выбирается, а любая цифра меняется в одном месте.</span>
+  </div>
+
+  <header>
+    <div class="strip"></div>
+    <h1>Мобильный шиномонтаж<br>в Красноярске — расчёт за 10 секунд</h1>
+    <p class="sub">Клиент узнаёт цену <b>сам, без звонка диспетчеру</b>, и сразу оставляет заявку мастеру.</p>
+  </header>
+
+  <!-- 1. РАСЧЁТ -->
+  <div class="card">
+    <p class="ctitle"><i>шаг 1</i> что случилось</p>
+
+    <div class="field">
+      <label class="fl" for="svc-snyatie">Нужна услуга (колёса R16)</label>
+      <div class="chips" id="svc" role="group" aria-label="Услуга">
+        <button type="button" class="chip" id="svc-snyatie" data-svc="snyatie" aria-pressed="true">Снятие/установка колеса</button>
+        <button type="button" class="chip" data-svc="montazh" aria-pressed="false">Демонтаж/монтаж шины</button>
+        <button type="button" class="chip" data-svc="balans" aria-pressed="false">Балансировка колеса</button>
+        <button type="button" class="chip" data-svc="sezon" aria-pressed="false">Комплекс 4 колеса — сезонная смена</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="fl" for="dist">Расстояние от центра города, км</label>
+      <input type="number" id="dist" min="0" max="300" value="0" inputmode="numeric">
+      <p class="hintline">Нужно мастеру для маршрута. Среднее время прибытия — от 30 минут. На цену ниже не влияет.</p>
+    </div>
+  </div>
+
+  <!-- 2. ЦЕНА -->
+  <div class="card c2">
+    <p class="ctitle"><i>шаг 2</i> стоимость</p>
+    <div class="readout">
+      <div class="lines" id="lines"></div>
+      <div class="total"><span class="tl">Итого</span><span class="tv" id="total">—</span></div>
+      <div class="badge">🕐 <b>работаем круглосуточно</b> — по Красноярску и краю</div>
+    </div>
+    <p class="hint" style="font-size:12.5px;color:var(--ink-dim);margin:0">Цены — для колёс диаметром R16, как указаны на сайте АвтоСпас24. Для другого диаметра стоимость отличается, мастер уточнит на месте.</p>
+  </div>
+
+  <!-- 3. ЗАПИСЬ -->
+  <div class="card c3">
+    <p class="ctitle"><i>шаг 3</i> вызвать мастера</p>
+    <div class="row2">
+      <div class="field"><label class="fl" for="nm">Имя</label><input type="text" id="nm" placeholder="Как к вам обращаться" autocomplete="name"></div>
+      <div class="field"><label class="fl" for="ph">Телефон</label><input type="tel" id="ph" placeholder="+7 ___ ___-__-__" autocomplete="tel"></div>
+    </div>
+    <div class="field"><label class="fl" for="addr">Адрес или ориентир</label><input type="text" id="addr" placeholder="Улица, дом — или ориентир"></div>
+    <div class="row2">
+      <div class="field"><label class="fl" for="car">Машина</label><input type="text" id="car" placeholder="Напр. Kia Rio"></div>
+      <div class="field"><label class="fl" for="whn">Когда</label>
+        <select id="whn">
+          <option value="Сейчас, срочно" selected>Сейчас, срочно</option>
+          <option value="В течение часа">В течение часа</option>
+          <option value="Сегодня вечером">Сегодня вечером</option>
+          <option value="Завтра утром">Завтра утром</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="send" type="button">Собрать заявку</button>
+    <p class="err" id="err" hidden></p>
+    <div id="ticket" hidden></div>
+    <a class="btn ghost" id="wa" href="https://wa.me/79135397557" target="_blank" rel="noopener">Или написать в WhatsApp мастеру напрямую</a>
+  </div>
+
+  <footer>
+    <span><b>Что это даёт компании.</b> Клиент считает цену сам и не уходит звонить конкурентам, пока ждёт ответа. Заявка приходит мастеру готовой: услуга, адрес, машина, время — без лишних звонков.</span>
+    <span>Прототип. Собрал Ярослав Хоружий по открытым данным с сайта АвтоСпас24. Контакты и прайс в рабочей версии — ваши и обновляются вами.</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // Реальный прайс с сайта autospas24.ru, Красноярск (колонка R16, проверено 14 октября 2026).
+  var FLAT = {
+    snyatie: {label:"Снятие/установка колеса (R16)",      v:100},
+    montazh: {label:"Демонтаж/монтаж шины (R16)",         v:200},
+    balans:  {label:"Балансировка колеса (R16)",          v:150},
+    sezon:   {label:"Комплекс 4 колеса — сезонная смена (R16)", v:2000}
+  };
+
+  var state = {svc:"snyatie", dist:0};
+
+  function $(id){ return document.getElementById(id); }
+  function money(n){ return new Intl.NumberFormat("ru-RU").format(Math.round(n)) + " ₽"; }
+
+  function calc(s){
+    var f = FLAT[s.svc];
+    return {items:[{l:f.label, v:f.v}], total:f.v};
+  }
+
+  function render(){
+    var r = calc(state);
+    var box = $("lines");
+    box.textContent = "";
+    r.items.forEach(function(it){
+      var row = document.createElement("div");
+      row.className = "pl";
+      var a = document.createElement("span"); a.textContent = it.l;
+      var b = document.createElement("span"); b.textContent = money(it.v);
+      row.appendChild(a); row.appendChild(b); box.appendChild(row);
+    });
+    $("total").textContent = money(r.total);
+  }
+
+  function group(id, attr, key, cast){
+    var root = $(id);
+    if (!root) return;
+    root.addEventListener("click", function(e){
+      var b = e.target.closest("button[" + attr + "]");
+      if (!b || b.disabled) return;
+      Array.prototype.forEach.call(root.querySelectorAll("button[" + attr + "]"), function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      state[key] = cast(b.getAttribute(attr));
+      render();
+    });
+  }
+  group("svc","data-svc","svc",String);
+
+  $("dist").addEventListener("input", function(){ state.dist = parseInt(this.value,10) || 0; });
+
+  $("send").addEventListener("click", function(){
+    var nm = $("nm").value.trim(), ph = $("ph").value.trim(), addr = $("addr").value.trim();
+    var err = $("err");
+    if (!nm || !ph || !addr){
+      err.textContent = "Заполните имя, телефон и адрес — без них мастер не сможет выехать.";
+      err.hidden = false;
+      return;
+    }
+    err.hidden = true;
+
+    var r = calc(state);
+    var txt =
+      "НОВАЯ ЗАЯВКА — АвтоСпас24 (Красноярск)\n" +
+      "Услуга: " + r.items.map(function(it){return it.l;}).join("; ") + "\n" +
+      "Машина: " + ($("car").value.trim() || "не указана") + "\n" +
+      "Адрес: " + addr + " (расстояние от центра: " + (state.dist || 0) + " км)\n" +
+      "Когда: " + $("whn").value + "\n" +
+      "Клиент: " + nm + ", " + ph + "\n" +
+      "Расчёт по прайсу с сайта: " + money(r.total);
+
+    var waUrl = "https://wa.me/79135397557?text=" + encodeURIComponent(txt);
+    $("wa").href = waUrl;
+
+    var t = $("ticket");
+    t.textContent = "";
+    t.hidden = false;
+
+    var wrap = document.createElement("div");
+    wrap.className = "ticket";
+    var h = document.createElement("div"); h.className = "th"; h.textContent = "✓ Заявка собрана"; wrap.appendChild(h);
+    var hint1 = document.createElement("p"); hint1.className = "hint";
+    hint1.textContent = "В рабочей версии этот текст уходит мастеру в WhatsApp сразу по нажатию кнопки. Здесь, в демо, он просто показан.";
+    wrap.appendChild(hint1);
+    var pre = document.createElement("pre"); pre.textContent = txt; wrap.appendChild(pre);
+    var cp = document.createElement("button"); cp.className = "btn ghost"; cp.type = "button"; cp.textContent = "Скопировать заявку";
+    cp.addEventListener("click", function(){
+      var done = document.createElement("span"); done.className = "copied";
+      function ok(){ done.textContent = "скопировано"; }
+      function no(){
+        done.textContent = "выделите текст заявки выше и скопируйте вручную";
+        try{ var sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents(pre); sel.removeAllRanges(); sel.addRange(rg); }catch(e){}
+      }
+      try{ if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok, no); } else { no(); } }catch(e){ no(); }
+      if (!cp.nextSibling || cp.nextSibling.className !== "copied") cp.after(done);
+    });
+    wrap.appendChild(cp);
+    t.appendChild(wrap);
+    wrap.scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
