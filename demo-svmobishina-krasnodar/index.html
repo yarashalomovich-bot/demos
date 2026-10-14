@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Расчёт выездного шиномонтажа — СВ МобиШина</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=PT+Sans:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: roadside instrument — hazard-yellow signal on asphalt, calculator up top, price read-out always visible, booking below. Phone-first: this is used standing next to a flat tyre. */
+:root{
+  --bg:#111315; --surface:#1a1d20; --surface-2:#23272b; --surface-3:#2e3338;
+  --ink:#f1f3f4; --ink-mid:#a7b0b7; --ink-dim:#79838b;
+  --line:#31373d;
+  --hazard:#ffd21f; --hazard-ink:#1a1500;
+  --ok:#5fc97f; --alert:#ff8a5c;
+  --font-display:'Oswald','PT Sans',system-ui,sans-serif;
+  --font-body:'PT Sans',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eceef0; --surface:#ffffff; --surface-2:#f2f4f6; --surface-3:#e2e6ea;
+    --ink:#14171a; --ink-mid:#4a545c; --ink-dim:#6d777f;
+    --line:#d3d9de;
+    --hazard:#8a6a00; --hazard-ink:#ffffff;
+    --ok:#1f7a3d; --alert:#b24a22;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#eceef0; --surface:#ffffff; --surface-2:#f2f4f6; --surface-3:#e2e6ea;
+  --ink:#14171a; --ink-mid:#4a545c; --ink-dim:#6d777f;
+  --line:#d3d9de;
+  --hazard:#8a6a00; --hazard-ink:#ffffff;
+  --ok:#1f7a3d; --alert:#b24a22;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:15px; line-height:1.55;
+  padding-inline:16px; padding-block:18px 48px;
+  display:flex; justify-content:center;
+}
+.app{width:100%; max-width:560px; display:flex; flex-direction:column; gap:16px}
+
+.demolabel{
+  display:flex; gap:10px; align-items:flex-start;
+  background:var(--surface-2); border:1px dashed var(--line); border-radius:10px;
+  padding:11px 13px; font-size:12.5px; color:var(--ink-mid); line-height:1.45;
+}
+.demolabel b{
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  background:var(--hazard); color:var(--hazard-ink); padding:3px 7px; border-radius:5px; flex:none; margin-top:1px;
+}
+
+header{display:flex; flex-direction:column; gap:7px; animation:rise .45s ease both}
+.strip{height:5px; border-radius:3px; background:repeating-linear-gradient(135deg,var(--hazard) 0 11px,transparent 11px 22px)}
+h1{
+  font-family:var(--font-display); font-weight:600; font-size:clamp(25px,6.6vw,34px);
+  line-height:1.1; margin:0; text-transform:uppercase; letter-spacing:.005em; text-wrap:balance;
+}
+.sub{color:var(--ink-mid); font-size:14.5px; margin:0}
+.sub b{color:var(--hazard)}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:17px; display:flex; flex-direction:column; gap:15px; animation:rise .5s ease both}
+.card.c2{animation-delay:.08s}
+.card.c3{animation-delay:.16s}
+.ctitle{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--ink-dim); margin:0; display:flex; gap:9px; align-items:center;
+}
+.ctitle i{font-family:var(--font-display); font-style:normal; font-size:11px; background:var(--surface-3); color:var(--ink-mid); border-radius:4px; padding:2px 6px; letter-spacing:0}
+
+.field{display:flex; flex-direction:column; gap:7px}
+label.fl{font-size:13px; color:var(--ink-mid); font-weight:700}
+
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{
+  font-family:var(--font-body); font-size:13.5px; padding:9px 13px; border-radius:9px; cursor:pointer;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.2;
+  transition:border-color .13s, background .13s;
+}
+.chip:hover{border-color:var(--ink-dim)}
+.chip[aria-pressed="true"]{background:var(--hazard); border-color:var(--hazard); color:var(--hazard-ink); font-weight:700}
+.chip:focus-visible{outline:2px solid var(--hazard); outline-offset:2px}
+.chip.sm{font-family:var(--font-mono); font-size:12.5px; padding:8px 10px; min-width:46px; text-align:center}
+
+select,input[type="text"],input[type="tel"],input[type="number"]{
+  font-family:var(--font-body); font-size:15px; padding:11px 12px; border-radius:9px;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
+}
+select:focus,input:focus{outline:2px solid var(--hazard); outline-offset:1px; border-color:var(--hazard)}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:11px}
+
+.toggle{display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13.5px; color:var(--ink-mid); user-select:none}
+.toggle input{width:18px; height:18px; accent-color:var(--hazard); flex:none; margin:0}
+
+.hintline{font-size:12px; color:var(--ink-dim); margin:0; line-height:1.5}
+
+.readout{
+  background:var(--surface-2); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:11px;
+  border-left:4px solid var(--hazard);
+}
+.lines{display:flex; flex-direction:column; gap:6px}
+.pl{display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:var(--ink-mid)}
+.pl span:last-child{font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--ink); white-space:nowrap}
+.total{display:flex; justify-content:space-between; align-items:baseline; gap:12px; border-top:1px solid var(--line); padding-top:11px}
+.total .tl{font-family:var(--font-display); font-size:14px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-mid)}
+.total .tv{font-family:var(--font-display); font-weight:600; font-size:31px; color:var(--hazard); font-variant-numeric:tabular-nums; line-height:1}
+.badge{display:flex; gap:8px; align-items:center; font-family:var(--font-mono); font-size:12px; color:var(--ink-mid)}
+.badge b{color:var(--ok); font-weight:500}
+
+.btn{
+  font-family:var(--font-display); font-weight:600; font-size:16px; text-transform:uppercase; letter-spacing:.04em;
+  background:var(--hazard); color:var(--hazard-ink); border:none; border-radius:10px; padding:14px 18px;
+  cursor:pointer; width:100%; transition:filter .13s; text-align:center; text-decoration:none; display:block;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+.btn.ghost{background:transparent; color:var(--ink-mid); border:1.5px solid var(--line); font-size:13px; margin-top:4px}
+
+.ticket{background:var(--surface-2); border-radius:11px; padding:15px; display:flex; flex-direction:column; gap:10px; border:1px solid var(--ok)}
+.ticket .th{display:flex; gap:9px; align-items:center; font-family:var(--font-display); font-size:15px; text-transform:uppercase; letter-spacing:.03em; color:var(--ok)}
+.ticket pre{
+  font-family:var(--font-mono); font-size:12px; line-height:1.65; margin:0; white-space:pre-wrap; word-break:break-word;
+  color:var(--ink); background:var(--surface); border-radius:8px; padding:12px; border:1px solid var(--line);
+}
+.ticket .hint{font-size:12.5px; color:var(--ink-mid); margin:0}
+.copied{font-family:var(--font-mono); font-size:11.5px; color:var(--ok)}
+
+.err{font-size:13px; color:var(--alert); margin:0}
+
+footer{display:flex; flex-direction:column; gap:7px; font-size:12px; color:var(--ink-dim); line-height:1.6; border-top:1px solid var(--line); padding-top:15px}
+footer b{color:var(--ink-mid)}
+
+@keyframes rise{from{opacity:0; transform:translateY(9px)} to{opacity:1; transform:translateY(0)}}
+@media (prefers-reduced-motion: reduce){header,.card{animation:none; opacity:1}}
+@media (max-width:420px){.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+
+  <div class="demolabel">
+    <b>демо</b>
+    <span>Это прототип, собранный Ярославом Хоружим как предложение для «СВ МобиШина» (Краснодар). Не официальная страница компании. Цены и районы выезда — реальные, с вашего сайта svmobishina.ru, на 14 октября 2026. В рабочей версии любая цифра меняется в одном месте.</span>
+  </div>
+
+  <header>
+    <div class="strip"></div>
+    <h1>Выездной шиномонтаж<br>в Краснодаре — расчёт за 15 секунд</h1>
+    <p class="sub">Клиент считает цену <b>сам, по вашему прайсу</b>, и сразу отправляет заявку.</p>
+  </header>
+
+  <!-- 1. РАСЧЁТ -->
+  <div class="card">
+    <p class="ctitle"><i>шаг 1</i> что случилось</p>
+
+    <div class="field">
+      <label class="fl" for="svc-mount">Услуга</label>
+      <div class="chips" id="svc" role="group" aria-label="Услуга">
+        <button type="button" class="chip" id="svc-mount" data-svc="mount" aria-pressed="true">Шиномонтаж (снятие + демонтаж-монтаж + балансировка)</button>
+        <button type="button" class="chip" data-svc="cold" aria-pressed="false">Холодный ремонт прокола</button>
+      </div>
+    </div>
+
+    <!-- шиномонтаж -->
+    <div id="mount-fields">
+      <div class="field">
+        <label class="fl" for="rad-16">Радиус колеса</label>
+        <div class="chips" id="rad" role="group" aria-label="Радиус колеса">
+          <button type="button" class="chip sm" data-r="13" aria-pressed="false">R13</button>
+          <button type="button" class="chip sm" data-r="14" aria-pressed="false">R14</button>
+          <button type="button" class="chip sm" id="rad-16" data-r="16" aria-pressed="true">R15–16</button>
+          <button type="button" class="chip sm" data-r="17" aria-pressed="false">R17</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="fl" for="prof-op">Профиль шины</label>
+        <div class="chips" id="prof" role="group" aria-label="Профиль шины">
+          <button type="button" class="chip" id="prof-op" data-pr="op" aria-pressed="true">Обычный</button>
+          <button type="button" class="chip" data-pr="np" aria-pressed="false">Низкий (55% и ниже)</button>
+        </div>
+        <p class="hintline" id="prof-hint"></p>
+      </div>
+
+      <div class="field">
+        <label class="fl" for="qty">Сколько колёс</label>
+        <div class="chips" id="qty" role="group" aria-label="Количество колёс">
+          <button type="button" class="chip sm" data-q="1" aria-pressed="false">1</button>
+          <button type="button" class="chip sm" data-q="2" aria-pressed="false">2</button>
+          <button type="button" class="chip sm" data-q="3" aria-pressed="false">3</button>
+          <button type="button" class="chip sm" data-q="4" aria-pressed="true">4</button>
+        </div>
+      </div>
+
+      <label class="toggle" for="runflat">
+        <input type="checkbox" id="runflat">
+        <span>Шина Run Flat / раллийная (демонтаж-монтаж +70%)</span>
+      </label>
+      <label class="toggle" for="lowprof40">
+        <input type="checkbox" id="lowprof40">
+        <span>Профиль шины 40 и ниже (+20%)</span>
+      </label>
+      <label class="toggle" for="tpms">
+        <input type="checkbox" id="tpms">
+        <span>Есть датчик давления в шине (+10%)</span>
+      </label>
+    </div>
+
+    <!-- холодный ремонт -->
+    <div class="field" id="cold-field" hidden>
+      <label class="fl" for="cold-up3">Вид повреждения</label>
+      <div class="chips" id="cold-type" role="group" aria-label="Вид холодного ремонта">
+        <button type="button" class="chip" data-ct="puncture300" aria-pressed="false">Прокол камеры (латка 500-й серии)</button>
+        <button type="button" class="chip" id="cold-up3" data-ct="up3" aria-pressed="true">Универсальная латка УП3 (до 3 мм)</button>
+        <button type="button" class="chip" data-ct="up45" aria-pressed="false">Универсальная латка УП4.5 (до 4,5 мм)</button>
+        <button type="button" class="chip" data-ct="grib45" aria-pressed="false">Грибок 4,5 мм</button>
+        <button type="button" class="chip" data-ct="grib6" aria-pressed="false">Грибок 6 мм</button>
+        <button type="button" class="chip" data-ct="grib8" aria-pressed="false">Грибок 8 мм</button>
+        <button type="button" class="chip" data-ct="stem6" aria-pressed="false">Ножка с латкой 6 мм</button>
+        <button type="button" class="chip" data-ct="stem8" aria-pressed="false">Ножка с латкой 8 мм</button>
+      </div>
+      <p class="hintline">Материалы REMA TIP TOP. Цена — за сам ремонт, без снятия/установки колеса.</p>
+    </div>
+
+    <div class="field">
+      <label class="fl" for="zone">Район Краснодара</label>
+      <select id="zone">
+        <option value="central" selected>ЦМР, СМР, ФМР, ЮМР, Энка</option>
+        <option value="pmr">ПМР, ГМР, Аэропорт</option>
+        <option value="ozmall">OZ Молл, Знаменский</option>
+        <option value="outside">За пределами города</option>
+      </select>
+      <div class="field" id="km-field" hidden>
+        <label class="fl" for="km">Км от города</label>
+        <input type="number" id="km" min="1" max="150" value="10" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ЦЕНА -->
+  <div class="card c2">
+    <p class="ctitle"><i>шаг 2</i> стоимость</p>
+    <div class="readout">
+      <div class="lines" id="lines"></div>
+      <div class="total"><span class="tl">Итого</span><span class="tv" id="total">—</span></div>
+      <div class="badge">🚐 <b>работаем круглосуточно</b> — Краснодар и край</div>
+    </div>
+    <p class="hint" style="font-size:12.5px;color:var(--ink-dim);margin:0">Минимальная стоимость работ на выезде — 500 ₽ (условие сайта). Точную стоимость подтверждает мастер на месте после осмотра.</p>
+  </div>
+
+  <!-- 3. ЗАПИСЬ -->
+  <div class="card c3">
+    <p class="ctitle"><i>шаг 3</i> вызвать мастера</p>
+    <div class="row2">
+      <div class="field"><label class="fl" for="nm">Имя</label><input type="text" id="nm" placeholder="Как к вам обращаться" autocomplete="name"></div>
+      <div class="field"><label class="fl" for="ph">Телефон</label><input type="tel" id="ph" placeholder="+7 ___ ___-__-__" autocomplete="tel"></div>
+    </div>
+    <div class="field"><label class="fl" for="addr">Адрес или ориентир в Краснодаре</label><input type="text" id="addr" placeholder="Улица, дом — или ориентир"></div>
+    <div class="row2">
+      <div class="field"><label class="fl" for="car">Машина</label><input type="text" id="car" placeholder="Напр. Kia Rio"></div>
+      <div class="field"><label class="fl" for="whn">Когда</label>
+        <select id="whn">
+          <option value="Сейчас, срочно" selected>Сейчас, срочно</option>
+          <option value="В течение часа">В течение часа</option>
+          <option value="Сегодня вечером">Сегодня вечером</option>
+          <option value="Завтра утром">Завтра утром</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="send" type="button">Собрать заявку</button>
+    <p class="err" id="err" hidden></p>
+    <div id="ticket" hidden></div>
+    <a class="btn ghost" id="wa" href="https://wa.me/79882442211" target="_blank" rel="noopener">Или написать в WhatsApp напрямую</a>
+  </div>
+
+  <footer>
+    <span><b>Что это даёт компании.</b> Клиент считает стоимость сам по вашему прайсу и не уходит звонить конкурентам, пока ждёт ответа. Заявка приходит мастеру готовой: услуга, радиус, район, адрес, время — без уточняющих звонков.</span>
+    <span>Прототип. Собрал Ярослав Хоружий по открытым данным с сайта svmobishina.ru. Контакты и прайс в рабочей версии — ваши и обновляются вами.</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // Реальный прайс с сайта svmobishina.ru (страница «Легковые автомобили» + «Холодный ремонт»), проверено 14 октября 2026.
+  // Работы на 1 колесо, руб: снятие/установка + демонтаж-монтаж + балансировка = итого.
+  var MOUNT_OP = { // обычный профиль
+    13:500, 14:550, 15:600, 16:600, 17:700
+  };
+  var MOUNT_NP = { // низкий профиль (55% и ниже)
+    15:700, 16:700, 17:750
+  };
+  var COLD = {
+    puncture300: {label:"Прокол камеры, латка 500-й серии", v:300},
+    up3:   {label:"Универсальная латка УП3 (до 3 мм)", v:500},
+    up45:  {label:"Универсальная латка УП4.5 (до 4,5 мм)", v:550},
+    grib45:{label:"Грибок 4,5 мм", v:500},
+    grib6: {label:"Грибок 6 мм", v:650},
+    grib8: {label:"Грибок 8 мм", v:750},
+    stem6: {label:"Ножка с латкой 6 мм", v:900},
+    stem8: {label:"Ножка с латкой 8 мм", v:1000}
+  };
+  var ZONES = {
+    central: {label:"ЦМР, СМР, ФМР, ЮМР, Энка", v:1500},
+    pmr:     {label:"ПМР, ГМР, Аэропорт", v:1500},
+    ozmall:  {label:"OZ Молл, Знаменский", v:1800},
+    outside: {label:"За пределами города", v:0}
+  };
+  var PER_KM = 100;
+  var MIN_WORK = 500;
+
+  var state = {svc:"mount", rad:16, prof:"op", qty:4, runflat:false, lowprof40:false, tpms:false, ct:"up3", zone:"central", km:10};
+
+  function $(id){ return document.getElementById(id); }
+  function money(n){ return new Intl.NumberFormat("ru-RU").format(Math.round(n)) + " ₽"; }
+
+  function mountUnit(s){
+    return (s.prof === "np") ? (MOUNT_NP[s.rad] || MOUNT_NP[16]) : (MOUNT_OP[s.rad] || MOUNT_OP[16]);
+  }
+
+  // Чистая функция расчёта
+  function calc(s){
+    var items = [], work = 0;
+
+    if (s.svc === "mount"){
+      var unit = mountUnit(s);
+      var mult = 1;
+      var extras = [];
+      if (s.runflat){ mult += 0.70; extras.push("Run Flat/раллийная +70%"); }
+      if (s.lowprof40){ mult += 0.20; extras.push("профиль ≤40 +20%"); }
+      if (s.tpms){ mult += 0.10; extras.push("датчик давления +10%"); }
+      var perWheel = unit * mult;
+      var sum = perWheel * s.qty;
+      work += sum;
+      var profLabel = (s.prof === "np") ? "низкий профиль" : "обычный профиль";
+      items.push({l: "Шиномонтаж R" + (s.rad===16?"15–16":s.rad) + ", " + profLabel + " × " + s.qty + (extras.length ? " (" + extras.join(", ") + ")" : ""), v: sum});
+    } else {
+      var c = COLD[s.ct];
+      work += c.v;
+      items.push({l: c.label, v: c.v});
+    }
+
+    // минимальная стоимость работ на выезде
+    if (work < MIN_WORK){
+      items.push({l:"Доплата до минимума работ (500 ₽)", v: MIN_WORK - work});
+      work = MIN_WORK;
+    }
+
+    var zone = ZONES[s.zone];
+    var callout = 0;
+    if (s.zone === "outside"){
+      var km = Math.max(1, Math.min(150, s.km || 1));
+      callout = km * PER_KM;
+      items.push({l:"Выезд за город: " + km + " км × 100 ₽", v: callout});
+    } else {
+      callout = zone.v;
+      items.push({l:"Выезд, район: " + zone.label, v: callout});
+    }
+
+    return {items: items, total: work + callout};
+  }
+
+  function render(){
+    var isMount = (state.svc === "mount");
+    $("mount-fields").hidden = !isMount;
+    $("cold-field").hidden = isMount;
+    $("km-field").hidden = (state.zone !== "outside");
+
+    var npAvailable = (state.rad >= 15);
+    if (!npAvailable && state.prof === "np"){ state.prof = "op"; }
+    $("prof-hint").textContent = npAvailable
+      ? "Для R15–16 и R17 на сайте указаны отдельные цены для низкого профиля."
+      : "Для R13–14 на сайте цена указана только для обычного профиля.";
+
+    var r = calc(state);
+    var box = $("lines");
+    box.textContent = "";
+    r.items.forEach(function(it){
+      var row = document.createElement("div");
+      row.className = "pl";
+      var a = document.createElement("span"); a.textContent = it.l;
+      var b = document.createElement("span"); b.textContent = money(it.v);
+      row.appendChild(a); row.appendChild(b); box.appendChild(row);
+    });
+    $("total").textContent = money(r.total);
+  }
+
+  function group(id, attr, key, cast){
+    var root = $(id);
+    if (!root) return;
+    root.addEventListener("click", function(e){
+      var b = e.target.closest("button[" + attr + "]");
+      if (!b) return;
+      Array.prototype.forEach.call(root.querySelectorAll("button[" + attr + "]"), function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      state[key] = cast(b.getAttribute(attr));
+      render();
+    });
+  }
+  group("svc","data-svc","svc",String);
+  group("rad","data-r","rad",Number);
+  group("prof","data-pr","prof",String);
+  group("qty","data-q","qty",Number);
+  group("cold-type","data-ct","ct",String);
+
+  $("zone").addEventListener("change", function(){ state.zone = this.value; render(); });
+  $("km").addEventListener("input", function(){ state.km = parseInt(this.value,10) || 1; render(); });
+  $("runflat").addEventListener("change", function(){ state.runflat = this.checked; render(); });
+  $("lowprof40").addEventListener("change", function(){ state.lowprof40 = this.checked; render(); });
+  $("tpms").addEventListener("change", function(){ state.tpms = this.checked; render(); });
+
+  $("send").addEventListener("click", function(){
+    var nm = $("nm").value.trim(), ph = $("ph").value.trim(), addr = $("addr").value.trim();
+    var err = $("err");
+    if (!nm || !ph || !addr){
+      err.textContent = "Заполните имя, телефон и адрес — без них мастер не сможет выехать.";
+      err.hidden = false;
+      return;
+    }
+    err.hidden = true;
+
+    var r = calc(state);
+    var svcName = (state.svc === "mount")
+      ? ("Шиномонтаж R" + (state.rad===16?"15–16":state.rad) + " × " + state.qty)
+      : COLD[state.ct].label;
+    var zoneTxt = (state.zone === "outside") ? ("за городом, " + state.km + " км") : ZONES[state.zone].label;
+    var txt =
+      "НОВАЯ ЗАЯВКА — СВ МобиШина\n" +
+      "Услуга: " + svcName + "\n" +
+      "Машина: " + ($("car").value.trim() || "не указана") + "\n" +
+      "Адрес: " + addr + ", Краснодар (" + zoneTxt + ")\n" +
+      "Когда: " + $("whn").value + "\n" +
+      "Клиент: " + nm + ", " + ph + "\n" +
+      "Расчёт по прайсу: " + money(r.total);
+
+    var t = $("ticket");
+    t.textContent = "";
+    t.hidden = false;
+
+    var wrap = document.createElement("div");
+    wrap.className = "ticket";
+
+    var h = document.createElement("div");
+    h.className = "th";
+    h.textContent = "✓ Заявка собрана";
+    wrap.appendChild(h);
+
+    var hint1 = document.createElement("p");
+    hint1.className = "hint";
+    hint1.textContent = "В рабочей версии этот текст уходит мастеру в WhatsApp в момент нажатия кнопки. Здесь, в демо, он просто показан — чтобы было видно, что именно получает мастер.";
+    wrap.appendChild(hint1);
+
+    var pre = document.createElement("pre");
+    pre.textContent = txt;
+    wrap.appendChild(pre);
+
+    var cp = document.createElement("button");
+    cp.className = "btn ghost";
+    cp.type = "button";
+    cp.textContent = "Скопировать заявку";
+    cp.addEventListener("click", function(){
+      var done = document.createElement("span");
+      done.className = "copied";
+      function ok(){ done.textContent = "скопировано"; }
+      function no(){
+        done.textContent = "выделите текст заявки выше и скопируйте вручную";
+        try{
+          var sel = window.getSelection(), rg = document.createRange();
+          rg.selectNodeContents(pre); sel.removeAllRanges(); sel.addRange(rg);
+        }catch(e){}
+      }
+      try{
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(txt).then(ok, no);
+        } else { no(); }
+      }catch(e){ no(); }
+      if (!cp.nextSibling || cp.nextSibling.className !== "copied") cp.after(done);
+    });
+    wrap.appendChild(cp);
+
+    t.appendChild(wrap);
+    wrap.scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>

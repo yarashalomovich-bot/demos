@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Расчёт выездного шиномонтажа — МОЯ ШИНКА</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=PT+Sans:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: roadside instrument — hazard-yellow signal on asphalt, calculator up top, price read-out always visible, booking below. Phone-first: this is used standing next to a flat tyre. */
+:root{
+  --bg:#111315; --surface:#1a1d20; --surface-2:#23272b; --surface-3:#2e3338;
+  --ink:#f1f3f4; --ink-mid:#a7b0b7; --ink-dim:#79838b;
+  --line:#31373d;
+  --hazard:#ffd21f; --hazard-ink:#1a1500;
+  --ok:#5fc97f; --alert:#ff8a5c;
+  --font-display:'Oswald','PT Sans',system-ui,sans-serif;
+  --font-body:'PT Sans',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eceef0; --surface:#ffffff; --surface-2:#f2f4f6; --surface-3:#e2e6ea;
+    --ink:#14171a; --ink-mid:#4a545c; --ink-dim:#6d777f;
+    --line:#d3d9de;
+    --hazard:#8a6a00; --hazard-ink:#ffffff;
+    --ok:#1f7a3d; --alert:#b24a22;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#eceef0; --surface:#ffffff; --surface-2:#f2f4f6; --surface-3:#e2e6ea;
+  --ink:#14171a; --ink-mid:#4a545c; --ink-dim:#6d777f;
+  --line:#d3d9de;
+  --hazard:#8a6a00; --hazard-ink:#ffffff;
+  --ok:#1f7a3d; --alert:#b24a22;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:15px; line-height:1.55;
+  padding-inline:16px; padding-block:18px 48px;
+  display:flex; justify-content:center;
+}
+.app{width:100%; max-width:560px; display:flex; flex-direction:column; gap:16px}
+
+.demolabel{
+  display:flex; gap:10px; align-items:flex-start;
+  background:var(--surface-2); border:1px dashed var(--line); border-radius:10px;
+  padding:11px 13px; font-size:12.5px; color:var(--ink-mid); line-height:1.45;
+}
+.demolabel b{
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  background:var(--hazard); color:var(--hazard-ink); padding:3px 7px; border-radius:5px; flex:none; margin-top:1px;
+}
+
+header{display:flex; flex-direction:column; gap:7px; animation:rise .45s ease both}
+.strip{height:5px; border-radius:3px; background:repeating-linear-gradient(135deg,var(--hazard) 0 11px,transparent 11px 22px)}
+h1{
+  font-family:var(--font-display); font-weight:600; font-size:clamp(25px,6.6vw,34px);
+  line-height:1.1; margin:0; text-transform:uppercase; letter-spacing:.005em; text-wrap:balance;
+}
+.sub{color:var(--ink-mid); font-size:14.5px; margin:0}
+.sub b{color:var(--hazard)}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:17px; display:flex; flex-direction:column; gap:15px; animation:rise .5s ease both}
+.card.c2{animation-delay:.08s}
+.card.c3{animation-delay:.16s}
+.ctitle{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--ink-dim); margin:0; display:flex; gap:9px; align-items:center;
+}
+.ctitle i{font-family:var(--font-display); font-style:normal; font-size:11px; background:var(--surface-3); color:var(--ink-mid); border-radius:4px; padding:2px 6px; letter-spacing:0}
+
+.field{display:flex; flex-direction:column; gap:7px}
+label.fl{font-size:13px; color:var(--ink-mid); font-weight:700}
+
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{
+  font-family:var(--font-body); font-size:13.5px; padding:9px 13px; border-radius:9px; cursor:pointer;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.2;
+  transition:border-color .13s, background .13s;
+}
+.chip:hover{border-color:var(--ink-dim)}
+.chip[aria-pressed="true"]{background:var(--hazard); border-color:var(--hazard); color:var(--hazard-ink); font-weight:700}
+.chip:focus-visible{outline:2px solid var(--hazard); outline-offset:2px}
+.chip.sm{font-family:var(--font-mono); font-size:12.5px; padding:8px 10px; min-width:46px; text-align:center}
+
+select,input[type="text"],input[type="tel"],input[type="number"]{
+  font-family:var(--font-body); font-size:15px; padding:11px 12px; border-radius:9px;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
+}
+select:focus,input:focus{outline:2px solid var(--hazard); outline-offset:1px; border-color:var(--hazard)}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:11px}
+
+.toggle{display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13.5px; color:var(--ink-mid); user-select:none}
+.toggle input{width:18px; height:18px; accent-color:var(--hazard); flex:none; margin:0}
+
+.hintline{font-size:12px; color:var(--ink-dim); margin:0; line-height:1.5}
+
+.readout{
+  background:var(--surface-2); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:11px;
+  border-left:4px solid var(--hazard);
+}
+.lines{display:flex; flex-direction:column; gap:6px}
+.pl{display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:var(--ink-mid)}
+.pl span:last-child{font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--ink); white-space:nowrap}
+.total{display:flex; justify-content:space-between; align-items:baseline; gap:12px; border-top:1px solid var(--line); padding-top:11px}
+.total .tl{font-family:var(--font-display); font-size:14px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-mid)}
+.total .tv{font-family:var(--font-display); font-weight:600; font-size:31px; color:var(--hazard); font-variant-numeric:tabular-nums; line-height:1}
+.badge{display:flex; gap:8px; align-items:center; font-family:var(--font-mono); font-size:12px; color:var(--ink-mid)}
+.badge b{color:var(--ok); font-weight:500}
+
+.btn{
+  font-family:var(--font-display); font-weight:600; font-size:16px; text-transform:uppercase; letter-spacing:.04em;
+  background:var(--hazard); color:var(--hazard-ink); border:none; border-radius:10px; padding:14px 18px;
+  cursor:pointer; width:100%; transition:filter .13s; text-align:center; text-decoration:none; display:block;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+.btn.ghost{background:transparent; color:var(--ink-mid); border:1.5px solid var(--line); font-size:13px; margin-top:4px}
+
+.ticket{background:var(--surface-2); border-radius:11px; padding:15px; display:flex; flex-direction:column; gap:10px; border:1px solid var(--ok)}
+.ticket .th{display:flex; gap:9px; align-items:center; font-family:var(--font-display); font-size:15px; text-transform:uppercase; letter-spacing:.03em; color:var(--ok)}
+.ticket pre{
+  font-family:var(--font-mono); font-size:12px; line-height:1.65; margin:0; white-space:pre-wrap; word-break:break-word;
+  color:var(--ink); background:var(--surface); border-radius:8px; padding:12px; border:1px solid var(--line);
+}
+.ticket .hint{font-size:12.5px; color:var(--ink-mid); margin:0}
+.copied{font-family:var(--font-mono); font-size:11.5px; color:var(--ok)}
+
+.err{font-size:13px; color:var(--alert); margin:0}
+
+footer{display:flex; flex-direction:column; gap:7px; font-size:12px; color:var(--ink-dim); line-height:1.6; border-top:1px solid var(--line); padding-top:15px}
+footer b{color:var(--ink-mid)}
+
+@keyframes rise{from{opacity:0; transform:translateY(9px)} to{opacity:1; transform:translateY(0)}}
+@media (prefers-reduced-motion: reduce){header,.card{animation:none; opacity:1}}
+@media (max-width:420px){.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+
+  <div class="demolabel">
+    <b>демо</b>
+    <span>Это прототип, собранный Ярославом Хоружим как предложение для «МОЯ ШИНКА» (Челябинск, выезд). Не официальная страница компании. Цены — реальный прайс с вашего сайта (моя-шинка.рф) на 14 октября 2026, тариф «без карты постоянного клиента». В рабочей версии любая цифра меняется в одном месте.</span>
+  </div>
+
+  <header>
+    <div class="strip"></div>
+    <h1>Выездной шиномонтаж<br>в Челябинске — расчёт сам</h1>
+    <p class="sub">Клиент узнаёт цену <b>сам, без звонка</b>, и сразу отправляет заявку мастеру.</p>
+  </header>
+
+  <!-- 1. РАСЧЁТ -->
+  <div class="card">
+    <p class="ctitle"><i>шаг 1</i> что нужно</p>
+
+    <div class="field">
+      <label class="fl" for="svc-complex">Услуга</label>
+      <div class="chips" id="svc" role="group" aria-label="Услуга">
+        <button type="button" class="chip" id="svc-complex" data-svc="complex" aria-pressed="true">Комплексный шиномонтаж</button>
+        <button type="button" class="chip" data-svc="zamena" aria-pressed="false">Сезонная замена колёс</button>
+        <button type="button" class="chip" data-svc="prokol" aria-pressed="false">Ремонт прокола</button>
+        <button type="button" class="chip" data-svc="porez" aria-pressed="false">Ремонт пореза / «грыжи»</button>
+      </div>
+    </div>
+
+    <!-- для шиномонтажа/замены: тип авто + радиус + кол-во -->
+    <div id="full-fields">
+      <div class="field">
+        <label class="fl" for="veh-legk">Тип автомобиля</label>
+        <div class="chips" id="veh" role="group" aria-label="Тип автомобиля">
+          <button type="button" class="chip" id="veh-legk" data-veh="legk" aria-pressed="true">Легковой</button>
+          <button type="button" class="chip" data-veh="jeep" aria-pressed="false">Джип / кроссовер</button>
+          <button type="button" class="chip" data-veh="malogruz" aria-pressed="false">Малогрузовой (Газель и т.п.)</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="fl" for="rad">Радиус колеса</label>
+        <div class="chips" id="rad" role="group" aria-label="Радиус колеса"></div>
+      </div>
+
+      <div class="field" id="qty-field">
+        <label class="fl" for="qty">Сколько колёс</label>
+        <div class="chips" id="qty" role="group" aria-label="Количество колёс">
+          <button type="button" class="chip sm" data-q="1" aria-pressed="false">1</button>
+          <button type="button" class="chip sm" data-q="2" aria-pressed="false">2</button>
+          <button type="button" class="chip sm" data-q="3" aria-pressed="false">3</button>
+          <button type="button" class="chip sm" data-q="4" aria-pressed="true">4</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ремонт прокола -->
+    <div class="field" id="prokol-field" hidden>
+      <label class="fl" for="prokol-latka">Способ ремонта</label>
+      <div class="chips" id="prokol-type" role="group" aria-label="Способ ремонта прокола">
+        <button type="button" class="chip" id="prokol-latka" data-pk="latka" aria-pressed="true">Латкой — 1 год гарантии</button>
+        <button type="button" class="chip" data-pk="gribok" aria-pressed="false">Грибком — 5 лет гарантии</button>
+        <button type="button" class="chip" data-pk="nozhka" aria-pressed="false">Ножка грибка + пластырь — 5 лет</button>
+        <button type="button" class="chip" data-pk="kamera" aria-pressed="false">Прокол камеры</button>
+      </div>
+      <p class="hintline">Цена на сайте указана за сам ремонт шины/камеры — без учёта снятия и установки колеса.</p>
+    </div>
+
+    <!-- ремонт пореза -->
+    <div class="field" id="porez-field" hidden>
+      <label class="fl" for="porez-1">Размер повреждения</label>
+      <div class="chips" id="porez-size" role="group" aria-label="Размер повреждения">
+        <button type="button" class="chip sm" id="porez-1" data-pz="1" aria-pressed="true">до 1 см</button>
+        <button type="button" class="chip sm" data-pz="2" aria-pressed="false">до 2 см</button>
+        <button type="button" class="chip sm" data-pz="3" aria-pressed="false">до 3 см</button>
+        <button type="button" class="chip sm" data-pz="4" aria-pressed="false">до 4,5 см</button>
+        <button type="button" class="chip sm" data-pz="5" aria-pressed="false">до 5,5 см</button>
+        <button type="button" class="chip sm" data-pz="6" aria-pressed="false">более 5,5 см</button>
+      </div>
+      <p class="hintline">Цена на сайте — за сам ремонт пореза/«грыжи», без шиномонтажных работ (гарантия до 5 лет).</p>
+    </div>
+
+    <!-- добавить шиномонтаж к ремонту -->
+    <div class="field" id="addmount-field" hidden>
+      <label class="toggle" for="addmount">
+        <input type="checkbox" id="addmount">
+        <span>Добавить снятие/установку и балансировку колеса (по тарифу комплексного шиномонтажа — см. тип авто и радиус ниже)</span>
+      </label>
+      <div id="addmount-sub"></div>
+    </div>
+
+    <label class="toggle" for="card" id="card-toggle">
+      <input type="checkbox" id="card">
+      <span>Есть электронная карта постоянного клиента (скидка 15% на шиномонтажные работы)</span>
+    </label>
+
+    <label class="toggle" for="night">
+      <input type="checkbox" id="night">
+      <span>Ночной выезд, с 00:00 до 06:00 (на сайте — повышающий коэффициент ×1,5)</span>
+    </label>
+  </div>
+
+  <!-- 2. ЦЕНА -->
+  <div class="card c2">
+    <p class="ctitle"><i>шаг 2</i> стоимость</p>
+    <div class="readout">
+      <div class="lines" id="lines"></div>
+      <div class="total"><span class="tl">Итого</span><span class="tv" id="total">—</span></div>
+      <div class="badge">🚐 <b>работаем круглосуточно</b> — выезд по Челябинску</div>
+    </div>
+    <p class="hint" style="font-size:12.5px;color:var(--ink-dim);margin:0">Минимальная стоимость работ на выезде — 1000 ₽ (условие сайта). Мастер на месте может скорректировать стоимость до 30% и применить сезонный коэффициент ×1,2–1,5 — это правило компании, не калькулятора.</p>
+  </div>
+
+  <!-- 3. ЗАПИСЬ -->
+  <div class="card c3">
+    <p class="ctitle"><i>шаг 3</i> вызвать мастера</p>
+    <div class="row2">
+      <div class="field"><label class="fl" for="nm">Имя</label><input type="text" id="nm" placeholder="Как к вам обращаться" autocomplete="name"></div>
+      <div class="field"><label class="fl" for="ph">Телефон</label><input type="tel" id="ph" placeholder="+7 ___ ___-__-__" autocomplete="tel"></div>
+    </div>
+    <div class="field"><label class="fl" for="addr">Адрес или ориентир в Челябинске</label><input type="text" id="addr" placeholder="Улица, дом — или «ТРК Родник, парковка»"></div>
+    <div class="row2">
+      <div class="field"><label class="fl" for="car">Машина</label><input type="text" id="car" placeholder="Напр. Kia Rio"></div>
+      <div class="field"><label class="fl" for="whn">Когда</label>
+        <select id="whn">
+          <option value="Сейчас, срочно" selected>Сейчас, срочно</option>
+          <option value="В течение часа">В течение часа</option>
+          <option value="Сегодня вечером">Сегодня вечером</option>
+          <option value="Завтра утром">Завтра утром</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="send" type="button">Собрать заявку</button>
+    <p class="err" id="err" hidden></p>
+    <div id="ticket" hidden></div>
+    <a class="btn ghost" id="wa" href="https://wa.me/73517772970" target="_blank" rel="noopener">Или написать на выездную линию в WhatsApp напрямую</a>
+  </div>
+
+  <footer>
+    <span><b>Что это даёт компании.</b> Клиент считает цену сам и не уходит искать конкурентов, пока ждёт ответа. Заявка приходит мастеру готовой: услуга, авто, радиус, адрес, время — без лишних звонков.</span>
+    <span>Прототип. Собрал Ярослав Хоружий по открытым данным с сайта «МОЯ ШИНКА» (моя-шинка.рф) и Telegram-канала @myshinka74. Контакты и прайс в рабочей версии — ваши и обновляются вами.</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // Реальный прайс с сайта xn----8sbxihie5fxc.xn--p1ai (моя-шинка.рф), проверено 14 октября 2026.
+  // Цены "без карты постоянного клиента", за 1 колесо.
+  var RADII = {
+    legk:     ["R12","R13","R14","R15","R16","R17","R18","R19","R20","R21","R22","R23-R24"],
+    jeep:     ["R14-R15","R16","R17","R18","R19","R20","R21","R22","R23-R24"],
+    malogruz: ["R14C","R15C","R16C"]
+  };
+  var COMPLEX = {
+    legk:     {"R12":690,"R13":780,"R14":835,"R15":920,"R16":1035,"R17":1105,"R18":1145,"R19":1220,"R20":1380,"R21":1535,"R22":1660,"R23-R24":1975},
+    jeep:     {"R14-R15":1065,"R16":1155,"R17":1305,"R18":1455,"R19":1560,"R20":1670,"R21":1825,"R22":1985,"R23-R24":2310},
+    malogruz: {"R14C":1200,"R15C":1305,"R16C":1420}
+  };
+  var ZAMENA = {
+    legk:     {"R12":550,"R13":645,"R14":645,"R15":680,"R16":745,"R17":765,"R18":795,"R19":840,"R20":935,"R21":1060,"R22":1155,"R23-R24":1300},
+    jeep:     {"R14-R15":745,"R16":830,"R17":890,"R18":960,"R19":1020,"R20":1120,"R21":1230,"R22":1330,"R23-R24":1475},
+    malogruz: {"R14C":850,"R15C":900,"R16C":985}
+  };
+  var VEH_NAME = {legk:"легковой", jeep:"джип/кроссовер", malogruz:"малогрузовой"};
+  var CARD_DISCOUNT = 0.15;
+  var NIGHT_MULT = 1.5;
+  var MIN_WORK = 1000;
+
+  var PROKOL = {
+    latka:  {label:"Ремонт прокола латкой (гарантия 1 год)", v:595},
+    gribok: {label:"Ремонт прокола грибком (гарантия 5 лет)", v:935},
+    nozhka: {label:"Ремонт: ножка грибка + пластырь (гарантия 5 лет)", v:935},
+    kamera: {label:"Ремонт прокола камеры", v:400}
+  };
+  var POREZ = {
+    1:{label:"Ремонт пореза/«грыжи» до 1 см", v:2125},
+    2:{label:"Ремонт пореза/«грыжи» до 2 см", v:2295},
+    3:{label:"Ремонт пореза/«грыжи» до 3 см", v:2720},
+    4:{label:"Ремонт пореза/«грыжи» до 4,5 см", v:3910},
+    5:{label:"Ремонт пореза/«грыжи» до 5,5 см", v:4760},
+    6:{label:"Ремонт пореза/«грыжи» более 5,5 см", v:5100}
+  };
+
+  var state = {svc:"complex", veh:"legk", rad:"R16", qty:4, pk:"latka", pz:1, addmount:false, card:false, night:false};
+
+  function $(id){ return document.getElementById(id); }
+  function money(n, approx){ return (approx ? "от " : "") + new Intl.NumberFormat("ru-RU").format(Math.round(n)) + " ₽"; }
+
+  function buildRadii(){
+    var root = $("rad");
+    root.textContent = "";
+    RADII[state.veh].forEach(function(r, i){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip sm"; b.setAttribute("data-r", r);
+      b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+      b.textContent = r;
+      root.appendChild(b);
+    });
+    state.rad = RADII[state.veh][0];
+  }
+
+  // Чистая функция расчёта
+  function calc(s){
+    var items = [], work = 0, approx = false;
+
+    if (s.svc === "complex" || s.svc === "zamena"){
+      var table = (s.svc === "complex") ? COMPLEX : ZAMENA;
+      var unit = table[s.veh][s.rad];
+      var sum = unit * s.qty;
+      if (s.card) sum = sum * (1 - CARD_DISCOUNT);
+      work += sum;
+      items.push({
+        l: (s.svc === "complex" ? "Комплексный шиномонтаж" : "Сезонная замена колёс") + ", " + VEH_NAME[s.veh] + " " + s.rad + " × " + s.qty + (s.card ? " (карта −15%)" : ""),
+        v: sum
+      });
+    } else if (s.svc === "prokol"){
+      var pk = PROKOL[s.pk];
+      work += pk.v;
+      items.push({l: pk.label, v: pk.v});
+      if (s.addmount){
+        var u2 = COMPLEX[s.veh][s.rad];
+        var sum2 = s.card ? u2 * (1 - CARD_DISCOUNT) : u2;
+        work += sum2;
+        items.push({l: "+ снятие/установка/балансировка, " + VEH_NAME[s.veh] + " " + s.rad, v: sum2});
+      }
+    } else if (s.svc === "porez"){
+      var pz = POREZ[s.pz];
+      work += pz.v;
+      items.push({l: pz.label, v: pz.v});
+      if (s.addmount){
+        var u3 = COMPLEX[s.veh][s.rad];
+        var sum3 = s.card ? u3 * (1 - CARD_DISCOUNT) : u3;
+        work += sum3;
+        items.push({l: "+ снятие/установка/балансировка, " + VEH_NAME[s.veh] + " " + s.rad, v: sum3});
+      }
+    }
+
+    // минимальная стоимость работ на выезде
+    if (work < MIN_WORK){
+      items.push({l:"Доплата до минимума работ на выезде (1000 ₽)", v: MIN_WORK - work});
+      work = MIN_WORK;
+    }
+
+    var night = 0;
+    if (s.night){
+      night = work * (NIGHT_MULT - 1);
+      items.push({l:"Ночной выезд 00:00–06:00, ×1,5", v: night});
+    }
+
+    return {items: items, total: work + night, approx: approx};
+  }
+
+  function render(){
+    var isFull = (state.svc === "complex" || state.svc === "zamena");
+    $("full-fields").hidden = !isFull;
+    $("prokol-field").hidden = (state.svc !== "prokol");
+    $("porez-field").hidden = (state.svc !== "porez");
+    $("addmount-field").hidden = isFull;
+    $("qty-field").hidden = !isFull;
+    $("card-toggle").hidden = !(isFull || $("addmount").checked);
+
+    var r = calc(state);
+    var box = $("lines");
+    box.textContent = "";
+    r.items.forEach(function(it){
+      var row = document.createElement("div");
+      row.className = "pl";
+      var a = document.createElement("span"); a.textContent = it.l;
+      var b = document.createElement("span"); b.textContent = money(it.v);
+      row.appendChild(a); row.appendChild(b); box.appendChild(row);
+    });
+    $("total").textContent = money(r.total);
+  }
+
+  function group(id, attr, key, cast, after){
+    var root = $(id);
+    if (!root) return;
+    root.addEventListener("click", function(e){
+      var b = e.target.closest("button[" + attr + "]");
+      if (!b) return;
+      Array.prototype.forEach.call(root.querySelectorAll("button[" + attr + "]"), function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      state[key] = cast(b.getAttribute(attr));
+      if (after) after();
+      render();
+    });
+  }
+  group("svc","data-svc","svc",String);
+  group("veh","data-veh","veh",String, function(){ buildRadii(); });
+  group("qty","data-q","qty",Number);
+  group("prokol-type","data-pk","pk",String);
+  group("porez-size","data-pz","pz",Number);
+
+  // радиусы — делегирование на уже существующий контейнер (перестраивается динамически)
+  $("rad").addEventListener("click", function(e){
+    var b = e.target.closest("button[data-r]");
+    if (!b) return;
+    Array.prototype.forEach.call($("rad").querySelectorAll("button[data-r]"), function(x){
+      x.setAttribute("aria-pressed", x === b ? "true" : "false");
+    });
+    state.rad = b.getAttribute("data-r");
+    render();
+  });
+
+  $("addmount").addEventListener("change", function(){ state.addmount = this.checked; render(); });
+  $("card").addEventListener("change", function(){ state.card = this.checked; render(); });
+  $("night").addEventListener("change", function(){ state.night = this.checked; render(); });
+
+  $("send").addEventListener("click", function(){
+    var nm = $("nm").value.trim(), ph = $("ph").value.trim(), addr = $("addr").value.trim();
+    var err = $("err");
+    if (!nm || !ph || !addr){
+      err.textContent = "Заполните имя, телефон и адрес — без них мастер не сможет выехать.";
+      err.hidden = false;
+      return;
+    }
+    err.hidden = true;
+
+    var r = calc(state);
+    var svcName = {complex:"Комплексный шиномонтаж", zamena:"Сезонная замена колёс", prokol:"Ремонт прокола", porez:"Ремонт пореза/грыжи"}[state.svc];
+    var txt =
+      "НОВАЯ ЗАЯВКА — МОЯ ШИНКА (выезд)\n" +
+      "Услуга: " + svcName + "\n" +
+      ((state.svc === "complex" || state.svc === "zamena" || state.addmount) ? ("Авто/радиус: " + VEH_NAME[state.veh] + ", " + state.rad + "\n") : "") +
+      "Машина: " + ($("car").value.trim() || "не указана") + "\n" +
+      "Адрес: " + addr + ", Челябинск\n" +
+      "Когда: " + $("whn").value + (state.night ? " (ночной выезд)" : "") + "\n" +
+      "Клиент: " + nm + ", " + ph + "\n" +
+      "Расчёт по прайсу: " + money(r.total);
+
+    var t = $("ticket");
+    t.textContent = "";
+    t.hidden = false;
+
+    var wrap = document.createElement("div");
+    wrap.className = "ticket";
+
+    var h = document.createElement("div");
+    h.className = "th";
+    h.textContent = "✓ Заявка собрана";
+    wrap.appendChild(h);
+
+    var hint1 = document.createElement("p");
+    hint1.className = "hint";
+    hint1.textContent = "В рабочей версии этот текст уходит мастеру в WhatsApp в момент нажатия кнопки. Здесь, в демо, он просто показан — чтобы было видно, что именно получает мастер.";
+    wrap.appendChild(hint1);
+
+    var pre = document.createElement("pre");
+    pre.textContent = txt;
+    wrap.appendChild(pre);
+
+    var cp = document.createElement("button");
+    cp.className = "btn ghost";
+    cp.type = "button";
+    cp.textContent = "Скопировать заявку";
+    cp.addEventListener("click", function(){
+      var done = document.createElement("span");
+      done.className = "copied";
+      function ok(){ done.textContent = "скопировано"; }
+      function no(){
+        done.textContent = "выделите текст заявки выше и скопируйте вручную";
+        try{
+          var sel = window.getSelection(), rg = document.createRange();
+          rg.selectNodeContents(pre); sel.removeAllRanges(); sel.addRange(rg);
+        }catch(e){}
+      }
+      try{
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(txt).then(ok, no);
+        } else { no(); }
+      }catch(e){ no(); }
+      if (!cp.nextSibling || cp.nextSibling.className !== "copied") cp.after(done);
+    });
+    wrap.appendChild(cp);
+
+    t.appendChild(wrap);
+    wrap.scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
+
+  buildRadii();
+  // выставить R16 по умолчанию, если есть в списке
+  (function(){
+    var btn = $("rad").querySelector('button[data-r="R16"]');
+    if (btn){
+      Array.prototype.forEach.call($("rad").querySelectorAll("button[data-r]"), function(x){ x.setAttribute("aria-pressed","false"); });
+      btn.setAttribute("aria-pressed","true");
+      state.rad = "R16";
+    }
+  })();
+  render();
+})();
+</script>
+
+</body>
+</html>
