@@ -249,6 +249,9 @@ footer{max-width:1180px; margin:0 auto; padding:0 20px 50px; display:flex; flex-
 footer b{color:var(--ink-mid)}
 
 @media (max-width:380px){.row2{grid-template-columns:1fr}}
+
+/* hidden must always win over .field/.card display:flex */
+[hidden]{display:none !important}
 </style>
 </head>
 <body>
