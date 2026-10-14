@@ -4,139 +4,221 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Расчёт выездного шиномонтажа — Шинка116</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=PT+Sans:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap">
 <style>
 :root{
-  --bg:#111315; --surface:#1a1d20; --surface-2:#23272b; --surface-3:#2e3338;
-  --ink:#f1f3f4; --ink-mid:#a7b0b7; --ink-dim:#79838b;
-  --line:#31373d;
-  --hazard:#ffd21f; --hazard-ink:#1a1500;
-  --ok:#5fc97f; --alert:#ff8a5c;
-  --font-display:'Oswald','PT Sans',system-ui,sans-serif;
-  --font-body:'PT Sans',system-ui,-apple-system,sans-serif;
-  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+  --bg:#0a0b0d;
+  --surface: rgba(255,255,255,.04); --surface-2: rgba(255,255,255,.065); --surface-3: rgba(255,255,255,.1);
+  --line: rgba(255,255,255,.09); --line-soft: rgba(255,255,255,.06);
+  --ink:#f5f6f8; --ink-mid:#a6adb6; --ink-dim:#757d87;
+  --accent-1:#ffb020; --accent-2:#ff5a5f; --accent-ink:#1a0e02;
+  --accent-grad: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  --ok:#36d399; --alert:#ff6b6b;
+  --font-display:'Manrope',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,sans-serif;
+  --shadow-card: 0 1px 0 rgba(255,255,255,.05) inset, 0 24px 48px -28px rgba(0,0,0,.75);
+  --shadow-pop: 0 10px 24px -8px rgba(255,90,70,.45);
   color-scheme: dark;
 }
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]){
-    --bg:#eceef0; --surface:#ffffff; --surface-2:#f2f4f6; --surface-3:#e2e6ea;
-    --ink:#14171a; --ink-mid:#4a545c; --ink-dim:#6d777f;
-    --line:#d3d9de;
-    --hazard:#8a6a00; --hazard-ink:#ffffff;
-    --ok:#1f7a3d; --alert:#b24a22;
+    --bg:#eef0f3;
+    --surface:#ffffff; --surface-2:#f4f5f7; --surface-3:#e9ebee;
+    --line: rgba(10,15,20,.1); --line-soft: rgba(10,15,20,.06);
+    --ink:#14171a; --ink-mid:#555f68; --ink-dim:#7c858d;
+    --accent-ink:#1a0e02;
+    --shadow-card: 0 1px 0 rgba(255,255,255,.6) inset, 0 20px 40px -24px rgba(20,23,26,.18);
     color-scheme: light;
   }
 }
 :root[data-theme="light"]{
-  --bg:#eceef0; --surface:#ffffff; --surface-2:#f2f4f6; --surface-3:#e2e6ea;
-  --ink:#14171a; --ink-mid:#4a545c; --ink-dim:#6d777f;
-  --line:#d3d9de;
-  --hazard:#8a6a00; --hazard-ink:#ffffff;
-  --ok:#1f7a3d; --alert:#b24a22;
+  --bg:#eef0f3;
+  --surface:#ffffff; --surface-2:#f4f5f7; --surface-3:#e9ebee;
+  --line: rgba(10,15,20,.1); --line-soft: rgba(10,15,20,.06);
+  --ink:#14171a; --ink-mid:#555f68; --ink-dim:#7c858d;
+  --accent-ink:#1a0e02;
+  --shadow-card: 0 1px 0 rgba(255,255,255,.6) inset, 0 20px 40px -24px rgba(20,23,26,.18);
   color-scheme: light;
 }
 *{box-sizing:border-box}
+html,body{margin:0}
 body{
-  margin:0; background:var(--bg); color:var(--ink);
+  background:
+    radial-gradient(640px 420px at 12% -8%, rgba(255,176,32,.16), transparent 60%),
+    radial-gradient(520px 420px at 110% 10%, rgba(255,90,95,.14), transparent 55%),
+    var(--bg);
+  color:var(--ink);
   font-family:var(--font-body); font-size:15px; line-height:1.55;
-  padding-inline:16px; padding-block:18px 48px;
+  padding-inline:16px; padding-block:22px 52px;
   display:flex; justify-content:center;
+  -webkit-font-smoothing:antialiased;
 }
-.app{width:100%; max-width:560px; display:flex; flex-direction:column; gap:16px}
+.app{width:100%; max-width:480px; display:flex; flex-direction:column; gap:18px}
+.icon{width:1em; height:1em; display:inline-block; vertical-align:-0.15em; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
 
 .demolabel{
   display:flex; gap:10px; align-items:flex-start;
-  background:var(--surface-2); border:1px dashed var(--line); border-radius:10px;
-  padding:11px 13px; font-size:12.5px; color:var(--ink-mid); line-height:1.45;
+  background:var(--surface-2); border:1px solid var(--line); border-radius:12px;
+  padding:11px 13px; font-size:12.5px; color:var(--ink-mid); line-height:1.5;
 }
 .demolabel b{
-  font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
-  background:var(--hazard); color:var(--hazard-ink); padding:3px 7px; border-radius:5px; flex:none; margin-top:1px;
+  font-family:var(--font-display); font-weight:800; font-size:9.5px; letter-spacing:.09em; text-transform:uppercase;
+  background:var(--accent-grad); color:var(--accent-ink); padding:4px 8px; border-radius:6px; flex:none; margin-top:1px;
 }
 
-header{display:flex; flex-direction:column; gap:7px; animation:rise .45s ease both}
-.strip{height:5px; border-radius:3px; background:repeating-linear-gradient(135deg,var(--hazard) 0 11px,transparent 11px 22px)}
+header{display:flex; flex-direction:column; gap:12px; animation:rise .5s ease both}
+.brand{display:flex; align-items:center; gap:10px}
+.brandmark{
+  width:40px; height:40px; border-radius:12px; flex:none;
+  background:var(--accent-grad); box-shadow:var(--shadow-pop);
+  display:flex; align-items:center; justify-content:center; color:var(--accent-ink);
+}
+.brandmark .icon{width:21px; height:21px}
+.brandname{font-family:var(--font-display); font-weight:800; font-size:14.5px; letter-spacing:.02em}
+.brandloc{font-size:12px; color:var(--ink-dim); margin-top:1px}
 h1{
-  font-family:var(--font-display); font-weight:600; font-size:clamp(25px,6.6vw,34px);
-  line-height:1.1; margin:0; text-transform:uppercase; letter-spacing:.005em; text-wrap:balance;
+  font-family:var(--font-display); font-weight:800; font-size:clamp(25px,7vw,33px);
+  line-height:1.14; margin:0; letter-spacing:-.01em; text-wrap:balance;
 }
 .sub{color:var(--ink-mid); font-size:14.5px; margin:0}
-.sub b{color:var(--hazard)}
-
-.card{background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:17px; display:flex; flex-direction:column; gap:15px; animation:rise .5s ease both}
-.card.c2{animation-delay:.08s}
-.card.c3{animation-delay:.16s}
-.ctitle{
-  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.09em; text-transform:uppercase;
-  color:var(--ink-dim); margin:0; display:flex; gap:9px; align-items:center;
+.sub b{color:var(--ink); font-weight:600}
+.trustrow{display:flex; flex-wrap:wrap; gap:7px; margin-top:2px}
+.trust{
+  display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--ink-mid);
+  background:var(--surface-2); border:1px solid var(--line-soft); border-radius:999px; padding:5px 10px 5px 8px;
 }
-.ctitle i{font-family:var(--font-display); font-style:normal; font-size:11px; background:var(--surface-3); color:var(--ink-mid); border-radius:4px; padding:2px 6px; letter-spacing:0}
+.trust .icon{width:13px; height:13px; color:var(--ok)}
 
-.field{display:flex; flex-direction:column; gap:7px}
-label.fl{font-size:13px; color:var(--ink-mid); font-weight:700}
-
-.chips{display:flex; flex-wrap:wrap; gap:7px}
-.chip{
-  font-family:var(--font-body); font-size:13.5px; padding:9px 13px; border-radius:9px; cursor:pointer;
-  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.2;
-  transition:border-color .13s, background .13s;
+.steps{display:flex; align-items:center; gap:6px; padding:0 2px}
+.steps .dot{
+  width:7px; height:7px; border-radius:50%; background:var(--line); flex:none; transition:background .2s;
 }
-.chip:hover{border-color:var(--ink-dim)}
-.chip[aria-pressed="true"]{background:var(--hazard); border-color:var(--hazard); color:var(--hazard-ink); font-weight:700}
-.chip:focus-visible{outline:2px solid var(--hazard); outline-offset:2px}
+.steps .dot.on{background:var(--accent-1)}
+.steps .seg{flex:1; height:1px; background:var(--line-soft)}
 
-select,input[type="text"],input[type="tel"],input[type="number"]{
-  font-family:var(--font-body); font-size:15px; padding:11px 12px; border-radius:9px;
+.card{
+  position:relative; background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:19px;
+  display:flex; flex-direction:column; gap:16px; box-shadow:var(--shadow-card);
+  animation:rise .55s ease both; backdrop-filter:blur(14px);
+}
+.card.c2{animation-delay:.07s}
+.card.c3{animation-delay:.14s}
+
+.ctitle{display:flex; gap:10px; align-items:center; margin:0}
+.ctitle .num{
+  width:24px; height:24px; border-radius:8px; flex:none; display:flex; align-items:center; justify-content:center;
+  background:var(--surface-3); color:var(--ink-mid); font-family:var(--font-display); font-weight:800; font-size:12px;
+}
+.card .ctitle .num{background:var(--accent-grad); color:var(--accent-ink)}
+.ctitle .tt{font-family:var(--font-display); font-weight:700; font-size:14px; letter-spacing:.01em; color:var(--ink)}
+.ctitle .tt span{display:block; font-family:var(--font-body); font-weight:400; font-size:11.5px; color:var(--ink-dim); margin-top:1px}
+
+.field{display:flex; flex-direction:column; gap:8px}
+label.fl{font-size:12.5px; color:var(--ink-dim); font-weight:600; letter-spacing:.01em}
+
+.tiles{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+.tiles.one{grid-template-columns:1fr}
+.tile{
+  display:flex; flex-direction:column; align-items:flex-start; gap:9px; text-align:left;
+  font-family:var(--font-body); font-size:13.5px; font-weight:600; padding:13px 13px 12px; border-radius:14px; cursor:pointer;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.25;
+  transition:border-color .15s, background .15s, transform .15s, box-shadow .15s;
+}
+.tile:hover{border-color:var(--ink-dim); transform:translateY(-1px)}
+.tile .ic{
+  width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+  background:var(--surface-3); color:var(--ink-mid); transition:background .15s, color .15s;
+}
+.tile .ic .icon{width:16px; height:16px}
+.tile[aria-pressed="true"]{
+  background:linear-gradient(160deg, rgba(255,176,32,.14), rgba(255,90,95,.1)); border-color:transparent;
+  box-shadow:0 0 0 1.5px var(--accent-1) inset, var(--shadow-pop); color:var(--ink);
+}
+.tile[aria-pressed="true"] .ic{background:var(--accent-grad); color:var(--accent-ink)}
+.tile:focus-visible{outline:2px solid var(--accent-1); outline-offset:2px}
+
+select{
+  font-family:var(--font-body); font-weight:500; font-size:15px; padding:12px 38px 12px 14px; border-radius:12px;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
+  appearance:none; -webkit-appearance:none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-mid) 50%),
+    linear-gradient(135deg, var(--ink-mid) 50%, transparent 50%);
+  background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+  background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+}
+input[type="text"],input[type="tel"],input[type="number"]{
+  font-family:var(--font-body); font-weight:500; font-size:15px; padding:12px 14px; border-radius:12px;
   background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
 }
-select:focus,input:focus{outline:2px solid var(--hazard); outline-offset:1px; border-color:var(--hazard)}
+select:focus,input:focus{outline:none; border-color:var(--accent-1); box-shadow:0 0 0 3px rgba(255,176,32,.18)}
 .row2{display:grid; grid-template-columns:1fr 1fr; gap:11px}
 
-.hintline{font-size:12px; color:var(--ink-dim); margin:0; line-height:1.5}
+.hintline{font-size:12px; color:var(--ink-dim); margin:0; line-height:1.55; display:flex; gap:7px}
+.hintline .icon{width:14px; height:14px; flex:none; margin-top:2px; color:var(--ink-dim)}
 
 .readout{
-  background:var(--surface-2); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:11px;
-  border-left:4px solid var(--hazard);
+  background:linear-gradient(160deg, rgba(255,176,32,.1), rgba(255,90,95,.05));
+  border:1px solid var(--line); border-radius:16px; padding:17px 17px 16px;
+  display:flex; flex-direction:column; gap:13px;
 }
-.lines{display:flex; flex-direction:column; gap:6px}
+.lines{display:flex; flex-direction:column; gap:7px}
 .pl{display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:var(--ink-mid)}
-.pl span:last-child{font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--ink); white-space:nowrap}
-.total{display:flex; justify-content:space-between; align-items:baseline; gap:12px; border-top:1px solid var(--line); padding-top:11px}
-.total .tl{font-family:var(--font-display); font-size:14px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-mid)}
-.total .tv{font-family:var(--font-display); font-weight:600; font-size:31px; color:var(--hazard); font-variant-numeric:tabular-nums; line-height:1}
-.badge{display:flex; gap:8px; align-items:center; font-family:var(--font-mono); font-size:12px; color:var(--ink-mid)}
-.badge b{color:var(--ok); font-weight:500}
+.pl span:last-child{font-variant-numeric:tabular-nums; color:var(--ink); font-weight:600; white-space:nowrap}
+.total{display:flex; flex-direction:column; align-items:flex-start; gap:5px; border-top:1px solid var(--line); padding-top:12px}
+.total .tl{font-family:var(--font-display); font-size:12.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--ink-mid)}
+.total .tv{
+  font-family:var(--font-display); font-weight:800; font-size:clamp(26px,8vw,32px); font-variant-numeric:tabular-nums; line-height:1.1;
+  background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap;
+}
+.pillrow{display:flex; gap:8px; flex-wrap:wrap}
+.pill{
+  display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--ink);
+  background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:6px 11px 6px 9px;
+}
+.pill .icon{width:13px; height:13px; color:var(--ok)}
 
 .btn{
-  font-family:var(--font-display); font-weight:600; font-size:16px; text-transform:uppercase; letter-spacing:.04em;
-  background:var(--hazard); color:var(--hazard-ink); border:none; border-radius:10px; padding:14px 18px;
-  cursor:pointer; width:100%; transition:filter .13s; text-align:center; text-decoration:none; display:block;
+  font-family:var(--font-display); font-weight:700; font-size:15.5px; letter-spacing:.01em;
+  background:var(--accent-grad); color:var(--accent-ink); border:none; border-radius:14px; padding:15px 18px;
+  cursor:pointer; width:100%; transition:filter .15s, transform .15s; text-align:center; text-decoration:none;
+  display:flex; align-items:center; justify-content:center; gap:9px; box-shadow:var(--shadow-pop);
 }
-.btn:hover{filter:brightness(1.08)}
+.btn .icon{width:17px; height:17px}
+.btn:hover{filter:brightness(1.06); transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
 .btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
-.btn.ghost{background:transparent; color:var(--ink-mid); border:1.5px solid var(--line); font-size:13px; margin-top:4px}
+.btn.ghost{background:var(--surface-2); color:var(--ink-mid); border:1.5px solid var(--line); font-size:13.5px; font-weight:600; box-shadow:none}
+.btn.ghost:hover{color:var(--ink); border-color:var(--ink-dim)}
+.btn.wa{background:linear-gradient(135deg,#2bd16a,#1aa352); color:#07230f; box-shadow:0 10px 24px -8px rgba(43,209,106,.4); margin-top:2px}
 
-.ticket{background:var(--surface-2); border-radius:11px; padding:15px; display:flex; flex-direction:column; gap:10px; border:1px solid var(--ok)}
-.ticket .th{display:flex; gap:9px; align-items:center; font-family:var(--font-display); font-size:15px; text-transform:uppercase; letter-spacing:.03em; color:var(--ok)}
+.ticket{
+  background:var(--surface-2); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:11px;
+  border:1px solid rgba(54,211,153,.35);
+}
+.ticket .th{display:flex; gap:9px; align-items:center; font-family:var(--font-display); font-weight:700; font-size:14.5px; color:var(--ok)}
+.ticket .th .icon{width:17px; height:17px}
 .ticket pre{
-  font-family:var(--font-mono); font-size:12px; line-height:1.65; margin:0; white-space:pre-wrap; word-break:break-word;
-  color:var(--ink); background:var(--surface); border-radius:8px; padding:12px; border:1px solid var(--line);
+  font-family:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace; font-size:12px; line-height:1.7; margin:0;
+  white-space:pre-wrap; word-break:break-word; color:var(--ink); background:var(--surface); border-radius:10px;
+  padding:13px; border:1px solid var(--line);
 }
 .ticket .hint{font-size:12.5px; color:var(--ink-mid); margin:0}
-.copied{font-family:var(--font-mono); font-size:11.5px; color:var(--ok)}
+.copied{font-size:11.5px; color:var(--ok); font-weight:600}
 
-.err{font-size:13px; color:var(--alert); margin:0}
+.err{font-size:13px; color:var(--alert); margin:0; display:flex; gap:7px; align-items:flex-start}
+.err .icon{width:14px; height:14px; flex:none; margin-top:2px}
 
-footer{display:flex; flex-direction:column; gap:7px; font-size:12px; color:var(--ink-dim); line-height:1.6; border-top:1px solid var(--line); padding-top:15px}
+footer{display:flex; flex-direction:column; gap:8px; font-size:12px; color:var(--ink-dim); line-height:1.6; border-top:1px solid var(--line-soft); padding-top:16px}
 footer b{color:var(--ink-mid)}
 
-@keyframes rise{from{opacity:0; transform:translateY(9px)} to{opacity:1; transform:translateY(0)}}
+@keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
 @media (prefers-reduced-motion: reduce){header,.card{animation:none; opacity:1}}
-@media (max-width:420px){.row2{grid-template-columns:1fr}}
+@media (max-width:380px){.row2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
 
 <div class="app">
 
@@ -146,47 +228,81 @@ footer b{color:var(--ink-mid)}
   </div>
 
   <header>
-    <div class="strip"></div>
-    <h1>Выездной шиномонтаж<br>в Казани — узнать цену сразу</h1>
-    <p class="sub">Клиент видит стартовую цену <b>сам, без звонка</b>, и сразу отправляет заявку.</p>
+    <div class="brand">
+      <div class="brandmark"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="4" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="20" y2="12"/></svg></div>
+      <div>
+        <div class="brandname">ШИНКА116</div>
+        <div class="brandloc">Выездной шиномонтаж · Казань</div>
+      </div>
+    </div>
+    <h1>Узнайте цену за 10 секунд, не дожидаясь звонка</h1>
+    <p class="sub">Выберите услугу — увидите <b>стартовую стоимость сразу</b> и отправите заявку мастеру.</p>
+    <div class="trustrow">
+      <span class="trust"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg>Фиксированный прайс, без скрытых доплат</span>
+      <span class="trust"><svg class="icon" viewBox="0 0 24 24"><path d="M3 13l1.5-4.5A2 2 0 016.4 7h11.2a2 2 0 011.9 1.5L21 13"/><rect x="2" y="13" width="20" height="5" rx="2"/><circle cx="7" cy="18" r="1.3"/><circle cx="17" cy="18" r="1.3"/></svg>Спецмашина приезжает к вам</span>
+    </div>
   </header>
+
+  <div class="steps">
+    <span class="dot on"></span><span class="seg"></span>
+    <span class="dot on"></span><span class="seg"></span>
+    <span class="dot"></span>
+  </div>
 
   <!-- 1. РАСЧЁТ -->
   <div class="card">
-    <p class="ctitle"><i>шаг 1</i> что нужно</p>
+    <p class="ctitle"><span class="num">1</span><span class="tt">Что нужно<span>выберите услугу и транспорт</span></span></p>
 
     <div class="field">
-      <label class="fl" for="svc-tire">Услуга</label>
-      <div class="chips" id="svc" role="group" aria-label="Услуга">
-        <button type="button" class="chip" id="svc-tire" data-svc="tire" aria-pressed="true">Шиномонтаж с выездом</button>
-        <button type="button" class="chip" data-svc="warm" aria-pressed="false">Отогрев авто</button>
+      <label class="fl">Услуга</label>
+      <div class="tiles" id="svc" role="group" aria-label="Услуга">
+        <button type="button" class="tile" id="svc-tire" data-svc="tire" aria-pressed="true">
+          <span class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="4" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="20" y2="12"/></svg></span>
+          Шиномонтаж с выездом
+        </button>
+        <button type="button" class="tile" data-svc="warm" aria-pressed="false">
+          <span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1110 3a7 7 0 1010 11.5z"/></svg></span>
+          Отогрев авто
+        </button>
       </div>
     </div>
 
     <div class="field" id="veh-field">
-      <label class="fl" for="veh-legk">Тип транспорта</label>
-      <div class="chips" id="veh" role="group" aria-label="Тип транспорта">
-        <button type="button" class="chip" id="veh-legk" data-veh="legk" aria-pressed="true">Легковой</button>
-        <button type="button" class="chip" data-veh="comm" aria-pressed="false">Коммерческий транспорт</button>
-        <button type="button" class="chip" data-veh="truck" aria-pressed="false">Грузовой</button>
+      <label class="fl">Тип транспорта</label>
+      <div class="tiles" id="veh" role="group" aria-label="Тип транспорта">
+        <button type="button" class="tile" id="veh-legk" data-veh="legk" aria-pressed="true">
+          <span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M3 13l1.5-4.5A2 2 0 016.4 7h11.2a2 2 0 011.9 1.5L21 13"/><rect x="2" y="13" width="20" height="5" rx="2"/><circle cx="7" cy="18" r="1.3"/><circle cx="17" cy="18" r="1.3"/></svg></span>
+          Легковой
+        </button>
+        <button type="button" class="tile" data-veh="comm" aria-pressed="false">
+          <span class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="10" rx="1.5"/><path d="M16 10h3l2 2.5V17h-5"/><circle cx="7" cy="18.5" r="1.3"/><circle cx="17.5" cy="18.5" r="1.3"/></svg></span>
+          Коммерческий
+        </button>
+        <button type="button" class="tile" data-veh="truck" aria-pressed="false">
+          <span class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="9" width="11" height="8" rx="1"/><path d="M13 11h4l3 3v3h-7z"/><circle cx="6" cy="18.5" r="1.4"/><circle cx="17" cy="18.5" r="1.4"/></svg></span>
+          Грузовой
+        </button>
       </div>
     </div>
   </div>
 
   <!-- 2. ЦЕНА -->
   <div class="card c2">
-    <p class="ctitle"><i>шаг 2</i> стоимость</p>
+    <p class="ctitle"><span class="num">2</span><span class="tt">Стоимость<span>считается по вашему выбору выше</span></span></p>
     <div class="readout">
       <div class="lines" id="lines"></div>
       <div class="total"><span class="tl">Стартовая цена</span><span class="tv" id="total">—</span></div>
-      <div class="badge">🚐 <b>выезд спецмашины включён</b> — Казань</div>
+      <div class="pillrow">
+        <span class="pill"><svg class="icon" viewBox="0 0 24 24"><path d="M3 13l1.5-4.5A2 2 0 016.4 7h11.2a2 2 0 011.9 1.5L21 13"/><rect x="2" y="13" width="20" height="5" rx="2"/><circle cx="7" cy="18" r="1.3"/><circle cx="17" cy="18" r="1.3"/></svg>Выезд спецмашины включён</span>
+        <span class="pill"><svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-7.1-7-12a7 7 0 1114 0c0 4.9-7 12-7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>Казань</span>
+      </div>
     </div>
-    <p class="hint" style="font-size:12.5px;color:var(--ink-dim);margin:0">Это цена «от», так указано на сайте. Точную стоимость компания называет по телефону — она зависит от загруженности дорог и мастеров, погоды и расстояния до клиента.</p>
+    <p class="hintline"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".4" fill="currentColor"/></svg>Это цена «от», так указано на сайте. Точную стоимость компания называет по телефону — она зависит от загруженности дорог и мастеров, погоды и расстояния до клиента.</p>
   </div>
 
   <!-- 3. ЗАПИСЬ -->
   <div class="card c3">
-    <p class="ctitle"><i>шаг 3</i> вызвать мастера</p>
+    <p class="ctitle"><span class="num">3</span><span class="tt">Вызвать мастера<span>заявка уйдёт в WhatsApp</span></span></p>
     <div class="row2">
       <div class="field"><label class="fl" for="nm">Имя</label><input type="text" id="nm" placeholder="Как к вам обращаться" autocomplete="name"></div>
       <div class="field"><label class="fl" for="ph">Телефон</label><input type="tel" id="ph" placeholder="+7 ___ ___-__-__" autocomplete="tel"></div>
@@ -203,10 +319,16 @@ footer b{color:var(--ink-mid)}
         </select>
       </div>
     </div>
-    <button class="btn" id="send" type="button">Собрать заявку</button>
+    <button class="btn" id="send" type="button">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-7-8-3z"/></svg>
+      Собрать заявку
+    </button>
     <p class="err" id="err" hidden></p>
     <div id="ticket" hidden></div>
-    <a class="btn ghost" id="wa" href="https://wa.me/79655949889" target="_blank" rel="noopener">Или написать в WhatsApp напрямую</a>
+    <a class="btn wa" id="wa" href="https://wa.me/79655949889" target="_blank" rel="noopener">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M20.5 3.5a10 10 0 00-16 12L3 21l5.7-1.5A10 10 0 1020.5 3.5z"/><path d="M8.5 9c.3 3 2.5 5.2 5.5 5.5.8.1 1.2-.9.7-1.5l-1-1.3c-.3-.4-.8-.4-1.2-.2-.5.3-1.3.2-2-.5s-.8-1.5-.5-2c.2-.4.2-.9-.2-1.2L8.5 6.7c-.6-.5-1.6-.1-1.5.7"/></svg>
+      Написать в WhatsApp напрямую
+    </a>
   </div>
 
   <footer>
@@ -228,9 +350,11 @@ footer b{color:var(--ink-mid)}
   var WARM = {label:"Отогрев (легковые, грузовые, спецтехника)", v:8000};
 
   var state = {svc:"tire", veh:"legk"};
+  var shown = null;
 
   function $(id){ return document.getElementById(id); }
-  function money(n){ return "от " + new Intl.NumberFormat("ru-RU").format(Math.round(n)) + " ₽"; }
+  function fmt(n){ return new Intl.NumberFormat("ru-RU").format(Math.round(n)); }
+  function money(n){ return "от " + fmt(n) + " ₽"; }
 
   function calc(s){
     var items = [];
@@ -242,6 +366,21 @@ footer b{color:var(--ink-mid)}
       items.push({l: WARM.label, v: WARM.v});
       return {items: items, total: WARM.v};
     }
+  }
+
+  function animateTotal(to){
+    var from = shown == null ? to : shown;
+    shown = to;
+    var el = $("total");
+    if (from === to){ el.textContent = money(to); return; }
+    var t0 = performance.now(), dur = 280;
+    function step(t){
+      var p = Math.min(1, (t - t0) / dur);
+      var ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = money(from + (to - from) * ease);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
   }
 
   function render(){
@@ -256,7 +395,7 @@ footer b{color:var(--ink-mid)}
       var b = document.createElement("span"); b.textContent = money(it.v);
       row.appendChild(a); row.appendChild(b); box.appendChild(row);
     });
-    $("total").textContent = money(r.total);
+    animateTotal(r.total);
   }
 
   function group(id, attr, key, cast){
@@ -279,7 +418,9 @@ footer b{color:var(--ink-mid)}
     var nm = $("nm").value.trim(), ph = $("ph").value.trim(), addr = $("addr").value.trim();
     var err = $("err");
     if (!nm || !ph || !addr){
-      err.textContent = "Заполните имя, телефон и адрес — без них мастер не сможет выехать.";
+      err.textContent = "";
+      var ic = document.createElementNS("http://www.w3.org/2000/svg","svg");
+      err.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".4" fill="currentColor"/></svg><span>Заполните имя, телефон и адрес — без них мастер не сможет выехать.</span>';
       err.hidden = false;
       return;
     }
@@ -305,7 +446,7 @@ footer b{color:var(--ink-mid)}
 
     var h = document.createElement("div");
     h.className = "th";
-    h.textContent = "✓ Заявка собрана";
+    h.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg><span>Заявка собрана</span>';
     wrap.appendChild(h);
 
     var hint1 = document.createElement("p");
