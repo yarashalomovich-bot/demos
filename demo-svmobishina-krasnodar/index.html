@@ -3,699 +3,648 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Расчёт выездного шиномонтажа — СВ МобиШина</title>
+<title>СВ МобиШина — выездной шиномонтаж в Краснодаре</title>
+<meta name="theme-color" content="#0b0b0c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap">
 <style>
 :root{
-  --bg:#0a0b0d;
-  --surface: rgba(255,255,255,.04); --surface-2: rgba(255,255,255,.065); --surface-3: rgba(255,255,255,.1);
-  --line: rgba(255,255,255,.09); --line-soft: rgba(255,255,255,.06);
-  --ink:#f5f6f8; --ink-mid:#a6adb6; --ink-dim:#757d87;
-  --accent-1:#ffb020; --accent-2:#ff5a5f; --accent-ink:#1a0e02;
-  --accent-grad: linear-gradient(135deg,var(--accent-1),var(--accent-2));
-  --ok:#36d399; --alert:#ff6b6b;
-  --font-display:'Manrope',system-ui,sans-serif;
-  --font-body:'Inter',system-ui,-apple-system,sans-serif;
-  --shadow-card: 0 1px 0 rgba(255,255,255,.05) inset, 0 24px 48px -28px rgba(0,0,0,.75);
-  --shadow-pop: 0 10px 24px -8px rgba(255,90,70,.45);
-  color-scheme: dark;
-}
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"]){
-    --bg:#eef0f3;
-    --surface:#ffffff; --surface-2:#f4f5f7; --surface-3:#e9ebee;
-    --line: rgba(10,15,20,.1); --line-soft: rgba(10,15,20,.06);
-    --ink:#14171a; --ink-mid:#555f68; --ink-dim:#7c858d;
-    --accent-ink:#1a0e02;
-    --shadow-card: 0 1px 0 rgba(255,255,255,.6) inset, 0 20px 40px -24px rgba(20,23,26,.18);
-    color-scheme: light;
-  }
-}
-:root[data-theme="light"]{
-  --bg:#eef0f3;
-  --surface:#ffffff; --surface-2:#f4f5f7; --surface-3:#e9ebee;
-  --line: rgba(10,15,20,.1); --line-soft: rgba(10,15,20,.06);
-  --ink:#14171a; --ink-mid:#555f68; --ink-dim:#7c858d;
-  --accent-ink:#1a0e02;
-  --shadow-card: 0 1px 0 rgba(255,255,255,.6) inset, 0 20px 40px -24px rgba(20,23,26,.18);
-  color-scheme: light;
+  --bg:#0b0b0c; --bg-2:#111113; --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.14);
+  --ink:#f5f5f7; --ink-2:#a1a1a6; --ink-3:#6e6e73;
+  --acc:#ff9f2e; --acc-2:#ff5a36; --acc-glow:rgba(255,140,50,.35);
+  --display:'Inter Tight',system-ui,-apple-system,sans-serif;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+  --ease:cubic-bezier(.2,.7,.1,1);
 }
 *{box-sizing:border-box}
-html,body{margin:0}
-body{
-  background:var(--bg); color:var(--ink);
-  font-family:var(--font-body); font-size:15px; line-height:1.55;
-  -webkit-font-smoothing:antialiased;
-}
-.icon{width:1em; height:1em; display:inline-block; vertical-align:-0.15em; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+html{scroll-behavior:smooth}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+button{font:inherit}
 
-/* ---------- HERO (full-bleed) ---------- */
-.hero{
-  position:relative; width:100%; min-height:320px;
-  display:flex; align-items:flex-end; overflow:hidden;
-  background:
-    radial-gradient(900px 480px at 14% -10%, rgba(255,176,32,.22), transparent 60%),
-    radial-gradient(760px 520px at 104% 6%, rgba(255,90,95,.2), transparent 55%),
-    linear-gradient(180deg, #141311 0%, #0d0c0b 55%, var(--bg) 100%);
-  padding-top:120px;
-}
-.hero::before{
-  content:""; position:absolute; inset:0;
-  background-image:
-    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.16) 50%, transparent 52%),
-    radial-gradient(1px 1px at 60% 65%, rgba(255,255,255,.12) 50%, transparent 52%),
-    radial-gradient(1px 1px at 85% 20%, rgba(255,255,255,.14) 50%, transparent 52%),
-    radial-gradient(1px 1px at 40% 85%, rgba(255,255,255,.1) 50%, transparent 52%);
-  background-size:220px 220px; pointer-events:none;
-}
-.herowheel{position:absolute; right:-6%; top:50%; transform:translateY(-46%); width:min(52vw,620px); height:auto; opacity:.9; pointer-events:none}
-@media (max-width:720px){.herowheel{right:-28%; width:84vw; opacity:.55}}
-.herocap{position:relative; width:100%; max-width:1180px; margin:0 auto; padding:0 20px 26px; display:flex; flex-direction:column; gap:12px; color:#fff}
-.brand{display:flex; align-items:center; gap:10px}
-.brandmark{
-  width:40px; height:40px; border-radius:12px; flex:none;
-  background:var(--accent-grad); box-shadow:var(--shadow-pop);
-  display:flex; align-items:center; justify-content:center; color:var(--accent-ink);
-}
-.brandmark .icon{width:21px; height:21px}
-.brandname{font-family:var(--font-display); font-weight:800; font-size:14.5px; letter-spacing:.02em}
-.brandloc{font-size:12px; color:rgba(255,255,255,.72); margin-top:1px}
-.hero h1{
-  font-family:var(--font-display); font-weight:800; font-size:clamp(28px,4.6vw,46px);
-  line-height:1.1; margin:4px 0 0; letter-spacing:-.01em; text-wrap:balance; max-width:640px;
-  text-shadow:0 2px 24px rgba(0,0,0,.35);
-}
-.hero .sub{color:rgba(255,255,255,.82); font-size:15px; margin:0; max-width:520px}
-.hero .sub b{color:#fff; font-weight:700}
+/* ---------- NAV ---------- */
+.nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  padding:14px clamp(16px,4vw,48px);transition:background .4s,backdrop-filter .4s,border-color .4s;border-bottom:1px solid transparent}
+.nav.solid{background:rgba(11,11,12,.72);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-color:var(--line)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo b{font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.02em}
+.logo span{font-size:11px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+.navlinks{display:flex;gap:28px;font-size:13px;color:var(--ink-2)}
+.navlinks a{text-decoration:none;transition:color .2s}
+.navlinks a:hover{color:var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;text-decoration:none;
+  background:var(--ink);color:#000;border:0;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s}
+.pill:hover{transform:translateY(-1px);box-shadow:0 8px 30px -8px rgba(255,255,255,.35)}
+.pill.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+.pill.acc{background:linear-gradient(135deg,var(--acc),var(--acc-2));color:#160800}
+.pill.acc:hover{box-shadow:0 10px 40px -8px var(--acc-glow)}
+@media (max-width:760px){.navlinks{display:none}}
 
-/* ---------- SHELL / GRID ---------- */
-.shell{max-width:1180px; margin:0 auto; padding:26px 20px 60px; display:grid; grid-template-columns:1fr; gap:20px}
-@media (min-width:900px){
-  .shell{grid-template-columns:340px 1fr; align-items:start; gap:28px}
-  .infocol{position:sticky; top:22px; display:flex; flex-direction:column; gap:16px}
-}
-.infocol{display:flex; flex-direction:column; gap:16px}
+/* ---------- HERO ---------- */
+.hero{position:relative;height:100svh;min-height:620px;display:grid;place-items:center;overflow:hidden}
+.hero-glow{position:absolute;inset:auto -20% -55% -20%;height:90%;background:radial-gradient(closest-side,rgba(255,120,40,.22),transparent 70%);filter:blur(10px);pointer-events:none}
+#wave{position:absolute;left:0;top:50%;width:100%;height:46%;transform:translateY(-50%);pointer-events:none;opacity:0;transition:opacity 1.6s var(--ease) .5s}
+.loaded #wave{opacity:1}
+.hero{--r:min(20vw,200px)}
+.word{position:absolute;inset:0;pointer-events:none}
+.word .w1{position:absolute;left:0;right:0;bottom:calc(50% + var(--r)*.72);text-align:center;margin:0;z-index:3;
+  font-family:var(--display);font-weight:800;font-size:clamp(76px,16vw,240px);line-height:.8;letter-spacing:-.055em;
+  background:linear-gradient(180deg,#fff 35%,#9a9a9e);-webkit-background-clip:text;background-clip:text;color:transparent;
+  opacity:0;transform:translateY(40px);transition:opacity 1.2s var(--ease),transform 1.4s var(--ease)}
+.word .w2{position:absolute;left:-10%;right:-10%;top:50%;text-align:center;z-index:1;white-space:nowrap;
+  font-family:var(--display);font-weight:700;font-size:clamp(60px,12.5vw,190px);line-height:1;letter-spacing:-.04em;
+  color:transparent;-webkit-text-stroke:1.2px rgba(255,255,255,.4);transform:translate(0,-40%);opacity:0;transition:opacity 1.4s var(--ease) .3s,transform 1.6s var(--ease) .3s}
+.word .tag{position:absolute;left:0;right:0;top:calc(50% + var(--r) + 34px);text-align:center;font-size:clamp(10px,1.1vw,13px);letter-spacing:.5em;text-transform:uppercase;color:var(--ink-2);opacity:0;transition:opacity 1s .7s}
+.loaded .word .w1{opacity:1;transform:none}
+.loaded .word .w2{opacity:1;transform:translate(0,-50%)}
+.loaded .word .tag{opacity:1}
+.hero-wheel{position:relative;width:calc(var(--r)*2);aspect-ratio:1;z-index:2;opacity:0;transform:scale(.86) rotate(-40deg);
+  transition:opacity 1.2s var(--ease) .15s,transform 1.8s var(--ease) .15s;filter:drop-shadow(0 40px 60px rgba(0,0,0,.7))}
+.loaded .hero-wheel{opacity:1;transform:scale(1) rotate(0)}
+.hero-wheel svg{width:100%;height:100%;display:block}
+.spin{transform-origin:50% 50%;animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero-foot{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;
+  padding:0 clamp(16px,4vw,48px) clamp(22px,4vh,40px);z-index:3}
+.hero-foot .l{display:flex;gap:10px;flex-wrap:wrap}
+.hero-foot .r{max-width:300px;text-align:right}
+.hero-foot .r b{display:block;font-family:var(--display);font-size:15px;font-weight:700}
+.hero-foot .r span{font-size:12.5px;color:var(--ink-2)}
+.scrollhint{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);width:1px;height:46px;background:linear-gradient(var(--ink-3),transparent);z-index:3;overflow:hidden}
+.scrollhint::after{content:"";position:absolute;left:0;top:-20px;width:1px;height:20px;background:var(--ink);animation:drip 2.2s var(--ease) infinite}
+@keyframes drip{to{top:46px}}
+@media (max-width:760px){.hero-foot{flex-direction:column;align-items:flex-start}.hero-foot .r{text-align:left}.scrollhint{display:none}.hero{--r:35vw}.word .w1{font-size:21vw;bottom:calc(50% + var(--r)*.86)}}
 
-.demolabel{
-  display:flex; gap:10px; align-items:flex-start;
-  background:var(--surface-2); border:1px solid var(--line); border-radius:12px;
-  padding:11px 13px; font-size:12.5px; color:var(--ink-mid); line-height:1.5;
-}
-.demolabel b{
-  font-family:var(--font-display); font-weight:800; font-size:9.5px; letter-spacing:.09em; text-transform:uppercase;
-  background:var(--accent-grad); color:var(--accent-ink); padding:4px 8px; border-radius:6px; flex:none; margin-top:1px;
+/* ---------- SECTION BASICS ---------- */
+section{position:relative}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+.eyebrow{font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);margin:0 0 14px}
+.h2{font-family:var(--display);font-weight:700;font-size:clamp(34px,5.4vw,64px);line-height:1.02;letter-spacing:-.035em;margin:0}
+.h2 em{font-style:normal;background:linear-gradient(90deg,var(--acc),var(--acc-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--ink-2);font-size:clamp(15px,1.4vw,18px);max-width:520px;margin:18px 0 0}
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s var(--ease),transform 1.2s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.2s}.rv.d3{transition-delay:.3s}
+.no-js .rv{opacity:1;transform:none}
+
+/* ---------- STATEMENT ---------- */
+.statement{padding:clamp(110px,18vh,200px) 0 clamp(60px,10vh,120px)}
+.statement p{font-family:var(--display);font-weight:600;font-size:clamp(28px,4.4vw,56px);line-height:1.12;letter-spacing:-.03em;margin:0;max-width:1000px}
+.statement p span{color:var(--ink-3);transition:color .5s}
+.statement p span.on{color:var(--ink)}
+.statement p.eyebrow{font-family:var(--body);font-size:11.5px;font-weight:400;letter-spacing:.22em;line-height:1.5;margin:0 0 22px;color:var(--ink-3)}
+
+/* ---------- EXPLODED ---------- */
+.explode{height:420vh}
+.stage{position:sticky;top:0;height:100svh;display:grid;grid-template-columns:1fr 1.1fr;align-items:center;overflow:hidden}
+.copy{position:relative;height:260px;padding-left:clamp(16px,6vw,96px)}
+.step{position:absolute;inset:0 0 auto clamp(16px,6vw,96px);opacity:0;transform:translateY(30px);transition:opacity .7s var(--ease),transform .9s var(--ease);pointer-events:none}
+.step.on{opacity:1;transform:none;pointer-events:auto}
+.step .h2{font-size:clamp(30px,4vw,52px)}
+.step p{color:var(--ink-2);max-width:380px;margin:16px 0 22px;font-size:15px}
+.stepnav{position:absolute;left:clamp(16px,6vw,96px);bottom:-70px;display:flex;gap:8px}
+.stepnav i{width:22px;height:2px;border-radius:2px;background:var(--line-2);transition:background .4s,width .4s}
+.stepnav i.on{background:var(--ink);width:40px}
+.scene{position:relative;height:100%;perspective:1400px}
+.rig{position:absolute;left:50%;top:50%;width:min(40vw,440px);aspect-ratio:1;transform-style:preserve-3d;
+  transform:translate(-50%,-50%) rotateY(var(--ry,-8deg)) rotateX(4deg)}
+.layer{position:absolute;inset:0;transform-style:preserve-3d;transform:translateZ(var(--z,0px));transition:transform .15s linear}
+.layer svg{width:100%;height:100%;display:block;overflow:visible}
+.callout{position:absolute;display:flex;align-items:center;gap:0;opacity:0;transition:opacity .6s var(--ease);pointer-events:none;white-space:nowrap}
+.callout.on{opacity:1}
+.callout .dot{width:9px;height:9px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 5px rgba(255,159,46,.18),0 0 20px var(--acc);flex:none}
+.callout .ln{height:1px;width:0;background:linear-gradient(90deg,var(--acc),rgba(255,255,255,.35));transition:width .8s var(--ease) .15s}
+.callout.on .ln{width:var(--len,120px)}
+.callout .lb{padding-left:12px;font-size:13px}
+.callout .lb b{display:block;font-family:var(--display);font-weight:700;font-size:14px}
+.callout .lb span{color:var(--ink-2);font-size:12px}
+.callout.left{flex-direction:row-reverse}
+.callout.left .lb{padding:0 12px 0 0;text-align:right}
+.callout.left .ln{background:linear-gradient(270deg,var(--acc),rgba(255,255,255,.35))}
+@media (max-width:860px){
+  .explode{height:380vh}
+  .stage{grid-template-columns:1fr;grid-template-rows:56% 44%}
+  .scene{order:1}.copy{order:2;height:auto;padding:0 16px}
+  .step{inset:0 16px auto 16px}
+  .rig{width:62vw}
+  .stepnav{left:16px;bottom:auto;top:-28px}
+  .callout .lb span{display:none}
+  .callout:not(.left){left:52%!important}
+  .callout.left{right:52%!important}
+  .callout{--len:26px!important}
+  .callout .lb b{font-size:12.5px}
 }
 
-.trustrow{display:flex; flex-direction:column; gap:8px}
-.trust{
-  display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink-mid); font-weight:500;
-  background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+/* ---------- NUMBERS ---------- */
+.numbers{padding:clamp(100px,16vh,180px) 0}
+.ngrid{display:grid;grid-template-columns:repeat(4,1fr);margin-top:56px;border-top:1px solid var(--line)}
+.n{padding:34px 22px 10px 0;border-right:1px solid var(--line)}
+.n:last-child{border-right:0}
+.n .v{font-family:var(--display);font-weight:700;font-size:clamp(44px,6vw,84px);letter-spacing:-.045em;line-height:1;white-space:nowrap}
+.n .v small{font-size:.42em;letter-spacing:-.01em;color:var(--ink-2);font-weight:600;margin-left:4px}
+.n .k{color:var(--ink-2);font-size:14px;margin-top:12px;max-width:200px}
+@media (max-width:860px){.ngrid{grid-template-columns:1fr 1fr}.n:nth-child(2){border-right:0}.n{border-bottom:1px solid var(--line);padding-left:0}}
+
+/* ---------- CALCULATOR ---------- */
+.calc{padding:clamp(80px,12vh,140px) 0}
+.calc-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(24px,4vw,56px);margin-top:56px;align-items:start}
+.panel{background:var(--bg-2);border:1px solid var(--line);border-radius:28px;padding:clamp(20px,3vw,36px)}
+.row{padding:20px 0;border-bottom:1px solid var(--line)}
+.row:first-child{padding-top:0}
+.row:last-child{border-bottom:0;padding-bottom:0}
+.lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 12px}
+.seg{display:flex;flex-wrap:wrap;gap:6px;background:rgba(255,255,255,.04);border-radius:14px;padding:4px;width:max-content;max-width:100%}
+.seg button{border:0;background:transparent;color:var(--ink-2);padding:10px 16px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;transition:background .3s var(--ease),color .3s}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#000;font-weight:600}
+.seg.wide{width:100%}.seg.wide button{flex:1 1 auto}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0;cursor:pointer;color:var(--ink-2);font-size:14.5px}
+.tg input{appearance:none;-webkit-appearance:none;width:42px;height:26px;border-radius:999px;background:rgba(255,255,255,.12);position:relative;flex:none;cursor:pointer;transition:background .3s}
+.tg input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .35s var(--ease)}
+.tg input:checked{background:var(--acc)}
+.tg input:checked::after{transform:translateX(16px)}
+.tg b{color:var(--ink);font-weight:500}
+select,input[type=text],input[type=tel],input[type=number]{width:100%;font:inherit;font-size:15px;color:var(--ink);background:rgba(255,255,255,.05);
+  border:1px solid var(--line);border-radius:14px;padding:14px 16px;outline:none;transition:border-color .3s,background .3s;appearance:none;-webkit-appearance:none}
+select:focus,input:focus{border-color:rgba(255,159,46,.6);background:rgba(255,255,255,.07)}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--ink-2) 50%),linear-gradient(135deg,var(--ink-2) 50%,transparent 50%);
+  background-position:calc(100% - 22px) 50%,calc(100% - 17px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:44px}
+select option{background:#1a1a1c}
+.hint{font-size:12.5px;color:var(--ink-3);margin:10px 0 0}
+.sum{position:sticky;top:90px}
+.sum .panel{position:relative;overflow:hidden}
+.sum .panel::before{content:"";position:absolute;inset:-40% -30% auto auto;width:360px;height:360px;background:radial-gradient(closest-side,var(--acc-glow),transparent);pointer-events:none;opacity:.7}
+.price{font-family:var(--display);font-weight:800;font-size:clamp(54px,7vw,92px);letter-spacing:-.05em;line-height:1;margin:6px 0 4px;font-variant-numeric:tabular-nums;position:relative}
+.price small{font-size:.38em;color:var(--ink-2);font-weight:600;letter-spacing:-.01em}
+.lines{margin:22px 0 0;padding:18px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px;position:relative}
+.ln2{display:flex;justify-content:space-between;gap:16px;font-size:13.5px;color:var(--ink-2)}
+.ln2 span:last-child{color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sum .note{font-size:12px;color:var(--ink-3);margin:18px 0 0;position:relative}
+@media (max-width:900px){.calc-grid{grid-template-columns:1fr}.sum{position:static}}
+
+/* ---------- BOOK ---------- */
+.book{padding:clamp(80px,12vh,140px) 0 clamp(60px,10vh,120px)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:40px;max-width:760px}
+.fgrid .full{grid-column:1/-1}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.cta .pill{padding:16px 26px;font-size:15px}
+.err{color:#ff7a6b;font-size:13.5px;margin:14px 0 0}
+.ticket{margin-top:24px;max-width:760px;border:1px solid rgba(54,211,153,.35);border-radius:22px;padding:22px;background:rgba(54,211,153,.04)}
+.ticket h4{margin:0 0 6px;font-family:var(--display);font-size:16px;color:#4fe0a6}
+.ticket p{margin:0 0 14px;color:var(--ink-2);font-size:13.5px}
+.ticket pre{margin:0;white-space:pre-wrap;font:12.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);background:rgba(0,0,0,.35);border-radius:14px;padding:16px}
+@media (max-width:640px){.fgrid{grid-template-columns:1fr}}
+[hidden]{display:none!important}
+
+footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--ink-3);font-size:12.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+footer .demo{max-width:620px}
+footer b{color:var(--ink-2);font-weight:600}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
 }
-.trust .ic{
-  width:28px; height:28px; border-radius:9px; flex:none; display:flex; align-items:center; justify-content:center;
-  background:var(--surface-3); color:var(--ok);
-}
-.trust .ic .icon{width:15px; height:15px}
-.trust b{color:var(--ink); font-weight:700}
-
-.howcard{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:17px; box-shadow:var(--shadow-card)}
-.howcard .httl{font-family:var(--font-display); font-weight:700; font-size:13px; letter-spacing:.01em; margin:0 0 13px; color:var(--ink)}
-.howrow{display:flex; gap:11px; align-items:flex-start}
-.howrow + .howrow{margin-top:12px}
-.hownum{
-  width:22px; height:22px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
-  font-family:var(--font-display); font-weight:800; font-size:11px; background:var(--surface-3); color:var(--ink-mid);
-}
-.howrow:last-child .hownum{background:var(--accent-grad); color:var(--accent-ink)}
-.howtxt{font-size:13px; color:var(--ink-mid); line-height:1.45; padding-top:2px}
-.howtxt b{color:var(--ink); font-weight:600}
-
-/* ---------- STEPS COLUMN ---------- */
-.stepscol{display:flex; flex-direction:column; gap:16px}
-.card{
-  position:relative; background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:20px;
-  display:flex; flex-direction:column; gap:16px; box-shadow:var(--shadow-card);
-}
-
-.ctitle{display:flex; gap:10px; align-items:center; margin:0}
-.ctitle .num{
-  width:24px; height:24px; border-radius:8px; flex:none; display:flex; align-items:center; justify-content:center;
-  background:var(--accent-grad); color:var(--accent-ink); font-family:var(--font-display); font-weight:800; font-size:12px;
-}
-.ctitle .tt{font-family:var(--font-display); font-weight:700; font-size:14.5px; letter-spacing:.01em; color:var(--ink)}
-.ctitle .tt span{display:block; font-family:var(--font-body); font-weight:400; font-size:11.5px; color:var(--ink-dim); margin-top:1px}
-
-.field{display:flex; flex-direction:column; gap:8px}
-label.fl{font-size:12.5px; color:var(--ink-dim); font-weight:600; letter-spacing:.01em}
-
-.tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-@media (min-width:560px){.tiles.three{grid-template-columns:repeat(3,1fr)}}
-.tile{
-  display:flex; flex-direction:column; align-items:flex-start; gap:10px; text-align:left;
-  font-family:var(--font-body); font-size:13.5px; font-weight:600; padding:14px 14px 13px; border-radius:14px; cursor:pointer;
-  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.25;
-  transition:border-color .15s, background .15s, transform .15s, box-shadow .15s;
-}
-.tile:hover{border-color:var(--ink-dim); transform:translateY(-1px)}
-.tile .ic{
-  width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-  background:var(--surface-3); color:var(--ink-mid); transition:background .15s, color .15s;
-}
-.tile .ic .icon{width:17px; height:17px}
-.tile[aria-pressed="true"]{
-  background:linear-gradient(160deg, rgba(255,176,32,.14), rgba(255,90,95,.1)); border-color:transparent;
-  box-shadow:0 0 0 1.5px var(--accent-1) inset, var(--shadow-pop); color:var(--ink);
-}
-.tile[aria-pressed="true"] .ic{background:var(--accent-grad); color:var(--accent-ink)}
-.tile:focus-visible{outline:2px solid var(--accent-1); outline-offset:2px}
-
-select{
-  font-family:var(--font-body); font-weight:500; font-size:15px; padding:12px 38px 12px 14px; border-radius:12px;
-  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
-  appearance:none; -webkit-appearance:none;
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--ink-mid) 50%),
-    linear-gradient(135deg, var(--ink-mid) 50%, transparent 50%);
-  background-position: calc(100% - 20px) center, calc(100% - 15px) center;
-  background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
-}
-input[type="text"],input[type="tel"],input[type="number"]{
-  font-family:var(--font-body); font-weight:500; font-size:15px; padding:12px 14px; border-radius:12px;
-  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
-}
-select:focus,input:focus{outline:none; border-color:var(--accent-1); box-shadow:0 0 0 3px rgba(255,176,32,.18)}
-.row2{display:grid; grid-template-columns:1fr 1fr; gap:11px}
-
-.hintline{font-size:12px; color:var(--ink-dim); margin:0; line-height:1.55; display:flex; gap:7px}
-.hintline .icon{width:14px; height:14px; flex:none; margin-top:2px; color:var(--ink-dim)}
-
-.readout{
-  background:linear-gradient(160deg, rgba(255,176,32,.1), rgba(255,90,95,.05));
-  border:1px solid var(--line); border-radius:16px; padding:18px 18px 17px;
-  display:flex; flex-direction:column; gap:14px;
-}
-@media (min-width:560px){.readout{flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap}}
-.lines{display:flex; flex-direction:column; gap:7px; flex:1; min-width:220px}
-.pl{display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:var(--ink-mid)}
-.pl span:last-child{font-variant-numeric:tabular-nums; color:var(--ink); font-weight:600; white-space:nowrap}
-.total{display:flex; flex-direction:column; align-items:flex-start; gap:5px}
-.total .tl{font-family:var(--font-display); font-size:12.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--ink-mid)}
-.total .tv{
-  font-family:var(--font-display); font-weight:800; font-size:clamp(26px,4vw,34px); font-variant-numeric:tabular-nums; line-height:1.1;
-  background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap;
-}
-.pillrow{display:flex; gap:8px; flex-wrap:wrap}
-.pill{
-  display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--ink);
-  background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:6px 11px 6px 9px;
-}
-.pill .icon{width:13px; height:13px; color:var(--ok)}
-
-.btn{
-  font-family:var(--font-display); font-weight:700; font-size:15.5px; letter-spacing:.01em;
-  background:var(--accent-grad); color:var(--accent-ink); border:none; border-radius:14px; padding:15px 18px;
-  cursor:pointer; width:100%; transition:filter .15s, transform .15s; text-align:center; text-decoration:none;
-  display:flex; align-items:center; justify-content:center; gap:9px; box-shadow:var(--shadow-pop);
-}
-.btn .icon{width:17px; height:17px}
-.btn:hover{filter:brightness(1.06); transform:translateY(-1px)}
-.btn:active{transform:translateY(0)}
-.btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
-.btn.ghost{background:var(--surface-2); color:var(--ink-mid); border:1.5px solid var(--line); font-size:13.5px; font-weight:600; box-shadow:none}
-.btn.ghost:hover{color:var(--ink); border-color:var(--ink-dim)}
-.btn.wa{background:linear-gradient(135deg,#2bd16a,#1aa352); color:#07230f; box-shadow:0 10px 24px -8px rgba(43,209,106,.4); margin-top:2px}
-.ctarow{display:flex; flex-direction:column; gap:10px}
-@media (min-width:560px){.ctarow{flex-direction:row}}
-
-.ticket{
-  background:var(--surface-2); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:11px;
-  border:1px solid rgba(54,211,153,.35);
-}
-.ticket .th{display:flex; gap:9px; align-items:center; font-family:var(--font-display); font-weight:700; font-size:14.5px; color:var(--ok)}
-.ticket .th .icon{width:17px; height:17px}
-.ticket pre{
-  font-family:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace; font-size:12px; line-height:1.7; margin:0;
-  white-space:pre-wrap; word-break:break-word; color:var(--ink); background:var(--surface); border-radius:10px;
-  padding:13px; border:1px solid var(--line);
-}
-.ticket .hint{font-size:12.5px; color:var(--ink-mid); margin:0}
-.copied{font-size:11.5px; color:var(--ok); font-weight:600}
-
-.err{font-size:13px; color:var(--alert); margin:0; display:flex; gap:7px; align-items:flex-start}
-.err .icon{width:14px; height:14px; flex:none; margin-top:2px}
-
-footer{max-width:1180px; margin:0 auto; padding:0 20px 50px; display:flex; flex-direction:column; gap:8px; font-size:12px; color:var(--ink-dim); line-height:1.6; border-top:1px solid var(--line-soft); padding-top:16px}
-footer b{color:var(--ink-mid)}
-
-@media (max-width:380px){.row2{grid-template-columns:1fr}}
-
-/* ---------- CHIPS (secondary multi-option selectors: radius, qty, etc.) ---------- */
-.chips{display:flex; flex-wrap:wrap; gap:7px}
-.chip{
-  font-family:var(--font-body); font-size:13px; font-weight:600; padding:9px 13px; border-radius:10px; cursor:pointer;
-  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.2;
-  transition:border-color .15s, background .15s;
-}
-.chip:hover{border-color:var(--ink-dim)}
-.chip[aria-pressed="true"]{background:var(--accent-grad); border-color:transparent; color:var(--accent-ink); font-weight:700; box-shadow:var(--shadow-pop)}
-.chip:focus-visible{outline:2px solid var(--accent-1); outline-offset:2px}
-.chip.sm{font-size:12.5px; padding:8px 10px; min-width:46px; text-align:center}
-
-.toggle{display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13px; color:var(--ink-mid); user-select:none; line-height:1.4}
-.toggle input{width:18px; height:18px; accent-color:var(--accent-1); flex:none; margin:0}
-
-/* hidden must always win over .field/.card display:flex */
-[hidden]{display:none !important}
-
-/* ---------- CHECKLIST (multi-select add-ons with price) ---------- */
-.checklist{display:flex; flex-direction:column; gap:9px}
-.citem{display:flex; align-items:center; gap:10px; font-size:13.5px; color:var(--ink); background:var(--surface-2); border:1.5px solid var(--line); border-radius:11px; padding:10px 12px; transition:border-color .15s}
-.citem:has(input:checked){border-color:var(--accent-1); background:linear-gradient(160deg, rgba(255,176,32,.1), rgba(255,90,95,.05))}
-.citem input[type="checkbox"]{width:18px; height:18px; accent-color:var(--accent-1); flex:none; margin:0}
-.citem .cl{flex:1}
-.citem .cv{font-variant-numeric:tabular-nums; color:var(--ink-mid); white-space:nowrap; font-weight:600; font-size:12.5px}
-
 </style>
 </head>
-<body>
-<div class="hero">
-  <svg class="herowheel" viewBox="0 0 400 400" aria-hidden="true">
-    <defs>
-      <linearGradient id="wheelgrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#ffb020"/>
-        <stop offset="1" stop-color="#ff5a5f"/>
-      </linearGradient>
-      <radialGradient id="hubgrad" cx="0.35" cy="0.35" r="0.75">
-        <stop offset="0" stop-color="#2a2d31"/>
-        <stop offset="1" stop-color="#101214"/>
-      </radialGradient>
-    </defs>
-    <circle cx="200" cy="200" r="178" fill="none" stroke="url(#wheelgrad)" stroke-width="2" opacity="0.55"/>
-    <circle cx="200" cy="200" r="150" fill="url(#hubgrad)" stroke="url(#wheelgrad)" stroke-width="3"/>
-    <circle cx="200" cy="200" r="150" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="22"/>
-    <g stroke="url(#wheelgrad)" stroke-width="2.4" stroke-linecap="round" opacity="0.8">
-      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(0 200 200)"/>
-      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(60 200 200)"/>
-      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(120 200 200)"/>
-      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(180 200 200)"/>
-      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(240 200 200)"/>
-      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(300 200 200)"/>
-    </g>
-    <circle cx="200" cy="200" r="46" fill="#17191c" stroke="url(#wheelgrad)" stroke-width="3"/>
-    <circle cx="200" cy="200" r="10" fill="url(#wheelgrad)"/>
-  </svg>
-  <div class="herocap">
-    <div class="brand">
-      <div class="brandmark"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="4" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="20" y2="12"/></svg></div>
-      <div>
-        <div class="brandname">СВ МОБИШИНА</div>
-        <div class="brandloc">Выездной шиномонтаж · Краснодар</div>
-      </div>
-    </div>
-    <h1>Выездной шиномонтаж в Краснодаре — расчёт за 15 секунд</h1>
-    <p class="sub">Клиент считает цену <b>сам, по вашему прайсу</b>, и сразу отправляет заявку.</p>
+<body class="no-js">
+
+<!-- ===== SVG wheel parts (defs reused by hero + exploded view) ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="gTire" cx="50%" cy="45%" r="55%">
+      <stop offset="78%" stop-color="#1c1c1e"/><stop offset="92%" stop-color="#0e0e0f"/><stop offset="100%" stop-color="#2a2a2c"/>
+    </radialGradient>
+    <linearGradient id="gSide" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a3a3d"/><stop offset=".5" stop-color="#151516"/><stop offset="1" stop-color="#2b2b2e"/>
+    </linearGradient>
+    <radialGradient id="gRim" cx="40%" cy="35%" r="75%">
+      <stop offset="0" stop-color="#f4f4f6"/><stop offset=".45" stop-color="#a9abb0"/><stop offset=".8" stop-color="#5d5f64"/><stop offset="1" stop-color="#2c2d30"/>
+    </radialGradient>
+    <linearGradient id="gSpoke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8e9ec"/><stop offset=".55" stop-color="#8c8e93"/><stop offset="1" stop-color="#4a4b4f"/>
+    </linearGradient>
+    <radialGradient id="gHub" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#9b9da2"/><stop offset="1" stop-color="#3a3b3e"/>
+    </radialGradient>
+    <linearGradient id="gAcc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb347"/><stop offset="1" stop-color="#ff5a36"/>
+    </linearGradient>
+    <symbol id="tire" viewBox="0 0 600 600">
+      <circle cx="300" cy="300" r="292" fill="url(#gTire)"/>
+      <circle cx="300" cy="300" r="286" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="10" stroke-dasharray="14 9"/>
+      <circle cx="300" cy="300" r="270" fill="none" stroke="url(#gSide)" stroke-width="24"/>
+      <circle cx="300" cy="300" r="250" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+      <path id="arcTxt" d="M44 300A256 256 0 0 1 556 300" fill="none"/>
+      <text font-family="Inter Tight,sans-serif" font-weight="700" font-size="17" letter-spacing="6" fill="rgba(255,255,255,.22)">
+        <textPath href="#arcTxt" startOffset="50%" text-anchor="middle">205 / 55 R16 · ВЫЕЗДНОЙ ШИНОМОНТАЖ</textPath>
+      </text>
+      <circle cx="300" cy="300" r="236" fill="#0b0b0c"/>
+    </symbol>
+    <symbol id="rim" viewBox="0 0 600 600">
+      <circle cx="300" cy="300" r="236" fill="url(#gRim)"/>
+      <circle cx="300" cy="300" r="222" fill="#141416"/>
+      <circle cx="300" cy="300" r="222" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
+      <g fill="url(#gSpoke)" stroke="rgba(255,255,255,.25)" stroke-width="1">
+        <path id="spk" d="M286 252 L272 92 Q300 80 328 92 L314 252 Z"/>
+        <use href="#spk" transform="rotate(72 300 300)"/>
+        <use href="#spk" transform="rotate(144 300 300)"/>
+        <use href="#spk" transform="rotate(216 300 300)"/>
+        <use href="#spk" transform="rotate(288 300 300)"/>
+      </g>
+      <circle cx="300" cy="300" r="62" fill="url(#gRim)"/>
+    </symbol>
+    <symbol id="hub" viewBox="0 0 600 600">
+      <circle cx="300" cy="300" r="46" fill="url(#gHub)" stroke="rgba(0,0,0,.4)" stroke-width="2"/>
+      <g fill="#2b2c2f" stroke="rgba(255,255,255,.5)" stroke-width="1.5">
+        <circle cx="300" cy="268" r="8"/><circle cx="330" cy="290" r="8"/><circle cx="319" cy="326" r="8"/><circle cx="281" cy="326" r="8"/>
+      </g>
+      <circle cx="270" cy="290" r="9" fill="url(#gAcc)" stroke="#fff" stroke-opacity=".6" stroke-width="1.5"/>
+      <circle cx="300" cy="300" r="15" fill="#1a1a1c" stroke="rgba(255,255,255,.4)"/>
+    </symbol>
+    <symbol id="weight" viewBox="0 0 600 600">
+      <path d="M232 470 A190 190 0 0 0 368 470" fill="none" stroke="url(#gAcc)" stroke-width="16" stroke-linecap="round"/>
+      <path d="M244 474 A190 190 0 0 0 356 474" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-dasharray="4 10"/>
+    </symbol>
+  </defs>
+</svg>
+
+<nav class="nav" id="nav">
+  <a class="logo" href="#top"><b>СВ МОБИШИНА</b><span>Краснодар</span></a>
+  <div class="navlinks"><a href="#how">Как работаем</a><a href="#numbers">Цифры</a><a href="#calc">Цена</a><a href="#book">Вызвать мастера</a></div>
+  <a class="pill acc" href="#calc">Рассчитать</a>
+</nav>
+
+<!-- ===== HERO ===== -->
+<header class="hero" id="top">
+  <div class="hero-glow"></div>
+  <canvas id="wave" aria-hidden="true"></canvas>
+  <div class="word" aria-hidden="true">
+    <span class="w1">Выезд</span>
+    <span class="tag">шиномонтаж · Краснодар и край</span>
+    <span class="w2">круглосуточно</span>
   </div>
-</div>
+  <div class="hero-wheel" id="heroWheel">
+    <svg viewBox="0 0 600 600" role="img" aria-label="Колесо">
+      <g class="spin">
+        <use href="#tire"/><use href="#rim"/><use href="#hub"/>
+      </g>
+    </svg>
+  </div>
+  <div class="hero-foot">
+    <div class="l"><a class="pill" href="#calc">Узнать цену за 15 секунд</a><a class="pill ghost" href="#book">Вызвать мастера</a></div>
+    <div class="r"><b>Мастер приедет к вам</b><span>Снимем, смонтируем, отбалансируем или починим прокол — прямо на месте.</span></div>
+  </div>
+  <div class="scrollhint"></div>
+</header>
 
-<div class="shell">
+<!-- ===== STATEMENT ===== -->
+<section class="statement" id="how">
+  <div class="wrap">
+    <p class="eyebrow">Почему клиенты не уходят</p>
+    <p id="statement">Цена на экране за секунды. Не нужно звонить, ждать диспетчера и читать таблицы — клиент выбирает колесо и сразу видит итог.</p>
+  </div>
+</section>
 
-  <div class="infocol">
-    <div class="demolabel">
-      <b>демо</b>
-      <span>Это прототип, собранный Ярославом Хоружим как предложение для «СВ МобиШина» (Краснодар). Не официальная страница компании. Цены и районы выезда — реальные, с вашего сайта svmobishina.ru, на 14 октября 2026. В рабочей версии любая цифра меняется в одном месте.</span>
+<!-- ===== EXPLODED VIEW ===== -->
+<section class="explode" id="explode">
+  <div class="stage">
+    <div class="copy">
+      <div class="step on" data-i="0">
+        <p class="eyebrow">01 · Шиномонтаж</p>
+        <h2 class="h2">Снимем, смонтируем, <em>отбалансируем</em></h2>
+        <p>Полный цикл на одно колесо — от 500 ₽. Цена зависит от радиуса и профиля, калькулятор считает её сам.</p>
+        <a class="pill ghost" href="#calc">Посчитать →</a>
+      </div>
+      <div class="step" data-i="1">
+        <p class="eyebrow">02 · Сложные шины</p>
+        <h2 class="h2">Низкий профиль и <em>Run Flat</em></h2>
+        <p>Профиль 40 и ниже — +20%, Run Flat и раллийная резина — +70%, датчик давления — +10%. Всё честно, на экране.</p>
+        <a class="pill ghost" href="#calc">Посчитать →</a>
+      </div>
+      <div class="step" data-i="2">
+        <p class="eyebrow">03 · Ремонт на месте</p>
+        <h2 class="h2">Прокол — <em>за один выезд</em></h2>
+        <p>Холодный ремонт материалами REMA TIP TOP: латки, грибки, ножки — от 300 ₽ за ремонт.</p>
+        <a class="pill ghost" href="#calc">Посчитать →</a>
+      </div>
+      <div class="stepnav"><i class="on"></i><i></i><i></i></div>
     </div>
-
-    <div class="trustrow">
-      <div class="trust"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><span><b>Работаем круглосуточно</b> — Краснодар и край</span></div>
-      <div class="trust"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg></span><span><b>Расчёт по официальному прайсу</b> — без сюрпризов</span></div>
-    </div>
-
-    <div class="howcard">
-      <p class="httl">Как это работает</p>
-      <div class="howrow"><span class="hownum">1</span><span class="howtxt"><b>Клиент считает сам</b> — выбирает услугу и район и сразу видит цену, не дожидаясь ответа диспетчера.</span></div>
-      <div class="howrow"><span class="hownum">2</span><span class="howtxt"><b>Не уходит к конкурентам</b> — пока другие сервисы молчат на линии, здесь цена уже на экране.</span></div>
-      <div class="howrow"><span class="hownum">3</span><span class="howtxt"><b>Заявка приходит готовой</b> — мастеру в WhatsApp сразу уходят услуга, район, адрес и время.</span></div>
+    <div class="scene">
+      <div class="rig" id="rig">
+        <div class="layer" data-z="-1"><svg viewBox="0 0 600 600"><use href="#tire"/></svg></div>
+        <div class="layer" data-z="0"><svg viewBox="0 0 600 600"><use href="#rim"/></svg></div>
+        <div class="layer" data-z="0.4"><svg viewBox="0 0 600 600"><use href="#weight"/></svg></div>
+        <div class="layer" data-z="1"><svg viewBox="0 0 600 600"><use href="#hub"/></svg></div>
+      </div>
+      <div class="callout left" data-c="0" style="right:56%;top:22%;--len:90px"><span class="dot"></span><span class="ln"></span><span class="lb"><b>Шина</b><span>R13 – R17</span></span></div>
+      <div class="callout" data-c="0" style="left:62%;top:70%;--len:70px"><span class="dot"></span><span class="ln"></span><span class="lb"><b>Балансировка</b><span>в цене монтажа</span></span></div>
+      <div class="callout" data-c="1" style="left:60%;top:30%;--len:80px"><span class="dot"></span><span class="ln"></span><span class="lb"><b>Профиль ≤ 40</b><span>+20%</span></span></div>
+      <div class="callout left" data-c="1" style="right:55%;top:64%;--len:80px"><span class="dot"></span><span class="ln"></span><span class="lb"><b>Датчик давления</b><span>+10%</span></span></div>
+      <div class="callout" data-c="2" style="left:56%;top:48%;--len:100px"><span class="dot"></span><span class="ln"></span><span class="lb"><b>Латка / грибок</b><span>от 300 ₽</span></span></div>
     </div>
   </div>
+</section>
 
-  <div class="stepscol">
-
-    <!-- 1. РАСЧЁТ -->
-    <div class="card">
-      <p class="ctitle"><span class="num">1</span><span class="tt">Что случилось<span>выберите услугу и параметры</span></span></p>
-
-      <div class="field">
-        <label class="fl">Услуга</label>
-        <div class="tiles" id="svc" role="group" aria-label="Услуга">
-          <button type="button" class="tile" id="svc-mount" data-svc="mount" aria-pressed="true">
-            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="4" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="20" y2="12"/></svg></span>
-            Шиномонтаж (снятие + монтаж + балансировка)
-          </button>
-          <button type="button" class="tile" data-svc="cold" aria-pressed="false">
-            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l8 16H4L12 3z"/><line x1="12" y1="10" x2="12" y2="13"/><circle cx="12" cy="16" r=".6" fill="currentColor"/></svg></span>
-            Холодный ремонт прокола
-          </button>
-        </div>
-      </div>
-
-      <div id="mount-fields">
-        <div class="field">
-          <label class="fl">Радиус колеса</label>
-          <div class="chips" id="rad" role="group" aria-label="Радиус колеса">
-            <button type="button" class="chip sm" data-r="13" aria-pressed="false">R13</button>
-            <button type="button" class="chip sm" data-r="14" aria-pressed="false">R14</button>
-            <button type="button" class="chip sm" id="rad-16" data-r="16" aria-pressed="true">R15–16</button>
-            <button type="button" class="chip sm" data-r="17" aria-pressed="false">R17</button>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="fl">Профиль шины</label>
-          <div class="chips" id="prof" role="group" aria-label="Профиль шины">
-            <button type="button" class="chip" id="prof-op" data-pr="op" aria-pressed="true">Обычный</button>
-            <button type="button" class="chip" data-pr="np" aria-pressed="false">Низкий (55% и ниже)</button>
-          </div>
-          <p class="hintline" id="prof-hint"></p>
-        </div>
-
-        <div class="field">
-          <label class="fl">Сколько колёс</label>
-          <div class="chips" id="qty" role="group" aria-label="Количество колёс">
-            <button type="button" class="chip sm" data-q="1" aria-pressed="false">1</button>
-            <button type="button" class="chip sm" data-q="2" aria-pressed="false">2</button>
-            <button type="button" class="chip sm" data-q="3" aria-pressed="false">3</button>
-            <button type="button" class="chip sm" data-q="4" aria-pressed="true">4</button>
-          </div>
-        </div>
-
-        <label class="toggle" for="runflat">
-          <input type="checkbox" id="runflat">
-          <span>Шина Run Flat / раллийная (демонтаж-монтаж +70%)</span>
-        </label>
-        <label class="toggle" for="lowprof40">
-          <input type="checkbox" id="lowprof40">
-          <span>Профиль шины 40 и ниже (+20%)</span>
-        </label>
-        <label class="toggle" for="tpms">
-          <input type="checkbox" id="tpms">
-          <span>Есть датчик давления в шине (+10%)</span>
-        </label>
-      </div>
-
-      <div class="field" id="cold-field" hidden>
-        <label class="fl">Вид повреждения</label>
-        <div class="chips" id="cold-type" role="group" aria-label="Вид холодного ремонта">
-          <button type="button" class="chip" data-ct="puncture300" aria-pressed="false">Прокол камеры (латка 500-й серии)</button>
-          <button type="button" class="chip" id="cold-up3" data-ct="up3" aria-pressed="true">Универсальная латка УП3 (до 3 мм)</button>
-          <button type="button" class="chip" data-ct="up45" aria-pressed="false">Универсальная латка УП4.5 (до 4,5 мм)</button>
-          <button type="button" class="chip" data-ct="grib45" aria-pressed="false">Грибок 4,5 мм</button>
-          <button type="button" class="chip" data-ct="grib6" aria-pressed="false">Грибок 6 мм</button>
-          <button type="button" class="chip" data-ct="grib8" aria-pressed="false">Грибок 8 мм</button>
-          <button type="button" class="chip" data-ct="stem6" aria-pressed="false">Ножка с латкой 6 мм</button>
-          <button type="button" class="chip" data-ct="stem8" aria-pressed="false">Ножка с латкой 8 мм</button>
-        </div>
-        <p class="hintline"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".4" fill="currentColor"/></svg>Материалы REMA TIP TOP. Цена — за сам ремонт, без снятия/установки колеса.</p>
-      </div>
-
-      <div class="field">
-        <label class="fl" for="zone">Район Краснодара</label>
-        <select id="zone">
-          <option value="central" selected>ЦМР, СМР, ФМР, ЮМР, Энка</option>
-          <option value="pmr">ПМР, ГМР, Аэропорт</option>
-          <option value="ozmall">OZ Молл, Знаменский</option>
-          <option value="outside">За пределами города</option>
-        </select>
-      </div>
-      <div class="field" id="km-field" hidden>
-        <label class="fl" for="km">Км от города</label>
-        <input type="number" id="km" min="1" max="150" value="10" inputmode="numeric">
-      </div>
+<!-- ===== NUMBERS ===== -->
+<section class="numbers" id="numbers">
+  <div class="wrap">
+    <p class="eyebrow rv">В цифрах</p>
+    <h2 class="h2 rv d1">Всё, что клиент хочет знать <em>до звонка</em></h2>
+    <div class="ngrid">
+      <div class="n rv"><div class="v"><span data-count="500">0</span><small>₽</small></div><div class="k">шиномонтаж одного колеса, от</div></div>
+      <div class="n rv d1"><div class="v"><span data-count="1500">0</span><small>₽</small></div><div class="k">выезд по ЦМР, СМР, ФМР, ЮМР</div></div>
+      <div class="n rv d2"><div class="v">R<span data-count="17">0</span></div><div class="k">радиусы от R13 до R17</div></div>
+      <div class="n rv d3"><div class="v"><span data-count="24">0</span><small>/7</small></div><div class="k">Краснодар и край, круглосуточно</div></div>
     </div>
+  </div>
+</section>
 
-    <!-- 2. ЦЕНА -->
-    <div class="card">
-      <p class="ctitle"><span class="num">2</span><span class="tt">Стоимость<span>считается по вашему выбору выше</span></span></p>
-      <div class="readout">
-        <div class="lines" id="lines"></div>
-        <div class="total"><span class="tl">Итого</span><span class="tv" id="total">—</span></div>
-      </div>
-      <div class="pillrow">
-        <span class="pill"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Работаем круглосуточно</span>
-        <span class="pill"><svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-7.1-7-12a7 7 0 1114 0c0 4.9-7 12-7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>Краснодар и край</span>
-      </div>
-      <p class="hintline"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".4" fill="currentColor"/></svg>Минимальная стоимость работ на выезде — 500 ₽ (условие сайта). Точную стоимость подтверждает мастер на месте после осмотра.</p>
-    </div>
-
-    <!-- 3. ЗАПИСЬ -->
-    <div class="card">
-      <p class="ctitle"><span class="num">3</span><span class="tt">Вызвать мастера<span>заявка уйдёт в WhatsApp</span></span></p>
-      <div class="row2">
-        <div class="field"><label class="fl" for="nm">Имя</label><input type="text" id="nm" placeholder="Как к вам обращаться" autocomplete="name"></div>
-        <div class="field"><label class="fl" for="ph">Телефон</label><input type="tel" id="ph" placeholder="+7 ___ ___-__-__" autocomplete="tel"></div>
-      </div>
-      <div class="field"><label class="fl" for="addr">Адрес или ориентир в Краснодаре</label><input type="text" id="addr" placeholder="Улица, дом — или ориентир"></div>
-      <div class="row2">
-        <div class="field"><label class="fl" for="car">Машина</label><input type="text" id="car" placeholder="Напр. Kia Rio"></div>
-        <div class="field"><label class="fl" for="whn">Когда</label>
-          <select id="whn">
-            <option value="Сейчас, срочно" selected>Сейчас, срочно</option>
-            <option value="В течение часа">В течение часа</option>
-            <option value="Сегодня вечером">Сегодня вечером</option>
-            <option value="Завтра утром">Завтра утром</option>
+<!-- ===== CALCULATOR ===== -->
+<section class="calc" id="calc">
+  <div class="wrap">
+    <p class="eyebrow rv">Калькулятор</p>
+    <h2 class="h2 rv d1">Ваша цена — <em>прямо сейчас</em></h2>
+    <p class="lead rv d2">Те же цифры, что в прайсе на сайте, только без таблиц.</p>
+    <div class="calc-grid">
+      <div class="panel rv">
+        <div class="row">
+          <p class="lbl">Что нужно</p>
+          <div class="seg wide" data-k="svc"><button aria-pressed="true" data-v="mount">Шиномонтаж</button><button aria-pressed="false" data-v="cold">Ремонт прокола</button></div>
+        </div>
+        <div id="mountBox">
+          <div class="row">
+            <p class="lbl">Радиус</p>
+            <div class="seg" data-k="rad"><button aria-pressed="false" data-v="13">R13</button><button aria-pressed="false" data-v="14">R14</button><button aria-pressed="true" data-v="16">R15–16</button><button aria-pressed="false" data-v="17">R17</button></div>
+          </div>
+          <div class="row">
+            <p class="lbl">Профиль</p>
+            <div class="seg" data-k="prof"><button aria-pressed="true" data-v="op">Обычный</button><button aria-pressed="false" data-v="np">Низкий (55% и ниже)</button></div>
+            <p class="hint" id="profHint"></p>
+          </div>
+          <div class="row">
+            <p class="lbl">Колёс</p>
+            <div class="seg" data-k="qty"><button aria-pressed="false" data-v="1">1</button><button aria-pressed="false" data-v="2">2</button><button aria-pressed="false" data-v="3">3</button><button aria-pressed="true" data-v="4">4</button></div>
+          </div>
+          <div class="row">
+            <label class="tg"><span><b>Run Flat / раллийная</b> · +70%</span><input type="checkbox" id="runflat"></label>
+            <label class="tg"><span><b>Профиль 40 и ниже</b> · +20%</span><input type="checkbox" id="low40"></label>
+            <label class="tg"><span><b>Датчик давления</b> · +10%</span><input type="checkbox" id="tpms"></label>
+          </div>
+        </div>
+        <div class="row" id="coldBox" hidden>
+          <p class="lbl">Повреждение</p>
+          <select id="ct">
+            <option value="puncture300">Прокол камеры — латка 500-й серии</option>
+            <option value="up3" selected>Латка УП3 (до 3 мм)</option>
+            <option value="up45">Латка УП4.5 (до 4,5 мм)</option>
+            <option value="grib45">Грибок 4,5 мм</option>
+            <option value="grib6">Грибок 6 мм</option>
+            <option value="grib8">Грибок 8 мм</option>
+            <option value="stem6">Ножка с латкой 6 мм</option>
+            <option value="stem8">Ножка с латкой 8 мм</option>
           </select>
+          <p class="hint">Цена — за сам ремонт, без снятия и установки колеса.</p>
+        </div>
+        <div class="row">
+          <p class="lbl">Где вы</p>
+          <select id="zone">
+            <option value="central">ЦМР, СМР, ФМР, ЮМР, Энка</option>
+            <option value="pmr">ПМР, ГМР, Аэропорт</option>
+            <option value="ozmall">OZ Молл, Знаменский</option>
+            <option value="outside">За пределами города</option>
+          </select>
+          <div id="kmBox" hidden style="margin-top:10px"><input type="number" id="km" min="1" max="150" value="10" inputmode="numeric" aria-label="Километров от города"><p class="hint">Км от города — по 100 ₽ за км.</p></div>
         </div>
       </div>
-      <div class="ctarow">
-        <button class="btn" id="send" type="button">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-7-8-3z"/></svg>
-          Собрать заявку
-        </button>
-        <a class="btn wa" id="wa" href="https://wa.me/79882442211" target="_blank" rel="noopener">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M20.5 3.5a10 10 0 00-16 12L3 21l5.7-1.5A10 10 0 1020.5 3.5z"/><path d="M8.5 9c.3 3 2.5 5.2 5.5 5.5.8.1 1.2-.9.7-1.5l-1-1.3c-.3-.4-.8-.4-1.2-.2-.5.3-1.3.2-2-.5s-.8-1.5-.5-2c.2-.4.2-.9-.2-1.2L8.5 6.7c-.6-.5-1.6-.1-1.5.7"/></svg>
-          Написать в WhatsApp
-        </a>
+      <div class="sum rv d1">
+        <div class="panel">
+          <p class="lbl" style="position:relative">Итого</p>
+          <div class="price" id="price">0<small> ₽</small></div>
+          <div class="lines" id="lines"></div>
+          <p class="note">Минимальная стоимость работ на выезде — 500 ₽. Точную сумму мастер подтверждает после осмотра.</p>
+          <a class="pill acc" href="#book" style="margin-top:22px;position:relative">Вызвать мастера по этой цене</a>
+        </div>
       </div>
-      <p class="err" id="err" hidden></p>
-      <div id="ticket" hidden></div>
     </div>
-
   </div>
-</div>
+</section>
+
+<!-- ===== BOOKING ===== -->
+<section class="book" id="book">
+  <div class="wrap">
+    <p class="eyebrow rv">Заявка</p>
+    <h2 class="h2 rv d1">Мастер едет. <em>Вы ждёте.</em></h2>
+    <p class="lead rv d2">Заявка уходит в WhatsApp уже с услугой, ценой и адресом — без уточняющих звонков.</p>
+    <div class="fgrid rv">
+      <input type="text" id="nm" placeholder="Имя" autocomplete="name">
+      <input type="tel" id="ph" placeholder="Телефон" autocomplete="tel">
+      <input class="full" type="text" id="addr" placeholder="Адрес или ориентир в Краснодаре">
+      <input type="text" id="car" placeholder="Машина, например Kia Rio">
+      <select id="whn"><option>Сейчас, срочно</option><option>В течение часа</option><option>Сегодня вечером</option><option>Завтра утром</option></select>
+    </div>
+    <div class="cta rv"><button class="pill acc" id="send" type="button">Отправить заявку в WhatsApp</button><a class="pill ghost" id="wa" href="https://wa.me/79882442211" target="_blank" rel="noopener">Написать мастеру напрямую</a></div>
+    <p class="err" id="err" hidden></p>
+    <div class="ticket" id="ticket" hidden><h4>Заявка собрана</h4><p>В рабочей версии она сразу уходит мастеру. В демо — показываем, что именно он получит.</p><pre id="ticketTxt"></pre></div>
+  </div>
+</section>
 
 <footer>
-  <span><b>Что это даёт компании.</b> Клиент считает стоимость сам по вашему прайсу и не уходит звонить конкурентам, пока ждёт ответа. Заявка приходит мастеру готовой: услуга, радиус, район, адрес, время — без уточняющих звонков.</span>
-  <span>Прототип. Собрал Ярослав Хоружий по открытым данным с сайта svmobishina.ru. Контакты и прайс в рабочей версии — ваши и обновляются вами.</span>
+  <div class="wrap">
+    <span class="demo"><b>Демо.</b> Прототип, собранный Ярославом Хоружим как предложение для «СВ МобиШина». Не официальная страница компании. Цены и районы — реальные, с сайта svmobishina.ru, на 14 октября 2026.</span>
+    <span>СВ МобиШина · Краснодар</span>
+  </div>
 </footer>
 
 <script>
 (function(){
-  "use strict";
+"use strict";
+document.body.classList.remove("no-js");
 
-  // Реальный прайс с сайта svmobishina.ru (страница «Легковые автомобили» + «Холодный ремонт»), проверено 14 октября 2026.
-  // Работы на 1 колесо, руб: снятие/установка + демонтаж-монтаж + балансировка = итого.
-  var MOUNT_OP = { // обычный профиль
-    13:500, 14:550, 15:600, 16:600, 17:700
-  };
-  var MOUNT_NP = { // низкий профиль (55% и ниже)
-    15:700, 16:700, 17:750
-  };
-  var COLD = {
-    puncture300: {label:"Прокол камеры, латка 500-й серии", v:300},
-    up3:   {label:"Универсальная латка УП3 (до 3 мм)", v:500},
-    up45:  {label:"Универсальная латка УП4.5 (до 4,5 мм)", v:550},
-    grib45:{label:"Грибок 4,5 мм", v:500},
-    grib6: {label:"Грибок 6 мм", v:650},
-    grib8: {label:"Грибок 8 мм", v:750},
-    stem6: {label:"Ножка с латкой 6 мм", v:900},
-    stem8: {label:"Ножка с латкой 8 мм", v:1000}
-  };
-  var ZONES = {
-    central: {label:"ЦМР, СМР, ФМР, ЮМР, Энка", v:1500},
-    pmr:     {label:"ПМР, ГМР, Аэропорт", v:1500},
-    ozmall:  {label:"OZ Молл, Знаменский", v:1800},
-    outside: {label:"За пределами города", v:0}
-  };
-  var PER_KM = 100;
-  var MIN_WORK = 500;
+/* ================= CONFIG (реальный прайс svmobishina.ru, 14.10.2026) ================= */
+var C = {
+  name:"СВ МобиШина", city:"Краснодар", wa:"79882442211",
+  MOUNT_OP:{13:500,14:550,15:600,16:600,17:700},
+  MOUNT_NP:{15:700,16:700,17:750},
+  COLD:{
+    puncture300:{l:"Прокол камеры, латка 500-й серии",v:300},
+    up3:{l:"Латка УП3 (до 3 мм)",v:500}, up45:{l:"Латка УП4.5 (до 4,5 мм)",v:550},
+    grib45:{l:"Грибок 4,5 мм",v:500}, grib6:{l:"Грибок 6 мм",v:650}, grib8:{l:"Грибок 8 мм",v:750},
+    stem6:{l:"Ножка с латкой 6 мм",v:900}, stem8:{l:"Ножка с латкой 8 мм",v:1000}
+  },
+  ZONES:{central:{l:"ЦМР, СМР, ФМР, ЮМР, Энка",v:1500},pmr:{l:"ПМР, ГМР, Аэропорт",v:1500},ozmall:{l:"OZ Молл, Знаменский",v:1800},outside:{l:"За пределами города",v:0}},
+  PER_KM:100, MIN_WORK:500
+};
 
-  var state = {svc:"mount", rad:16, prof:"op", qty:4, runflat:false, lowprof40:false, tpms:false, ct:"up3", zone:"central", km:10};
+var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function $(id){return document.getElementById(id);}
+function fmt(n){return new Intl.NumberFormat("ru-RU").format(Math.round(n));}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 
-  function $(id){ return document.getElementById(id); }
-  function money(n){ return new Intl.NumberFormat("ru-RU").format(Math.round(n)) + " ₽"; }
+/* ---------- intro ---------- */
+requestAnimationFrame(function(){ setTimeout(function(){document.body.classList.add("loaded");},60); });
 
-  function mountUnit(s){
-    return (s.prof === "np") ? (MOUNT_NP[s.rad] || MOUNT_NP[16]) : (MOUNT_OP[s.rad] || MOUNT_OP[16]);
-  }
+/* ---------- nav ---------- */
+var nav=$("nav");
+function onNav(){ nav.classList.toggle("solid", window.scrollY>40); }
 
-  // Чистая функция расчёта
-  function calc(s){
-    var items = [], work = 0;
-
-    if (s.svc === "mount"){
-      var unit = mountUnit(s);
-      var mult = 1;
-      var extras = [];
-      if (s.runflat){ mult += 0.70; extras.push("Run Flat/раллийная +70%"); }
-      if (s.lowprof40){ mult += 0.20; extras.push("профиль ≤40 +20%"); }
-      if (s.tpms){ mult += 0.10; extras.push("датчик давления +10%"); }
-      var perWheel = unit * mult;
-      var sum = perWheel * s.qty;
-      work += sum;
-      var profLabel = (s.prof === "np") ? "низкий профиль" : "обычный профиль";
-      items.push({l: "Шиномонтаж R" + (s.rad===16?"15–16":s.rad) + ", " + profLabel + " × " + s.qty + (extras.length ? " (" + extras.join(", ") + ")" : ""), v: sum});
-    } else {
-      var c = COLD[s.ct];
-      work += c.v;
-      items.push({l: c.label, v: c.v});
+/* ---------- hero wave (живая «волна» сквозь колесо) ---------- */
+var cv=$("wave"), cx=cv.getContext("2d"), W=0,H=0,dpr=Math.min(2,window.devicePixelRatio||1), t0=performance.now(), heroVisible=true;
+function size(){ W=cv.clientWidth; H=cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; cx.setTransform(dpr,0,0,dpr,0,0); }
+size(); window.addEventListener("resize",size);
+var LINES=7;
+function drawWave(now){
+  if(!heroVisible){ requestAnimationFrame(drawWave); return; }
+  var t=(now-t0)/1000; cx.clearRect(0,0,W,H);
+  var mid=H/2, pulse=0.55+0.45*Math.sin(t*1.3);
+  for(var k=0;k<LINES;k++){
+    var ph=k/LINES, amp=(H*0.32)*(0.35+0.65*Math.sin(Math.PI*(k+1)/(LINES+1)))*(0.6+0.4*pulse);
+    var g=cx.createLinearGradient(0,0,W,0);
+    g.addColorStop(0,"rgba(255,255,255,0)"); g.addColorStop(.3,"rgba(255,180,90,"+(0.10+0.08*k/LINES)+")");
+    g.addColorStop(.5,"rgba(255,130,60,"+(0.85-0.07*k)+")"); g.addColorStop(.7,"rgba(255,180,90,"+(0.10+0.08*k/LINES)+")"); g.addColorStop(1,"rgba(255,255,255,0)");
+    cx.strokeStyle=g; cx.lineWidth=k===0?2:1.2; cx.beginPath();
+    for(var x=0;x<=W;x+=4){
+      var u=x/W, env=Math.exp(-Math.pow((u-.5)/.17,2));           // огибающая: пик в центре, за колесом
+      var side=0.12*Math.exp(-Math.pow((u-.5)/.42,2));              // хвосты по краям
+      var y=mid+Math.sin(u*38+t*3.2+ph*6.28)*amp*(env+side)*Math.sin(u*9-t*1.1+ph*3);
+      x===0?cx.moveTo(x,y):cx.lineTo(x,y);
     }
-
-    // минимальная стоимость работ на выезде
-    if (work < MIN_WORK){
-      items.push({l:"Доплата до минимума работ (500 ₽)", v: MIN_WORK - work});
-      work = MIN_WORK;
-    }
-
-    var zone = ZONES[s.zone];
-    var callout = 0;
-    if (s.zone === "outside"){
-      var km = Math.max(1, Math.min(150, s.km || 1));
-      callout = km * PER_KM;
-      items.push({l:"Выезд за город: " + km + " км × 100 ₽", v: callout});
-    } else {
-      callout = zone.v;
-      items.push({l:"Выезд, район: " + zone.label, v: callout});
-    }
-
-    return {items: items, total: work + callout};
+    cx.stroke();
   }
+  requestAnimationFrame(drawWave);
+}
+if(!reduce) requestAnimationFrame(drawWave);
+new IntersectionObserver(function(e){heroVisible=e[0].isIntersecting;}).observe($("top"));
 
-  function render(){
-    var isMount = (state.svc === "mount");
-    $("mount-fields").hidden = !isMount;
-    $("cold-field").hidden = isMount;
-    $("km-field").hidden = (state.zone !== "outside");
+/* ---------- hero parallax ---------- */
+var hw=$("heroWheel"), word=document.querySelector(".word");
+function onHero(){
+  var y=window.scrollY, h=window.innerHeight; if(y>h) return;
+  var p=y/h;
+  hw.style.transform="translateY("+(p*h*0.28)+"px) scale("+(1-p*0.18)+")";
+  word.style.transform="translateY("+(p*h*0.12)+"px)";
+  word.style.opacity=String(1-p*1.2);
+}
 
-    var npAvailable = (state.rad >= 15);
-    if (!npAvailable && state.prof === "np"){ state.prof = "op"; }
-    $("prof-hint").textContent = npAvailable
-      ? "Для R15–16 и R17 на сайте указаны отдельные цены для низкого профиля."
-      : "Для R13–14 на сайте цена указана только для обычного профиля.";
+/* ---------- statement: слова «зажигаются» по мере скролла ---------- */
+var st=$("statement"); var words=st.textContent.split(" ");
+st.innerHTML=words.map(function(w){return "<span>"+w+"</span>";}).join(" ");
+var sw=st.querySelectorAll("span");
+function onStatement(){
+  var r=st.getBoundingClientRect(), vh=window.innerHeight;
+  var p=clamp((vh*0.85-r.top)/(r.height+vh*0.35),0,1), n=Math.round(p*sw.length);
+  for(var i=0;i<sw.length;i++) sw[i].classList.toggle("on", i<n);
+}
 
-    var r = calc(state);
-    var box = $("lines");
-    box.textContent = "";
-    r.items.forEach(function(it){
-      var row = document.createElement("div");
-      row.className = "pl";
-      var a = document.createElement("span"); a.textContent = it.l;
-      var b = document.createElement("span"); b.textContent = money(it.v);
-      row.appendChild(a); row.appendChild(b); box.appendChild(row);
-    });
-    $("total").textContent = money(r.total);
+/* ---------- exploded view ---------- */
+var ex=$("explode"), rig=$("rig"), layers=rig.querySelectorAll(".layer"), steps=ex.querySelectorAll(".step"),
+    dots=ex.querySelectorAll(".stepnav i"), calls=ex.querySelectorAll(".callout"), cur=-1;
+function onExplode(){
+  var r=ex.getBoundingClientRect(), total=ex.offsetHeight-window.innerHeight;
+  var p=clamp(-r.top/total,0,1);
+  var spread=clamp(p/0.28,0,1);                     // разлёт деталей в первые 28% секции
+  var e=1-Math.pow(1-spread,3);
+  var gap=Math.min(window.innerWidth*0.12,150);
+  rig.style.setProperty("--ry",(-8-e*52+p*14)+"deg");
+  for(var i=0;i<layers.length;i++){
+    var z=parseFloat(layers[i].getAttribute("data-z"));
+    layers[i].style.setProperty("--z",(z*gap*e)+"px");
   }
-
-  function group(id, attr, key, cast){
-    var root = $(id);
-    if (!root) return;
-    root.addEventListener("click", function(e){
-      var b = e.target.closest("button[" + attr + "]");
-      if (!b) return;
-      Array.prototype.forEach.call(root.querySelectorAll("button[" + attr + "]"), function(x){
-        x.setAttribute("aria-pressed", x === b ? "true" : "false");
-      });
-      state[key] = cast(b.getAttribute(attr));
-      render();
-    });
+  var idx=p<0.40?0:(p<0.70?1:2);
+  if(idx!==cur){
+    cur=idx;
+    steps.forEach(function(s,i){s.classList.toggle("on",i===idx);});
+    dots.forEach(function(d,i){d.classList.toggle("on",i===idx);});
   }
-  group("svc","data-svc","svc",String);
-  group("rad","data-r","rad",Number);
-  group("prof","data-pr","prof",String);
-  group("qty","data-q","qty",Number);
-  group("cold-type","data-ct","ct",String);
+  calls.forEach(function(c){ c.classList.toggle("on", +c.getAttribute("data-c")===idx && spread>0.6); });
+}
 
-  $("zone").addEventListener("change", function(){ state.zone = this.value; render(); });
-  $("km").addEventListener("input", function(){ state.km = parseInt(this.value,10) || 1; render(); });
-  $("runflat").addEventListener("change", function(){ state.runflat = this.checked; render(); });
-  $("lowprof40").addEventListener("change", function(){ state.lowprof40 = this.checked; render(); });
-  $("tpms").addEventListener("change", function(){ state.tpms = this.checked; render(); });
-
-  $("send").addEventListener("click", function(){
-    var nm = $("nm").value.trim(), ph = $("ph").value.trim(), addr = $("addr").value.trim();
-    var err = $("err");
-    if (!nm || !ph || !addr){
-      err.textContent = "Заполните имя, телефон и адрес — без них мастер не сможет выехать.";
-      err.hidden = false;
-      return;
-    }
-    err.hidden = true;
-
-    var r = calc(state);
-    var svcName = (state.svc === "mount")
-      ? ("Шиномонтаж R" + (state.rad===16?"15–16":state.rad) + " × " + state.qty)
-      : COLD[state.ct].label;
-    var zoneTxt = (state.zone === "outside") ? ("за городом, " + state.km + " км") : ZONES[state.zone].label;
-    var txt =
-      "НОВАЯ ЗАЯВКА — СВ МобиШина\n" +
-      "Услуга: " + svcName + "\n" +
-      "Машина: " + ($("car").value.trim() || "не указана") + "\n" +
-      "Адрес: " + addr + ", Краснодар (" + zoneTxt + ")\n" +
-      "Когда: " + $("whn").value + "\n" +
-      "Клиент: " + nm + ", " + ph + "\n" +
-      "Расчёт по прайсу: " + money(r.total);
-
-    var t = $("ticket");
-    t.textContent = "";
-    t.hidden = false;
-
-    var wrap = document.createElement("div");
-    wrap.className = "ticket";
-
-    var h = document.createElement("div");
-    h.className = "th";
-    h.textContent = "✓ Заявка собрана";
-    wrap.appendChild(h);
-
-    var hint1 = document.createElement("p");
-    hint1.className = "hint";
-    hint1.textContent = "В рабочей версии этот текст уходит мастеру в WhatsApp в момент нажатия кнопки. Здесь, в демо, он просто показан — чтобы было видно, что именно получает мастер.";
-    wrap.appendChild(hint1);
-
-    var pre = document.createElement("pre");
-    pre.textContent = txt;
-    wrap.appendChild(pre);
-
-    var cp = document.createElement("button");
-    cp.className = "btn ghost";
-    cp.type = "button";
-    cp.textContent = "Скопировать заявку";
-    cp.addEventListener("click", function(){
-      var done = document.createElement("span");
-      done.className = "copied";
-      function ok(){ done.textContent = "скопировано"; }
-      function no(){
-        done.textContent = "выделите текст заявки выше и скопируйте вручную";
-        try{
-          var sel = window.getSelection(), rg = document.createRange();
-          rg.selectNodeContents(pre); sel.removeAllRanges(); sel.addRange(rg);
-        }catch(e){}
-      }
-      try{
-        if (navigator.clipboard && navigator.clipboard.writeText){
-          navigator.clipboard.writeText(txt).then(ok, no);
-        } else { no(); }
-      }catch(e){ no(); }
-      if (!cp.nextSibling || cp.nextSibling.className !== "copied") cp.after(done);
-    });
-    wrap.appendChild(cp);
-
-    t.appendChild(wrap);
-    wrap.scrollIntoView({behavior:"smooth", block:"nearest"});
+/* ---------- reveal + count-up ---------- */
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(!e.isIntersecting) return;
+    e.target.classList.add("in");
+    e.target.querySelectorAll("[data-count]").forEach(countUp);
+    io.unobserve(e.target);
   });
+},{threshold:.18});
+document.querySelectorAll(".rv").forEach(function(el){io.observe(el);});
+function countUp(el){
+  var to=+el.getAttribute("data-count"); if(reduce){el.textContent=fmt(to);return;}
+  var s=performance.now(), d=1400;
+  (function f(n){ var k=clamp((n-s)/d,0,1), e=1-Math.pow(1-k,4); el.textContent=fmt(to*e); if(k<1) requestAnimationFrame(f); })(s);
+}
 
-  render();
+/* ---------- scroll loop ---------- */
+var ticking=false;
+function onScroll(){ if(ticking) return; ticking=true; requestAnimationFrame(function(){ onNav(); onHero(); onStatement(); onExplode(); ticking=false; }); }
+window.addEventListener("scroll",onScroll,{passive:true}); window.addEventListener("resize",onScroll);
+onScroll();
+
+/* ================= CALCULATOR (логика как в прежнем демо) ================= */
+var S={svc:"mount",rad:16,prof:"op",qty:4,runflat:false,low40:false,tpms:false,ct:"up3",zone:"central",km:10};
+function unit(s){ return s.prof==="np" ? (C.MOUNT_NP[s.rad]||C.MOUNT_NP[16]) : (C.MOUNT_OP[s.rad]||C.MOUNT_OP[16]); }
+function calc(s){
+  var items=[], work=0;
+  if(s.svc==="mount"){
+    var m=1, ex=[];
+    if(s.runflat){m+=.70;ex.push("Run Flat +70%");}
+    if(s.low40){m+=.20;ex.push("профиль ≤40 +20%");}
+    if(s.tpms){m+=.10;ex.push("датчик +10%");}
+    var sum=unit(s)*m*s.qty; work+=sum;
+    items.push({l:"Шиномонтаж R"+(s.rad===16?"15–16":s.rad)+(s.prof==="np"?", низкий профиль":"")+" × "+s.qty+(ex.length?" ("+ex.join(", ")+")":""),v:sum});
+  } else { var c=C.COLD[s.ct]; work+=c.v; items.push({l:c.l,v:c.v}); }
+  if(work<C.MIN_WORK){ items.push({l:"Доплата до минимума работ",v:C.MIN_WORK-work}); work=C.MIN_WORK; }
+  var call;
+  if(s.zone==="outside"){ var km=clamp(s.km||1,1,150); call=km*C.PER_KM; items.push({l:"Выезд за город: "+km+" км × "+C.PER_KM+" ₽",v:call}); }
+  else { call=C.ZONES[s.zone].v; items.push({l:"Выезд: "+C.ZONES[s.zone].l,v:call}); }
+  return {items:items,total:work+call};
+}
+var shown=0, anim=null;
+function tweenPrice(to){
+  var el=$("price"), from=shown, s=performance.now(), d=reduce?0:650;
+  cancelAnimationFrame(anim);
+  (function f(n){ var k=d?clamp((n-s)/d,0,1):1, e=1-Math.pow(1-k,3); shown=from+(to-from)*e;
+    el.innerHTML=fmt(shown)+"<small> ₽</small>"; if(k<1) anim=requestAnimationFrame(f); })(s);
+}
+function render(){
+  $("mountBox").hidden=S.svc!=="mount"; $("coldBox").hidden=S.svc==="mount"; $("kmBox").hidden=S.zone!=="outside";
+  var np=S.rad>=15, npBtn=document.querySelector('[data-k="prof"] [data-v="np"]');
+  npBtn.disabled=!np; npBtn.style.opacity=np?"":".35";
+  if(!np&&S.prof==="np"){ S.prof="op"; press("prof","op"); }
+  $("profHint").textContent=np?"Для R15–17 на сайте есть отдельные цены для низкого профиля.":"Для R13–14 на сайте цена только для обычного профиля.";
+  var r=calc(S), box=$("lines"); box.textContent="";
+  r.items.forEach(function(it){ var d=document.createElement("div"); d.className="ln2";
+    var a=document.createElement("span"); a.textContent=it.l; var b=document.createElement("span"); b.textContent=fmt(it.v)+" ₽";
+    d.appendChild(a); d.appendChild(b); box.appendChild(d); });
+  tweenPrice(r.total);
+}
+function press(k,v){ document.querySelectorAll('[data-k="'+k+'"] button').forEach(function(b){ b.setAttribute("aria-pressed", b.getAttribute("data-v")===String(v)?"true":"false"); }); }
+document.querySelectorAll(".seg").forEach(function(g){
+  g.addEventListener("click",function(e){ var b=e.target.closest("button"); if(!b||b.disabled) return;
+    var k=g.getAttribute("data-k"), v=b.getAttribute("data-v"); S[k]=(k==="rad"||k==="qty")?+v:v; press(k,v); render(); });
+});
+["runflat","low40","tpms"].forEach(function(id){ $(id).addEventListener("change",function(){S[id]=this.checked;render();}); });
+$("ct").addEventListener("change",function(){S.ct=this.value;render();});
+$("zone").addEventListener("change",function(){S.zone=this.value;render();});
+$("km").addEventListener("input",function(){S.km=parseInt(this.value,10)||1;render();});
+render();
+
+/* ---------- booking ---------- */
+$("send").addEventListener("click",function(){
+  var nm=$("nm").value.trim(), ph=$("ph").value.trim(), ad=$("addr").value.trim(), er=$("err");
+  if(!nm||!ph||!ad){ er.textContent="Заполните имя, телефон и адрес — без них мастер не сможет выехать."; er.hidden=false; return; }
+  er.hidden=true;
+  var r=calc(S), svc=S.svc==="mount"?("Шиномонтаж R"+(S.rad===16?"15–16":S.rad)+" × "+S.qty):C.COLD[S.ct].l;
+  var zone=S.zone==="outside"?("за городом, "+S.km+" км"):C.ZONES[S.zone].l;
+  var txt="НОВАЯ ЗАЯВКА — "+C.name+"\nУслуга: "+svc+"\nМашина: "+($("car").value.trim()||"не указана")+"\nАдрес: "+ad+", "+C.city+" ("+zone+")\nКогда: "+$("whn").value+"\nКлиент: "+nm+", "+ph+"\nРасчёт по прайсу: "+fmt(r.total)+" ₽";
+  $("ticketTxt").textContent=txt; $("ticket").hidden=false;
+  $("wa").href="https://wa.me/"+C.wa+"?text="+encodeURIComponent(txt);
+  $("ticket").scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"});
+});
 })();
 </script>
-
 </body>
 </html>
