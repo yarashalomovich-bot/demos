@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Расчёт выезда — Греем Город</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#0a0b0d;
+  --surface: rgba(255,255,255,.04); --surface-2: rgba(255,255,255,.065); --surface-3: rgba(255,255,255,.1);
+  --line: rgba(255,255,255,.09); --line-soft: rgba(255,255,255,.06);
+  --ink:#f5f6f8; --ink-mid:#a6adb6; --ink-dim:#757d87;
+  --accent-1:#ffb020; --accent-2:#ff5a5f; --accent-ink:#1a0e02;
+  --accent-grad: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  --ok:#36d399; --alert:#ff6b6b;
+  --font-display:'Manrope',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,sans-serif;
+  --shadow-card: 0 1px 0 rgba(255,255,255,.05) inset, 0 24px 48px -28px rgba(0,0,0,.75);
+  --shadow-pop: 0 10px 24px -8px rgba(255,90,70,.45);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eef0f3;
+    --surface:#ffffff; --surface-2:#f4f5f7; --surface-3:#e9ebee;
+    --line: rgba(10,15,20,.1); --line-soft: rgba(10,15,20,.06);
+    --ink:#14171a; --ink-mid:#555f68; --ink-dim:#7c858d;
+    --accent-ink:#1a0e02;
+    --shadow-card: 0 1px 0 rgba(255,255,255,.6) inset, 0 20px 40px -24px rgba(20,23,26,.18);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#eef0f3;
+  --surface:#ffffff; --surface-2:#f4f5f7; --surface-3:#e9ebee;
+  --line: rgba(10,15,20,.1); --line-soft: rgba(10,15,20,.06);
+  --ink:#14171a; --ink-mid:#555f68; --ink-dim:#7c858d;
+  --accent-ink:#1a0e02;
+  --shadow-card: 0 1px 0 rgba(255,255,255,.6) inset, 0 20px 40px -24px rgba(20,23,26,.18);
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.icon{width:1em; height:1em; display:inline-block; vertical-align:-0.15em; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+
+/* ---------- HERO (full-bleed) ---------- */
+.hero{
+  position:relative; width:100%; min-height:320px;
+  display:flex; align-items:flex-end; overflow:hidden;
+  background:
+    radial-gradient(900px 480px at 14% -10%, rgba(255,176,32,.22), transparent 60%),
+    radial-gradient(760px 520px at 104% 6%, rgba(255,90,95,.2), transparent 55%),
+    linear-gradient(180deg, #141311 0%, #0d0c0b 55%, var(--bg) 100%);
+  padding-top:120px;
+}
+.hero::before{
+  content:""; position:absolute; inset:0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.16) 50%, transparent 52%),
+    radial-gradient(1px 1px at 60% 65%, rgba(255,255,255,.12) 50%, transparent 52%),
+    radial-gradient(1px 1px at 85% 20%, rgba(255,255,255,.14) 50%, transparent 52%),
+    radial-gradient(1px 1px at 40% 85%, rgba(255,255,255,.1) 50%, transparent 52%);
+  background-size:220px 220px; pointer-events:none;
+}
+.herowheel{position:absolute; right:-6%; top:50%; transform:translateY(-46%); width:min(52vw,620px); height:auto; opacity:.9; pointer-events:none}
+@media (max-width:720px){.herowheel{right:-28%; width:84vw; opacity:.55}}
+.herocap{position:relative; width:100%; max-width:1180px; margin:0 auto; padding:0 20px 26px; display:flex; flex-direction:column; gap:12px; color:#fff}
+.brand{display:flex; align-items:center; gap:10px}
+.brandmark{
+  width:40px; height:40px; border-radius:12px; flex:none;
+  background:var(--accent-grad); box-shadow:var(--shadow-pop);
+  display:flex; align-items:center; justify-content:center; color:var(--accent-ink);
+}
+.brandmark .icon{width:21px; height:21px}
+.brandname{font-family:var(--font-display); font-weight:800; font-size:14.5px; letter-spacing:.02em}
+.brandloc{font-size:12px; color:rgba(255,255,255,.72); margin-top:1px}
+.hero h1{
+  font-family:var(--font-display); font-weight:800; font-size:clamp(28px,4.6vw,46px);
+  line-height:1.1; margin:4px 0 0; letter-spacing:-.01em; text-wrap:balance; max-width:640px;
+  text-shadow:0 2px 24px rgba(0,0,0,.35);
+}
+.hero .sub{color:rgba(255,255,255,.82); font-size:15px; margin:0; max-width:520px}
+.hero .sub b{color:#fff; font-weight:700}
+
+/* ---------- SHELL / GRID ---------- */
+.shell{max-width:1180px; margin:0 auto; padding:26px 20px 60px; display:grid; grid-template-columns:1fr; gap:20px}
+@media (min-width:900px){
+  .shell{grid-template-columns:340px 1fr; align-items:start; gap:28px}
+  .infocol{position:sticky; top:22px; display:flex; flex-direction:column; gap:16px}
+}
+.infocol{display:flex; flex-direction:column; gap:16px}
+
+.demolabel{
+  display:flex; gap:10px; align-items:flex-start;
+  background:var(--surface-2); border:1px solid var(--line); border-radius:12px;
+  padding:11px 13px; font-size:12.5px; color:var(--ink-mid); line-height:1.5;
+}
+.demolabel b{
+  font-family:var(--font-display); font-weight:800; font-size:9.5px; letter-spacing:.09em; text-transform:uppercase;
+  background:var(--accent-grad); color:var(--accent-ink); padding:4px 8px; border-radius:6px; flex:none; margin-top:1px;
+}
+
+.trustrow{display:flex; flex-direction:column; gap:8px}
+.trust{
+  display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink-mid); font-weight:500;
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+}
+.trust .ic{
+  width:28px; height:28px; border-radius:9px; flex:none; display:flex; align-items:center; justify-content:center;
+  background:var(--surface-3); color:var(--ok);
+}
+.trust .ic .icon{width:15px; height:15px}
+.trust b{color:var(--ink); font-weight:700}
+
+.howcard{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:17px; box-shadow:var(--shadow-card)}
+.howcard .httl{font-family:var(--font-display); font-weight:700; font-size:13px; letter-spacing:.01em; margin:0 0 13px; color:var(--ink)}
+.howrow{display:flex; gap:11px; align-items:flex-start}
+.howrow + .howrow{margin-top:12px}
+.hownum{
+  width:22px; height:22px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-weight:800; font-size:11px; background:var(--surface-3); color:var(--ink-mid);
+}
+.howrow:last-child .hownum{background:var(--accent-grad); color:var(--accent-ink)}
+.howtxt{font-size:13px; color:var(--ink-mid); line-height:1.45; padding-top:2px}
+.howtxt b{color:var(--ink); font-weight:600}
+
+/* ---------- STEPS COLUMN ---------- */
+.stepscol{display:flex; flex-direction:column; gap:16px}
+.card{
+  position:relative; background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:20px;
+  display:flex; flex-direction:column; gap:16px; box-shadow:var(--shadow-card);
+}
+
+.ctitle{display:flex; gap:10px; align-items:center; margin:0}
+.ctitle .num{
+  width:24px; height:24px; border-radius:8px; flex:none; display:flex; align-items:center; justify-content:center;
+  background:var(--accent-grad); color:var(--accent-ink); font-family:var(--font-display); font-weight:800; font-size:12px;
+}
+.ctitle .tt{font-family:var(--font-display); font-weight:700; font-size:14.5px; letter-spacing:.01em; color:var(--ink)}
+.ctitle .tt span{display:block; font-family:var(--font-body); font-weight:400; font-size:11.5px; color:var(--ink-dim); margin-top:1px}
+
+.field{display:flex; flex-direction:column; gap:8px}
+label.fl{font-size:12.5px; color:var(--ink-dim); font-weight:600; letter-spacing:.01em}
+
+.tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+@media (min-width:560px){.tiles.three{grid-template-columns:repeat(3,1fr)}}
+.tile{
+  display:flex; flex-direction:column; align-items:flex-start; gap:10px; text-align:left;
+  font-family:var(--font-body); font-size:13.5px; font-weight:600; padding:14px 14px 13px; border-radius:14px; cursor:pointer;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.25;
+  transition:border-color .15s, background .15s, transform .15s, box-shadow .15s;
+}
+.tile:hover{border-color:var(--ink-dim); transform:translateY(-1px)}
+.tile .ic{
+  width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+  background:var(--surface-3); color:var(--ink-mid); transition:background .15s, color .15s;
+}
+.tile .ic .icon{width:17px; height:17px}
+.tile .price{font-size:12px; color:var(--ink-dim); font-weight:600}
+.tile[aria-pressed="true"]{
+  background:linear-gradient(160deg, rgba(255,176,32,.14), rgba(255,90,95,.1)); border-color:transparent;
+  box-shadow:0 0 0 1.5px var(--accent-1) inset, var(--shadow-pop); color:var(--ink);
+}
+.tile[aria-pressed="true"] .ic{background:var(--accent-grad); color:var(--accent-ink)}
+.tile[aria-pressed="true"] .price{color:var(--ink-mid)}
+.tile:focus-visible{outline:2px solid var(--accent-1); outline-offset:2px}
+
+select{
+  font-family:var(--font-body); font-weight:500; font-size:15px; padding:12px 38px 12px 14px; border-radius:12px;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
+  appearance:none; -webkit-appearance:none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-mid) 50%),
+    linear-gradient(135deg, var(--ink-mid) 50%, transparent 50%);
+  background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+  background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+}
+input[type="text"],input[type="tel"],input[type="number"]{
+  font-family:var(--font-body); font-weight:500; font-size:15px; padding:12px 14px; border-radius:12px;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
+}
+select:focus,input:focus{outline:none; border-color:var(--accent-1); box-shadow:0 0 0 3px rgba(255,176,32,.18)}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:11px}
+
+.hintline{font-size:12px; color:var(--ink-dim); margin:0; line-height:1.55; display:flex; gap:7px}
+.hintline .icon{width:14px; height:14px; flex:none; margin-top:2px; color:var(--ink-dim)}
+
+.readout{
+  background:linear-gradient(160deg, rgba(255,176,32,.1), rgba(255,90,95,.05));
+  border:1px solid var(--line); border-radius:16px; padding:18px 18px 17px;
+  display:flex; flex-direction:column; gap:14px;
+}
+@media (min-width:560px){.readout{flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap}}
+.lines{display:flex; flex-direction:column; gap:7px; flex:1; min-width:220px}
+.pl{display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:var(--ink-mid)}
+.pl span:last-child{font-variant-numeric:tabular-nums; color:var(--ink); font-weight:600; white-space:nowrap}
+.total{display:flex; flex-direction:column; align-items:flex-start; gap:5px}
+.total .tl{font-family:var(--font-display); font-size:12.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--ink-mid)}
+.total .tv{
+  font-family:var(--font-display); font-weight:800; font-size:clamp(26px,4vw,34px); font-variant-numeric:tabular-nums; line-height:1.1;
+  background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap;
+}
+.pillrow{display:flex; gap:8px; flex-wrap:wrap}
+.pill{
+  display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--ink);
+  background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:6px 11px 6px 9px;
+}
+.pill .icon{width:13px; height:13px; color:var(--ok)}
+
+.btn{
+  font-family:var(--font-display); font-weight:700; font-size:15.5px; letter-spacing:.01em;
+  background:var(--accent-grad); color:var(--accent-ink); border:none; border-radius:14px; padding:15px 18px;
+  cursor:pointer; width:100%; transition:filter .15s, transform .15s; text-align:center; text-decoration:none;
+  display:flex; align-items:center; justify-content:center; gap:9px; box-shadow:var(--shadow-pop);
+}
+.btn .icon{width:17px; height:17px}
+.btn:hover{filter:brightness(1.06); transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+.btn.ghost{background:var(--surface-2); color:var(--ink-mid); border:1.5px solid var(--line); font-size:13.5px; font-weight:600; box-shadow:none}
+.btn.ghost:hover{color:var(--ink); border-color:var(--ink-dim)}
+.btn.wa{background:linear-gradient(135deg,#2bd16a,#1aa352); color:#07230f; box-shadow:0 10px 24px -8px rgba(43,209,106,.4); margin-top:2px}
+.ctarow{display:flex; flex-direction:column; gap:10px}
+@media (min-width:560px){.ctarow{flex-direction:row}}
+
+.ticket{
+  background:var(--surface-2); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:11px;
+  border:1px solid rgba(54,211,153,.35);
+}
+.ticket .th{display:flex; gap:9px; align-items:center; font-family:var(--font-display); font-weight:700; font-size:14.5px; color:var(--ok)}
+.ticket .th .icon{width:17px; height:17px}
+.ticket pre{
+  font-family:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace; font-size:12px; line-height:1.7; margin:0;
+  white-space:pre-wrap; word-break:break-word; color:var(--ink); background:var(--surface); border-radius:10px;
+  padding:13px; border:1px solid var(--line);
+}
+.ticket .hint{font-size:12.5px; color:var(--ink-mid); margin:0}
+.copied{font-size:11.5px; color:var(--ok); font-weight:600}
+
+.err{font-size:13px; color:var(--alert); margin:0; display:flex; gap:7px; align-items:flex-start}
+.err .icon{width:14px; height:14px; flex:none; margin-top:2px}
+
+footer{max-width:1180px; margin:0 auto; padding:0 20px 50px; display:flex; flex-direction:column; gap:8px; font-size:12px; color:var(--ink-dim); line-height:1.6; border-top:1px solid var(--line-soft); padding-top:16px}
+footer b{color:var(--ink-mid)}
+
+@media (max-width:380px){.row2{grid-template-columns:1fr}}
+
+[hidden]{display:none !important}
+
+</style>
+</head>
+<body>
+<div class="hero">
+  <svg class="herowheel" viewBox="0 0 400 400" aria-hidden="true">
+    <defs>
+      <linearGradient id="wheelgrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ffb020"/>
+        <stop offset="1" stop-color="#ff5a5f"/>
+      </linearGradient>
+      <radialGradient id="hubgrad" cx="0.35" cy="0.35" r="0.75">
+        <stop offset="0" stop-color="#2a2d31"/>
+        <stop offset="1" stop-color="#101214"/>
+      </radialGradient>
+    </defs>
+    <circle cx="200" cy="200" r="178" fill="none" stroke="url(#wheelgrad)" stroke-width="2" opacity="0.55"/>
+    <circle cx="200" cy="200" r="150" fill="url(#hubgrad)" stroke="url(#wheelgrad)" stroke-width="3"/>
+    <circle cx="200" cy="200" r="150" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="22"/>
+    <g stroke="url(#wheelgrad)" stroke-width="2.4" stroke-linecap="round" opacity="0.8">
+      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(0 200 200)"/>
+      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(60 200 200)"/>
+      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(120 200 200)"/>
+      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(180 200 200)"/>
+      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(240 200 200)"/>
+      <line x1="200" y1="200" x2="200" y2="70" transform="rotate(300 200 200)"/>
+    </g>
+    <circle cx="200" cy="200" r="46" fill="#17191c" stroke="url(#wheelgrad)" stroke-width="3"/>
+    <circle cx="200" cy="200" r="10" fill="url(#wheelgrad)"/>
+  </svg>
+  <div class="herocap">
+    <div class="brand">
+      <div class="brandmark"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="4" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="20" y2="12"/></svg></div>
+      <div>
+        <div class="brandname">ГРЕЕМ ГОРОД</div>
+        <div class="brandloc">Выездная помощь на дороге · Новосибирск</div>
+      </div>
+    </div>
+    <h1>Помощь на дороге в Новосибирске — расчёт за 15 секунд</h1>
+    <p class="sub">Клиент считает цену <b>сам, по вашему прайсу</b>, и сразу отправляет заявку в WhatsApp.</p>
+  </div>
+</div>
+
+<div class="shell">
+
+  <div class="infocol">
+    <div class="demolabel">
+      <b>демо</b>
+      <span>Это прототип, собранный Ярославом Хоружим как предложение для «Греем Город» (Новосибирск). Не официальная страница компании. Цены — реальные, с вашего сайта greemgorod.ru, на 15 октября 2026. В рабочей версии любая цифра меняется в одном месте.</span>
+    </div>
+
+    <div class="trustrow">
+      <div class="trust"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><span><b>Работаем с 2013 года</b> — круглосуточно, без выходных</span></div>
+      <div class="trust"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg></span><span><b>98% выездов — за 20 минут</b> в любом районе города</span></div>
+    </div>
+
+    <div class="howcard">
+      <p class="httl">Как это работает</p>
+      <div class="howrow"><span class="hownum">1</span><span class="howtxt"><b>Клиент считает сам</b> — выбирает, что случилось, и сразу видит цену, не дожидаясь ответа диспетчера.</span></div>
+      <div class="howrow"><span class="hownum">2</span><span class="howtxt"><b>Не уходит к конкурентам</b> — пока другие молчат на линии, здесь цена уже на экране.</span></div>
+      <div class="howrow"><span class="hownum">3</span><span class="howtxt"><b>Заявка приходит готовой</b> — мастеру в WhatsApp сразу уходят услуга, адрес и телефон.</span></div>
+    </div>
+  </div>
+
+  <div class="stepscol">
+
+    <!-- 1. РАСЧЁТ -->
+    <div class="card">
+      <p class="ctitle"><span class="num">1</span><span class="tt">Что случилось<span>выберите нужную услугу</span></span></p>
+
+      <div class="field">
+        <div class="tiles" id="svc" role="group" aria-label="Услуга">
+          <button type="button" class="tile" id="svc-season" data-svc="season" aria-pressed="true">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="4" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="20" y2="12"/></svg></span>
+            Сезонная замена шин (4 колеса)
+            <span class="price">от 3 000 ₽</span>
+          </button>
+          <button type="button" class="tile" data-svc="puncture" aria-pressed="false">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l8 16H4L12 3z"/><line x1="12" y1="10" x2="12" y2="13"/><circle cx="12" cy="16" r=".6" fill="currentColor"/></svg></span>
+            Ремонт прокола
+            <span class="price">от 2 000 ₽</span>
+          </button>
+          <button type="button" class="tile" data-svc="spare" aria-pressed="false">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg></span>
+            Установка запасного колеса
+            <span class="price">2 000 ₽</span>
+          </button>
+          <button type="button" class="tile" data-svc="jump" aria-pressed="false">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
+            Прикуривание АКБ
+            <span class="price">от 2 000 ₽</span>
+          </button>
+          <button type="button" class="tile" data-svc="fuel" aria-pressed="false">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M6 3h8v18H6z"/><path d="M14 8h2a2 2 0 012 2v7a1.5 1.5 0 01-3 0v-5"/><path d="M8 7h4"/></svg></span>
+            Подвоз топлива (5–10 л)
+            <span class="price">1 500 ₽</span>
+          </button>
+          <button type="button" class="tile" data-svc="tow" aria-pressed="false">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="9" width="9" height="7" rx="1"/><path d="M11 12h4l3 3h2v-3"/><circle cx="6.5" cy="17.5" r="1.4"/><circle cx="17" cy="17.5" r="1.4"/></svg></span>
+            Буксировка по городу
+            <span class="price">от 2 000 ₽</span>
+          </button>
+          <button type="button" class="tile" data-svc="warmcar" aria-pressed="false">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3c2 3 3 5 3 7a3 3 0 01-6 0c0-2 1-4 3-7z"/></svg></span>
+            Отогрев легкового авто
+            <span class="price">от 3 500 ₽</span>
+          </button>
+          <button type="button" class="tile" data-svc="warmtruck" aria-pressed="false">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="8" width="12" height="8" rx="1"/><path d="M14 11h4l3 3v2h-7"/><circle cx="6" cy="17.5" r="1.4"/><circle cx="17" cy="17.5" r="1.4"/></svg></span>
+            Отогрев грузового авто
+            <span class="price">5 000 ₽/час</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="fl" for="km">Расстояние от центра города, км</label>
+        <input type="number" id="km" min="0" max="80" value="5" inputmode="numeric">
+        <p class="hintline"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".4" fill="currentColor"/></svg>На сайте нет фиксированной ставки за км — расстояние просто передаётся мастеру вместе с заявкой, доплату за дальний выезд или буксировку он подтвердит на месте.</p>
+      </div>
+    </div>
+
+    <!-- 2. ЦЕНА -->
+    <div class="card">
+      <p class="ctitle"><span class="num">2</span><span class="tt">Стоимость<span>по вашему прайсу greemgorod.ru</span></span></p>
+      <div class="readout">
+        <div class="lines" id="lines"></div>
+        <div class="total"><span class="tl">Ориентир</span><span class="tv" id="total">—</span></div>
+      </div>
+      <div class="pillrow">
+        <span class="pill"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Круглосуточно, без выходных</span>
+        <span class="pill"><svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-7.1-7-12a7 7 0 1114 0c0 4.9-7 12-7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>Новосибирск, любой район</span>
+      </div>
+      <p class="hintline"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".4" fill="currentColor"/></svg>Цена замены шин зависит от класса авто и радиуса колёс (на сайте указано «от») — точную сумму подтверждает мастер. Исключение по срокам — мороз ниже −33 °C.</p>
+    </div>
+
+    <!-- 3. ЗАПИСЬ -->
+    <div class="card">
+      <p class="ctitle"><span class="num">3</span><span class="tt">Вызвать мастера<span>заявка уйдёт в WhatsApp</span></span></p>
+      <div class="row2">
+        <div class="field"><label class="fl" for="nm">Имя</label><input type="text" id="nm" placeholder="Как к вам обращаться" autocomplete="name"></div>
+        <div class="field"><label class="fl" for="ph">Телефон</label><input type="tel" id="ph" placeholder="+7 ___ ___-__-__" autocomplete="tel"></div>
+      </div>
+      <div class="field"><label class="fl" for="addr">Адрес или ориентир в Новосибирске</label><input type="text" id="addr" placeholder="Улица, дом — или ориентир"></div>
+      <div class="row2">
+        <div class="field"><label class="fl" for="car">Машина</label><input type="text" id="car" placeholder="Напр. Kia Rio"></div>
+        <div class="field"><label class="fl" for="whn">Когда</label>
+          <select id="whn">
+            <option value="Сейчас, срочно" selected>Сейчас, срочно</option>
+            <option value="В течение часа">В течение часа</option>
+            <option value="Сегодня вечером">Сегодня вечером</option>
+            <option value="Завтра утром">Завтра утром</option>
+          </select>
+        </div>
+      </div>
+      <div class="ctarow">
+        <button class="btn" id="send" type="button">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-7-8-3z"/></svg>
+          Собрать заявку
+        </button>
+        <a class="btn wa" id="wa" href="https://wa.me/73832131766" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M20.5 3.5a10 10 0 00-16 12L3 21l5.7-1.5A10 10 0 1020.5 3.5z"/><path d="M8.5 9c.3 3 2.5 5.2 5.5 5.5.8.1 1.2-.9.7-1.5l-1-1.3c-.3-.4-.8-.4-1.2-.2-.5.3-1.3.2-2-.5s-.8-1.5-.5-2c.2-.4.2-.9-.2-1.2L8.5 6.7c-.6-.5-1.6-.1-1.5.7"/></svg>
+          Написать в WhatsApp
+        </a>
+      </div>
+      <p class="err" id="err" hidden></p>
+      <div id="ticket" hidden></div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span><b>Что это даёт компании.</b> Клиент считает стоимость сам по вашему прайсу и не уходит звонить конкурентам, пока ждёт ответа. Заявка приходит мастеру готовой: услуга, расстояние, адрес, время — без уточняющих звонков.</span>
+  <span>Прототип. Собрал Ярослав Хоружий по открытым данным с сайта greemgorod.ru. Контакты и прайс в рабочей версии — ваши и обновляются вами.</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // Реальный прайс с сайта greemgorod.ru/shinomontaj (раздел «Шиномонтаж» и «Помощь на дороге»), проверено 15 октября 2026.
+  var SVC = {
+    season:    {label:"Сезонная замена шин (4 колеса)", v:3000, approx:true},
+    puncture:  {label:"Ремонт прокола", v:2000, approx:true},
+    spare:     {label:"Установка запасного колеса", v:2000, approx:false},
+    jump:      {label:"Прикуривание АКБ", v:2000, approx:true},
+    fuel:      {label:"Подвоз топлива (5–10 л)", v:1500, approx:false},
+    tow:       {label:"Буксировка по городу", v:2000, approx:true},
+    warmcar:   {label:"Отогрев легкового авто", v:3500, approx:true},
+    warmtruck: {label:"Отогрев грузового авто (за час)", v:5000, approx:false}
+  };
+
+  var state = {svc:"season", km:5};
+
+  function $(id){ return document.getElementById(id); }
+  function money(n){ return new Intl.NumberFormat("ru-RU").format(Math.round(n)) + " ₽"; }
+
+  function calc(s){
+    var svc = SVC[s.svc];
+    var items = [];
+    items.push({l: svc.label, v: svc.v, approx: svc.approx});
+    return {items: items, total: svc.v, approx: svc.approx};
+  }
+
+  function render(){
+    var r = calc(state);
+    var box = $("lines");
+    box.textContent = "";
+    r.items.forEach(function(it){
+      var row = document.createElement("div");
+      row.className = "pl";
+      var a = document.createElement("span"); a.textContent = it.l;
+      var b = document.createElement("span"); b.textContent = (it.approx ? "от " : "") + money(it.v) + (state.svc === "warmtruck" ? "/час" : "");
+      row.appendChild(a); row.appendChild(b); box.appendChild(row);
+    });
+    $("total").textContent = (r.approx ? "от " : "") + money(r.total) + (state.svc === "warmtruck" ? " / час" : "");
+  }
+
+  function group(id, attr, key, cast){
+    var root = $(id);
+    if (!root) return;
+    root.addEventListener("click", function(e){
+      var b = e.target.closest("button[" + attr + "]");
+      if (!b) return;
+      Array.prototype.forEach.call(root.querySelectorAll("button[" + attr + "]"), function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      state[key] = cast(b.getAttribute(attr));
+      render();
+    });
+  }
+  group("svc","data-svc","svc",String);
+
+  $("km").addEventListener("input", function(){ state.km = parseInt(this.value,10) || 0; });
+
+  $("send").addEventListener("click", function(){
+    var nm = $("nm").value.trim(), ph = $("ph").value.trim(), addr = $("addr").value.trim();
+    var err = $("err");
+    if (!nm || !ph || !addr){
+      err.textContent = "Заполните имя, телефон и адрес — без них мастер не сможет выехать.";
+      err.hidden = false;
+      return;
+    }
+    err.hidden = true;
+
+    var r = calc(state);
+    var svcName = SVC[state.svc].label;
+    var txt =
+      "НОВАЯ ЗАЯВКА — Греем Город\n" +
+      "Услуга: " + svcName + "\n" +
+      "Машина: " + ($("car").value.trim() || "не указана") + "\n" +
+      "Адрес: " + addr + ", Новосибирск (≈" + state.km + " км от центра)\n" +
+      "Когда: " + $("whn").value + "\n" +
+      "Клиент: " + nm + ", " + ph + "\n" +
+      "Ориентир по прайсу: " + (r.approx ? "от " : "") + money(r.total) + (state.svc === "warmtruck" ? "/час" : "");
+
+    var t = $("ticket");
+    t.textContent = "";
+    t.hidden = false;
+
+    var wrap = document.createElement("div");
+    wrap.className = "ticket";
+
+    var h = document.createElement("div");
+    h.className = "th";
+    h.textContent = "✓ Заявка собрана";
+    wrap.appendChild(h);
+
+    var hint1 = document.createElement("p");
+    hint1.className = "hint";
+    hint1.textContent = "В рабочей версии этот текст уходит мастеру в WhatsApp в момент нажатия кнопки. Здесь, в демо, он просто показан — чтобы было видно, что именно получает мастер.";
+    wrap.appendChild(hint1);
+
+    var pre = document.createElement("pre");
+    pre.textContent = txt;
+    wrap.appendChild(pre);
+
+    var cp = document.createElement("button");
+    cp.className = "btn ghost";
+    cp.type = "button";
+    cp.textContent = "Скопировать заявку";
+    cp.addEventListener("click", function(){
+      var done = document.createElement("span");
+      done.className = "copied";
+      function ok(){ done.textContent = "скопировано"; }
+      function no(){
+        done.textContent = "выделите текст заявки выше и скопируйте вручную";
+        try{
+          var sel = window.getSelection(), rg = document.createRange();
+          rg.selectNodeContents(pre); sel.removeAllRanges(); sel.addRange(rg);
+        }catch(e){}
+      }
+      try{
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(txt).then(ok, no);
+        } else { no(); }
+      }catch(e){ no(); }
+      if (!cp.nextSibling || cp.nextSibling.className !== "copied") cp.after(done);
+    });
+    wrap.appendChild(cp);
+
+    t.appendChild(wrap);
+    wrap.scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
