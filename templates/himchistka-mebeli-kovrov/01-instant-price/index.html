@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Демо-пример — выездная химчистка мебели и ковров (мгновенный расчёт цены)</title>
+<meta name="theme-color" content="#0b0b0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#0b0b0c; --bg-2:#111113; --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.14);
+  --ink:#f5f5f7; --ink-2:#a1a1a6; --ink-3:#6e6e73;
+  --acc:#2dd4bf; --acc-2:#38bdf8; --acc-glow:rgba(45,212,191,.35);
+  --display:'Inter Tight',system-ui,-apple-system,sans-serif;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+  --ease:cubic-bezier(.2,.7,.1,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+button{font:inherit}
+
+/* ---------- NAV ---------- */
+.nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  padding:14px clamp(16px,4vw,48px);transition:background .4s,backdrop-filter .4s,border-color .4s;border-bottom:1px solid transparent}
+.nav.solid{background:rgba(11,11,12,.72);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-color:var(--line)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo b{font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.02em}
+.logo span{font-size:11px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+.navlinks{display:flex;gap:28px;font-size:13px;color:var(--ink-2)}
+.navlinks a{text-decoration:none;transition:color .2s}
+.navlinks a:hover{color:var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;text-decoration:none;
+  background:var(--ink);color:#000;border:0;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s}
+.pill:hover{transform:translateY(-1px);box-shadow:0 8px 30px -8px rgba(255,255,255,.35)}
+.pill.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+.pill.acc{background:linear-gradient(135deg,var(--acc),var(--acc-2));color:#031615}
+.pill.acc:hover{box-shadow:0 10px 40px -8px var(--acc-glow)}
+@media (max-width:760px){.navlinks{display:none}}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;height:100svh;min-height:620px;display:grid;place-items:center;overflow:hidden}
+.hero-glow{position:absolute;inset:auto -20% -55% -20%;height:90%;background:radial-gradient(closest-side,rgba(45,200,210,.22),transparent 70%);filter:blur(10px);pointer-events:none}
+#wave{position:absolute;left:0;top:50%;width:100%;height:46%;transform:translateY(-50%);pointer-events:none;opacity:0;transition:opacity 1.6s var(--ease) .5s}
+.loaded #wave{opacity:1}
+.hero{--r:min(20vw,200px)}
+.word{position:absolute;inset:0;pointer-events:none}
+.word .w1{position:absolute;left:0;right:0;bottom:calc(50% + var(--r)*.72);text-align:center;margin:0;z-index:3;
+  font-family:var(--display);font-weight:800;font-size:clamp(76px,16vw,240px);line-height:.8;letter-spacing:-.055em;
+  background:linear-gradient(180deg,#fff 35%,#9a9a9e);-webkit-background-clip:text;background-clip:text;color:transparent;
+  opacity:0;transform:translateY(40px);transition:opacity 1.2s var(--ease),transform 1.4s var(--ease)}
+.word .w2{position:absolute;left:-10%;right:-10%;top:50%;text-align:center;z-index:1;white-space:nowrap;
+  font-family:var(--display);font-weight:700;font-size:clamp(60px,12.5vw,190px);line-height:1;letter-spacing:-.04em;
+  color:transparent;-webkit-text-stroke:1.2px rgba(255,255,255,.4);transform:translate(0,-40%);opacity:0;transition:opacity 1.4s var(--ease) .3s,transform 1.6s var(--ease) .3s}
+.word .tag{position:absolute;left:0;right:0;top:calc(50% + var(--r) + 34px);text-align:center;font-size:clamp(10px,1.1vw,13px);letter-spacing:.5em;text-transform:uppercase;color:var(--ink-2);opacity:0;transition:opacity 1s .7s}
+.loaded .word .w1{opacity:1;transform:none}
+.loaded .word .w2{opacity:1;transform:translate(0,-50%)}
+.loaded .word .tag{opacity:1}
+.hero-wheel{position:relative;width:calc(var(--r)*2);aspect-ratio:1;z-index:2;opacity:0;transform:scale(.86) rotate(-6deg);
+  transition:opacity 1.2s var(--ease) .15s,transform 1.8s var(--ease) .15s;filter:drop-shadow(0 40px 60px rgba(0,0,0,.7))}
+.loaded .hero-wheel{opacity:1;transform:scale(1) rotate(0)}
+.hero-wheel svg{width:100%;height:100%;display:block}
+.shimmer{animation:shimmer 2.6s ease-in-out infinite}
+@keyframes shimmer{0%,100%{opacity:.5;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
+.hero-foot{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;
+  padding:0 clamp(16px,4vw,48px) clamp(22px,4vh,40px);z-index:3}
+.hero-foot .l{display:flex;gap:10px;flex-wrap:wrap}
+.hero-foot .r{max-width:300px;text-align:right}
+.hero-foot .r b{display:block;font-family:var(--display);font-size:15px;font-weight:700}
+.hero-foot .r span{font-size:12.5px;color:var(--ink-2)}
+.scrollhint{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);width:1px;height:46px;background:linear-gradient(var(--ink-3),transparent);z-index:3;overflow:hidden}
+.scrollhint::after{content:"";position:absolute;left:0;top:-20px;width:1px;height:20px;background:var(--ink);animation:drip 2.2s var(--ease) infinite}
+@keyframes drip{to{top:46px}}
+@media (max-width:760px){.hero-foot{flex-direction:column;align-items:flex-start}.hero-foot .r{text-align:left}.scrollhint{display:none}.hero{--r:35vw}.word .w1{font-size:21vw;bottom:calc(50% + var(--r)*.86)}}
+
+/* ---------- SECTION BASICS ---------- */
+section{position:relative}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+.eyebrow{font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);margin:0 0 14px}
+.h2{font-family:var(--display);font-weight:700;font-size:clamp(34px,5.4vw,64px);line-height:1.02;letter-spacing:-.035em;margin:0}
+.h2 em{font-style:normal;background:linear-gradient(90deg,var(--acc),var(--acc-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--ink-2);font-size:clamp(15px,1.4vw,18px);max-width:520px;margin:18px 0 0}
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s var(--ease),transform 1.2s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.2s}.rv.d3{transition-delay:.3s}
+.no-js .rv{opacity:1;transform:none}
+
+/* ---------- STATEMENT ---------- */
+.statement{padding:clamp(110px,18vh,200px) 0 clamp(60px,10vh,120px)}
+.statement p{font-family:var(--display);font-weight:600;font-size:clamp(28px,4.4vw,56px);line-height:1.12;letter-spacing:-.03em;margin:0;max-width:1000px}
+.statement p span{color:var(--ink-3);transition:color .5s}
+.statement p span.on{color:var(--ink)}
+.statement p.eyebrow{font-family:var(--body);font-size:11.5px;font-weight:400;letter-spacing:.22em;line-height:1.5;margin:0 0 22px;color:var(--ink-3)}
+
+/* ---------- EXPLODED ---------- */
+.explode{height:420vh}
+.stage{position:sticky;top:0;height:100svh;display:grid;grid-template-columns:1fr 1.1fr;align-items:center;overflow:hidden}
+.copy{position:relative;height:260px;padding-left:clamp(16px,6vw,96px)}
+.step{position:absolute;inset:0 0 auto clamp(16px,6vw,96px);opacity:0;transform:translateY(30px);transition:opacity .7s var(--ease),transform .9s var(--ease);pointer-events:none}
+.step.on{opacity:1;transform:none;pointer-events:auto}
+.step .h2{font-size:clamp(30px,4vw,52px)}
+.step p{color:var(--ink-2);max-width:380px;margin:16px 0 22px;font-size:15px}
+.stepnav{position:absolute;left:clamp(16px,6vw,96px);bottom:-70px;display:flex;gap:8px}
+.stepnav i{width:22px;height:2px;border-radius:2px;background:var(--line-2);transition:background .4s,width .4s}
+.stepnav i.on{background:var(--ink);width:40px}
+.scene{position:relative;height:100%;perspective:1400px}
+.rig{position:absolute;left:50%;top:50%;width:min(40vw,440px);aspect-ratio:1;transform-style:preserve-3d;
+  transform:translate(-50%,-50%) rotateY(var(--ry,-8deg)) rotateX(4deg)}
+.layer{position:absolute;inset:0;transform-style:preserve-3d;transform:translateZ(var(--z,0px));transition:transform .15s linear}
+.layer svg{width:100%;height:100%;display:block;overflow:visible}
+.callout{position:absolute;display:flex;align-items:center;gap:0;opacity:0;transition:opacity .6s var(--ease);pointer-events:none;white-space:nowrap}
+.callout.on{opacity:1}
+.callout .dot{width:9px;height:9px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 5px rgba(45,212,191,.18),0 0 20px var(--acc);flex:none}
+.callout .ln{height:1px;width:0;background:linear-gradient(90deg,var(--acc),rgba(255,255,255,.35));transition:width .8s var(--ease) .15s}
+.callout.on .ln{width:var(--len,120px)}
+.callout .lb{padding-left:12px;font-size:13px}
+.callout .lb b{display:block;font-family:var(--display);font-weight:700;font-size:14px}
+.callout .lb span{color:var(--ink-2);font-size:12px}
+.callout.left{flex-direction:row-reverse}
+.callout.left .lb{padding:0 12px 0 0;text-align:right}
+.callout.left .ln{background:linear-gradient(270deg,var(--acc),rgba(255,255,255,.35))}
+@media (max-width:860px){
+  .explode{height:380vh}
+  .stage{grid-template-columns:1fr;grid-template-rows:56% 44%}
+  .scene{order:1}.copy{order:2;height:auto;padding:0 16px}
+  .step{inset:0 16px auto 16px}
+  .rig{width:62vw}
+  .stepnav{left:16px;bottom:auto;top:-28px}
+  .callout .lb span{display:none}
+  .callout:not(.left){left:52%!important}
+  .callout.left{right:52%!important}
+  .callout{--len:26px!important}
+  .callout .lb b{font-size:12.5px}
+}
+
+/* ---------- NUMBERS ---------- */
+.numbers{padding:clamp(100px,16vh,180px) 0}
+.ngrid{display:grid;grid-template-columns:repeat(4,1fr);margin-top:56px;border-top:1px solid var(--line)}
+.n{padding:34px 22px 10px 0;border-right:1px solid var(--line)}
+.n:last-child{border-right:0}
+.n .v{font-family:var(--display);font-weight:700;font-size:clamp(44px,6vw,84px);letter-spacing:-.045em;line-height:1;white-space:nowrap}
+.n .v small{font-size:.42em;letter-spacing:-.01em;color:var(--ink-2);font-weight:600;margin-left:4px}
+.n .k{color:var(--ink-2);font-size:14px;margin-top:12px;max-width:200px}
+@media (max-width:860px){.ngrid{grid-template-columns:1fr 1fr}.n:nth-child(2){border-right:0}.n{border-bottom:1px solid var(--line);padding-left:0}}
+
+/* ---------- CALCULATOR ---------- */
+.calc{padding:clamp(80px,12vh,140px) 0}
+.calc-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(24px,4vw,56px);margin-top:56px;align-items:start}
+.panel{background:var(--bg-2);border:1px solid var(--line);border-radius:28px;padding:clamp(20px,3vw,36px)}
+.row{padding:20px 0;border-bottom:1px solid var(--line)}
+.row:first-child{padding-top:0}
+.row:last-child{border-bottom:0;padding-bottom:0}
+.lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 12px}
+.seg{display:flex;flex-wrap:wrap;gap:6px;background:rgba(255,255,255,.04);border-radius:14px;padding:4px;width:max-content;max-width:100%}
+.seg button{border:0;background:transparent;color:var(--ink-2);padding:10px 16px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;transition:background .3s var(--ease),color .3s}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#000;font-weight:600}
+.seg.wide{width:100%}.seg.wide button{flex:1 1 auto}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0;cursor:pointer;color:var(--ink-2);font-size:14.5px}
+.tg input{appearance:none;-webkit-appearance:none;width:42px;height:26px;border-radius:999px;background:rgba(255,255,255,.12);position:relative;flex:none;cursor:pointer;transition:background .3s}
+.tg input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .35s var(--ease)}
+.tg input:checked{background:var(--acc)}
+.tg input:checked::after{transform:translateX(16px)}
+.tg b{color:var(--ink);font-weight:500}
+select,input[type=text],input[type=tel],input[type=number]{width:100%;font:inherit;font-size:15px;color:var(--ink);background:rgba(255,255,255,.05);
+  border:1px solid var(--line);border-radius:14px;padding:14px 16px;outline:none;transition:border-color .3s,background .3s;appearance:none;-webkit-appearance:none}
+select:focus,input:focus{border-color:rgba(45,212,191,.6);background:rgba(255,255,255,.07)}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--ink-2) 50%),linear-gradient(135deg,var(--ink-2) 50%,transparent 50%);
+  background-position:calc(100% - 22px) 50%,calc(100% - 17px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:44px}
+select option{background:#1a1a1c}
+.hint{font-size:12.5px;color:var(--ink-3);margin:10px 0 0}
+.sum{position:sticky;top:90px}
+.sum .panel{position:relative;overflow:hidden}
+.sum .panel::before{content:"";position:absolute;inset:-40% -30% auto auto;width:360px;height:360px;background:radial-gradient(closest-side,var(--acc-glow),transparent);pointer-events:none;opacity:.7}
+.price{font-family:var(--display);font-weight:800;font-size:clamp(54px,7vw,92px);letter-spacing:-.05em;line-height:1;margin:6px 0 4px;font-variant-numeric:tabular-nums;position:relative}
+.price small{font-size:.38em;color:var(--ink-2);font-weight:600;letter-spacing:-.01em}
+.lines{margin:22px 0 0;padding:18px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px;position:relative}
+.ln2{display:flex;justify-content:space-between;gap:16px;font-size:13.5px;color:var(--ink-2)}
+.ln2 span:last-child{color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sum .note{font-size:12px;color:var(--ink-3);margin:18px 0 0;position:relative}
+@media (max-width:900px){.calc-grid{grid-template-columns:1fr}.sum{position:static}}
+
+/* ---------- BOOK ---------- */
+.book{padding:clamp(80px,12vh,140px) 0 clamp(60px,10vh,120px)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:40px;max-width:760px}
+.fgrid .full{grid-column:1/-1}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.cta .pill{padding:16px 26px;font-size:15px}
+.err{color:#ff7a6b;font-size:13.5px;margin:14px 0 0}
+.ticket{margin-top:24px;max-width:760px;border:1px solid rgba(54,211,153,.35);border-radius:22px;padding:22px;background:rgba(54,211,153,.04)}
+.ticket h4{margin:0 0 6px;font-family:var(--display);font-size:16px;color:#4fe0a6}
+.ticket p{margin:0 0 14px;color:var(--ink-2);font-size:13.5px}
+.ticket pre{margin:0;white-space:pre-wrap;font:12.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);background:rgba(0,0,0,.35);border-radius:14px;padding:16px}
+@media (max-width:640px){.fgrid{grid-template-columns:1fr}}
+[hidden]{display:none!important}
+
+footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--ink-3);font-size:12.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+footer .demo{max-width:620px}
+footer b{color:var(--ink-2);font-weight:600}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body class="no-js">
+
+<!-- ===== SVG furniture parts (defs reused by hero + exploded view) ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gFrame" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#343b42"/><stop offset=".55" stop-color="#1b1f23"/><stop offset="1" stop-color="#0e1113"/>
+    </linearGradient>
+    <linearGradient id="gArm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a4248"/><stop offset=".6" stop-color="#1c2024"/><stop offset="1" stop-color="#0d1012"/>
+    </linearGradient>
+    <radialGradient id="gCushion" cx="38%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#4a545c"/><stop offset=".55" stop-color="#262c31"/><stop offset="1" stop-color="#15181b"/>
+    </radialGradient>
+    <radialGradient id="gCushionBack" cx="40%" cy="25%" r="85%">
+      <stop offset="0" stop-color="#3e474e"/><stop offset=".6" stop-color="#20252a"/><stop offset="1" stop-color="#121517"/>
+    </radialGradient>
+    <linearGradient id="gAcc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5eead4"/><stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <radialGradient id="gGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#9cf7ea" stop-opacity=".9"/><stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="frame" viewBox="0 0 600 600">
+      <rect x="92" y="108" width="416" height="268" rx="54" fill="url(#gFrame)"/>
+      <rect x="48" y="156" width="92" height="322" rx="38" fill="url(#gArm)"/>
+      <rect x="460" y="156" width="92" height="322" rx="38" fill="url(#gArm)"/>
+      <rect x="84" y="456" width="18" height="46" rx="6" fill="#15181b"/>
+      <rect x="498" y="456" width="18" height="46" rx="6" fill="#15181b"/>
+      <rect x="160" y="456" width="18" height="40" rx="6" fill="#15181b"/>
+      <rect x="422" y="456" width="18" height="40" rx="6" fill="#15181b"/>
+      <text x="300" y="440" text-anchor="middle" font-family="Inter Tight,sans-serif" font-weight="700" font-size="12" letter-spacing="4" fill="rgba(255,255,255,.16)">ВЫЕЗДНАЯ ХИМЧИСТКА · МЕБЕЛЬ И КОВРЫ</text>
+    </symbol>
+    <symbol id="seatCushions" viewBox="0 0 600 600">
+      <rect x="138" y="300" width="162" height="158" rx="36" fill="url(#gCushion)"/>
+      <rect x="300" y="300" width="162" height="158" rx="36" fill="url(#gCushion)"/>
+      <path d="M160 320 Q220 300 278 322" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
+      <path d="M322 320 Q382 300 440 322" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
+    </symbol>
+    <symbol id="backCushions" viewBox="0 0 600 600">
+      <rect x="150" y="150" width="148" height="140" rx="32" fill="url(#gCushionBack)"/>
+      <rect x="302" y="150" width="148" height="140" rx="32" fill="url(#gCushionBack)"/>
+    </symbol>
+    <symbol id="sparkle" viewBox="0 0 600 600">
+      <circle cx="300" cy="230" r="70" fill="url(#gGlow)"/>
+      <path d="M210 190 l10 26 l26 10 l-26 10 l-10 26 l-10 -26 l-26 -10 l26 -10 Z" fill="url(#gAcc)"/>
+      <path d="M400 250 l7 18 l18 7 l-18 7 l-7 18 l-7 -18 l-18 -7 l18 -7 Z" fill="url(#gAcc)" opacity=".85"/>
+      <circle cx="330" cy="330" r="6" fill="url(#gAcc)" opacity=".8"/>
+      <circle cx="270" cy="170" r="4" fill="url(#gAcc)" opacity=".7"/>
+    </symbol>
+  </defs>
+</svg>
+
+<nav class="nav" id="nav">
+  <a class="logo" href="#top"><b>ХИМЧИСТКА 24</b><span>Ваш город</span></a>
+  <div class="navlinks"><a href="#how">Как работаем</a><a href="#numbers">Цифры</a><a href="#calc">Цена</a><a href="#book">Вызвать мастера</a></div>
+  <a class="pill acc" href="#calc">Рассчитать</a>
+</nav>
+
+<!-- ===== HERO ===== -->
+<header class="hero" id="top">
+  <div class="hero-glow"></div>
+  <canvas id="wave" aria-hidden="true"></canvas>
+  <div class="word" aria-hidden="true">
+    <span class="w1">Цена</span>
+    <span class="tag">химчистка мебели и ковров · ваш город</span>
+    <span class="w2">заранее</span>
+  </div>
+  <div class="hero-wheel" id="heroWheel">
+    <svg viewBox="0 0 600 600" role="img" aria-label="Диван">
+      <use href="#frame"/><use href="#seatCushions"/><use href="#backCushions"/>
+      <g class="shimmer"><use href="#sparkle"/></g>
+    </svg>
+  </div>
+  <div class="hero-foot">
+    <div class="l"><a class="pill" href="#calc">Узнать цену за 15 секунд</a><a class="pill ghost" href="#book">Вызвать мастера</a></div>
+    <div class="r"><b>Без визита «на оценку»</b><span>Выберите мебель или ковёр — калькулятор сразу показывает сумму, без ожидания звонка «мы посчитаем и перезвоним».</span></div>
+  </div>
+  <div class="scrollhint"></div>
+</header>
+
+<!-- ===== STATEMENT ===== -->
+<section class="statement" id="how">
+  <div class="wrap">
+    <p class="eyebrow">Почему клиенты не уходят</p>
+    <p id="statement">Многие компании называют цену только после бесплатного выезда мастера «на оценку» — и клиент ждёт звонка, чтобы узнать сумму. Здесь цена на экране сразу: выбрали диван, кресло или ковёр — увидели итог, без ожидания оценки на месте.</p>
+  </div>
+</section>
+
+<!-- ===== EXPLODED VIEW ===== -->
+<section class="explode" id="explode">
+  <div class="stage">
+    <div class="copy">
+      <div class="step on" data-i="0">
+        <p class="eyebrow">01 · Мебель</p>
+        <h2 class="h2">Диван или кресло — <em>сразу цена</em></h2>
+        <p>Отмечаете тип мебели и количество — калькулятор сразу считает итог по средним ценам рынка, без выезда на оценку.</p>
+        <a class="pill ghost" href="#calc">Посчитать →</a>
+      </div>
+      <div class="step" data-i="1">
+        <p class="eyebrow">02 · Сложные случаи</p>
+        <h2 class="h2">Шерсть питомцев и <em>стойкие пятна</em></h2>
+        <p>Сильные загрязнения и запах — отдельная, прозрачная доплата, видна в калькуляторе заранее, а не в чеке после визита.</p>
+        <a class="pill ghost" href="#calc">Посчитать →</a>
+      </div>
+      <div class="step" data-i="2">
+        <p class="eyebrow">03 · Ковры</p>
+        <h2 class="h2">Ковёр — <em>по площади и материалу</em></h2>
+        <p>Синтетика, шерсть, вискоза или шёлк — у каждого своя цена за м². Площадь вводите сами, сумма пересчитывается мгновенно.</p>
+        <a class="pill ghost" href="#calc">Посчитать →</a>
+      </div>
+      <div class="stepnav"><i class="on"></i><i></i><i></i></div>
+    </div>
+    <div class="scene">
+      <div class="rig" id="rig">
+        <div class="layer" data-z="-1"><svg viewBox="0 0 600 600"><use href="#frame"/></svg></div>
+        <div class="layer" data-z="0"><svg viewBox="0 0 600 600"><use href="#seatCushions"/></svg></div>
+        <div class="layer" data-z="0.4"><svg viewBox="0 0 600 600"><use href="#backCushions"/></svg></div>
+        <div class="layer" data-z="1"><svg viewBox="0 0 600 600"><use href="#sparkle"/></svg></div>
+      </div>
+      <div class="callout left" data-c="0" style="right:56%;top:22%;--len:90px"><span class="dot"></span><span class="ln"></span><span class="lb"><b>Кресло</b><span>от 1 100 ₽</span></span></div>
+      <div class="callout" data-c="0" style="left:62%;top:70%;--len:70px"><span class="dot"></span><span class="ln"></span><span class="lb"><b>Диван 3‑местный</b><span>от 2 700 ₽</span></span></div>
+      <div class="callout" data-c="1" style="left:60%;top:30%;--len:80px"><span class="dot"></span><span class="ln"></span><span class="lb"><b>Шерсть питомцев</b><span>+30%</span></span></div>
+      <div class="callout left" data-c="1" style="right:55%;top:64%;--len:80px"><span class="dot"></span><span class="ln"></span><span class="lb"><b>Удаление запаха</b><span>1 200 ₽</span></span></div>
+      <div class="callout" data-c="2" style="left:56%;top:48%;--len:100px"><span class="dot"></span><span class="ln"></span><span class="lb"><b>Ковёр, синтетика</b><span>700 ₽/м²</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== NUMBERS ===== -->
+<section class="numbers" id="numbers">
+  <div class="wrap">
+    <p class="eyebrow rv">В цифрах</p>
+    <h2 class="h2 rv d1">Всё, что клиент хочет знать <em>до звонка</em></h2>
+    <div class="ngrid">
+      <div class="n rv"><div class="v"><span data-count="1100">0</span><small>₽</small></div><div class="k">химчистка кресла, от</div></div>
+      <div class="n rv d1"><div class="v"><span data-count="700">0</span><small>₽/м²</small></div><div class="k">ковёр из синтетики, за м²</div></div>
+      <div class="n rv d2"><div class="v"><span data-count="100">0</span><small>₽</small></div><div class="k">доплата за км за городом, в городе — бесплатно</div></div>
+      <div class="n rv d3"><div class="v"><span data-count="2">0</span><small>ч</small></div><div class="k">высыхание мебели после чистки, от</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CALCULATOR ===== -->
+<section class="calc" id="calc">
+  <div class="wrap">
+    <p class="eyebrow rv">Калькулятор</p>
+    <h2 class="h2 rv d1">Ваша цена — <em>прямо сейчас</em></h2>
+    <p class="lead rv d2">Те же цифры, что в прайсе на сайте, только без ожидания оценки мастера.</p>
+    <div class="calc-grid">
+      <div class="panel rv">
+        <div class="row">
+          <p class="lbl">Что чистим</p>
+          <div class="seg wide" data-k="svc"><button aria-pressed="true" data-v="mebel">Мебель</button><button aria-pressed="false" data-v="kovry">Ковры</button></div>
+        </div>
+        <div id="mebelBox">
+          <div class="row">
+            <p class="lbl">Предмет</p>
+            <div class="seg wide" data-k="item">
+              <button aria-pressed="true" data-v="chair">Кресло</button>
+              <button aria-pressed="false" data-v="pouf">Пуф / стул</button>
+              <button aria-pressed="false" data-v="sofa2">Диван 2‑местный</button>
+              <button aria-pressed="false" data-v="sofa3">Диван 3‑местный</button>
+              <button aria-pressed="false" data-v="corner">Угловой диван</button>
+              <button aria-pressed="false" data-v="mattress">Матрас</button>
+            </div>
+          </div>
+          <div class="row">
+            <p class="lbl">Количество</p>
+            <div class="seg" data-k="qty"><button aria-pressed="true" data-v="1">1</button><button aria-pressed="false" data-v="2">2</button><button aria-pressed="false" data-v="3">3</button><button aria-pressed="false" data-v="4">4</button></div>
+          </div>
+          <div class="row">
+            <label class="tg"><span><b>Шерсть питомцев / стойкие пятна</b> · +30%</span><input type="checkbox" id="pet"></label>
+            <label class="tg"><span><b>Удаление запаха</b> · 1 200 ₽</span><input type="checkbox" id="odor"></label>
+          </div>
+        </div>
+        <div class="row" id="kovryBox" hidden>
+          <p class="lbl">Материал</p>
+          <select id="mat">
+            <option value="synth" selected>Синтетика</option>
+            <option value="wool">Шерсть / смесь</option>
+            <option value="visc">Вискоза / хлопок</option>
+            <option value="silk">Шёлк / ручная работа</option>
+          </select>
+          <p class="hint" style="margin-bottom:0">Площадь, м²</p>
+          <input type="number" id="area" min="1" max="60" value="6" inputmode="numeric" aria-label="Площадь ковра в м²" style="margin-top:10px">
+          <p class="hint">Длина × ширина в метрах — можно примерно, точно измерит мастер на месте.</p>
+        </div>
+        <div class="row">
+          <p class="lbl">Где вы</p>
+          <select id="zone">
+            <option value="city">В городе</option>
+            <option value="outside">За городом</option>
+          </select>
+          <div id="kmBox" hidden style="margin-top:10px"><input type="number" id="km" min="1" max="150" value="10" inputmode="numeric" aria-label="Километров от города"><p class="hint">Км от города — по 100 ₽ за км.</p></div>
+        </div>
+      </div>
+      <div class="sum rv d1">
+        <div class="panel">
+          <p class="lbl" style="position:relative">Итого</p>
+          <div class="price" id="price">0<small> ₽</small></div>
+          <div class="lines" id="lines"></div>
+          <p class="note">Цены усреднены по рынку выездной химчистки. Точную сумму мастер подтверждает на месте, но она крайне редко отличается заметно от расчёта.</p>
+          <a class="pill acc" href="#book" style="margin-top:22px;position:relative">Вызвать мастера по этой цене</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BOOKING ===== -->
+<section class="book" id="book">
+  <div class="wrap">
+    <p class="eyebrow rv">Заявка</p>
+    <h2 class="h2 rv d1">Мастер приедет. <em>Вы не ждёте оценки.</em></h2>
+    <p class="lead rv d2">Заявка уходит в WhatsApp уже с услугой и расчётной суммой — без дополнительных звонков, чтобы уточнить цену.</p>
+    <div class="fgrid rv">
+      <input type="text" id="nm" placeholder="Имя" autocomplete="name">
+      <input type="tel" id="ph" placeholder="Телефон" autocomplete="tel">
+      <input class="full" type="text" id="addr" placeholder="Адрес или ориентир">
+      <input type="text" id="itm" placeholder="Что чистим, например «угловой диван»">
+      <select id="whn"><option>Сегодня</option><option>Завтра</option><option>На этой неделе</option><option>В выходные</option></select>
+    </div>
+    <div class="cta rv"><button class="pill acc" id="send" type="button">Отправить заявку в WhatsApp</button><a class="pill ghost" id="wa" href="https://wa.me/70000000000" target="_blank" rel="noopener">Написать мастеру напрямую</a></div>
+    <p class="err" id="err" hidden></p>
+    <div class="ticket" id="ticket" hidden><h4>Заявка собрана</h4><p>В рабочей версии она сразу уходит мастеру. В демо — показываем, что именно он получит.</p><pre id="ticketTxt"></pre></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="demo"><b>Демо-пример.</b> Показывает, как клиент видит точную сумму на экране сразу — вместо ожидания бесплатного выезда «на оценку», которым многие компании оттягивают разговор о цене. Цены здесь усреднённые по рынку — в вашей версии стоят ваши цены, телефон, город и название компании.</span>
+    <span>Химчистка24 · демо-пример «Мгновенный расчёт»</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+document.body.classList.remove("no-js");
+
+/* ================= CONFIG (усреднённый прайс ниши «выездная химчистка мебели и ковров», на основе реальных прайсов нескольких компаний, 16.10.2026) ================= */
+var C = {
+  name:"Химчистка24", city:"ваш город", wa:"70000000000",
+  ITEMS:{
+    chair:{l:"Кресло",v:1100}, pouf:{l:"Пуф / стул",v:600},
+    sofa2:{l:"Диван 2‑местный",v:2200}, sofa3:{l:"Диван 3‑местный",v:2700},
+    corner:{l:"Угловой диван",v:3500}, mattress:{l:"Матрас",v:3800}
+  },
+  PET_MULT:0.30, ODOR_FEE:1200,
+  CARPET:{
+    synth:{l:"Синтетика",v:700}, wool:{l:"Шерсть / смесь",v:850},
+    visc:{l:"Вискоза / хлопок",v:1300}, silk:{l:"Шёлк / ручная работа",v:2000}
+  },
+  PER_KM:100
+};
+
+var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function $(id){return document.getElementById(id);}
+function fmt(n){return new Intl.NumberFormat("ru-RU").format(Math.round(n));}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+/* ---------- intro ---------- */
+requestAnimationFrame(function(){ setTimeout(function(){document.body.classList.add("loaded");},60); });
+
+/* ---------- nav ---------- */
+var nav=$("nav");
+function onNav(){ nav.classList.toggle("solid", window.scrollY>40); }
+
+/* ---------- hero wave (живая «волна» света) ---------- */
+var cv=$("wave"), cx=cv.getContext("2d"), W=0,H=0,dpr=Math.min(2,window.devicePixelRatio||1), t0=performance.now(), heroVisible=true;
+function size(){ W=cv.clientWidth; H=cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; cx.setTransform(dpr,0,0,dpr,0,0); }
+size(); window.addEventListener("resize",size);
+var LINES=7;
+function drawWave(now){
+  if(!heroVisible){ requestAnimationFrame(drawWave); return; }
+  var t=(now-t0)/1000; cx.clearRect(0,0,W,H);
+  var mid=H/2, pulse=0.55+0.45*Math.sin(t*1.3);
+  for(var k=0;k<LINES;k++){
+    var ph=k/LINES, amp=(H*0.32)*(0.35+0.65*Math.sin(Math.PI*(k+1)/(LINES+1)))*(0.6+0.4*pulse);
+    var g=cx.createLinearGradient(0,0,W,0);
+    g.addColorStop(0,"rgba(255,255,255,0)"); g.addColorStop(.3,"rgba(120,230,220,"+(0.10+0.08*k/LINES)+")");
+    g.addColorStop(.5,"rgba(70,190,220,"+(0.85-0.07*k)+")"); g.addColorStop(.7,"rgba(120,230,220,"+(0.10+0.08*k/LINES)+")"); g.addColorStop(1,"rgba(255,255,255,0)");
+    cx.strokeStyle=g; cx.lineWidth=k===0?2:1.2; cx.beginPath();
+    for(var x=0;x<=W;x+=4){
+      var u=x/W, env=Math.exp(-Math.pow((u-.5)/.17,2));
+      var side=0.12*Math.exp(-Math.pow((u-.5)/.42,2));
+      var y=mid+Math.sin(u*38+t*3.2+ph*6.28)*amp*(env+side)*Math.sin(u*9-t*1.1+ph*3);
+      x===0?cx.moveTo(x,y):cx.lineTo(x,y);
+    }
+    cx.stroke();
+  }
+  requestAnimationFrame(drawWave);
+}
+if(!reduce) requestAnimationFrame(drawWave);
+try{ new IntersectionObserver(function(e){heroVisible=e[0].isIntersecting;}).observe($("top")); }catch(e){}
+
+/* ---------- hero parallax ---------- */
+var hw=$("heroWheel"), word=document.querySelector(".word");
+function onHero(){
+  var y=window.scrollY, h=window.innerHeight; if(y>h) return;
+  var p=y/h;
+  hw.style.transform="translateY("+(p*h*0.28)+"px) scale("+(1-p*0.18)+")";
+  word.style.transform="translateY("+(p*h*0.12)+"px)";
+  word.style.opacity=String(1-p*1.2);
+}
+
+/* ---------- statement: слова «зажигаются» по мере скролла ---------- */
+var st=$("statement"); var words=st.textContent.split(" ");
+st.innerHTML=words.map(function(w){return "<span>"+w+"</span>";}).join(" ");
+var sw=st.querySelectorAll("span");
+function onStatement(){
+  var r=st.getBoundingClientRect(), vh=window.innerHeight;
+  var p=clamp((vh*0.85-r.top)/(r.height+vh*0.35),0,1), n=Math.round(p*sw.length);
+  for(var i=0;i<sw.length;i++) sw[i].classList.toggle("on", i<n);
+}
+
+/* ---------- exploded view ---------- */
+var ex=$("explode"), rig=$("rig"), layers=rig.querySelectorAll(".layer"), steps=ex.querySelectorAll(".step"),
+    dots=ex.querySelectorAll(".stepnav i"), calls=ex.querySelectorAll(".callout"), cur=-1;
+function onExplode(){
+  var r=ex.getBoundingClientRect(), total=ex.offsetHeight-window.innerHeight;
+  var p=clamp(-r.top/total,0,1);
+  var spread=clamp(p/0.28,0,1);
+  var e=1-Math.pow(1-spread,3);
+  var gap=Math.min(window.innerWidth*0.12,150);
+  rig.style.setProperty("--ry",(-8-e*52+p*14)+"deg");
+  for(var i=0;i<layers.length;i++){
+    var z=parseFloat(layers[i].getAttribute("data-z"));
+    layers[i].style.setProperty("--z",(z*gap*e)+"px");
+  }
+  var idx=p<0.40?0:(p<0.70?1:2);
+  if(idx!==cur){
+    cur=idx;
+    steps.forEach(function(s,i){s.classList.toggle("on",i===idx);});
+    dots.forEach(function(d,i){d.classList.toggle("on",i===idx);});
+  }
+  calls.forEach(function(c){ c.classList.toggle("on", +c.getAttribute("data-c")===idx && spread>0.6); });
+}
+
+/* ---------- reveal + count-up ---------- */
+try{
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      e.target.classList.add("in");
+      e.target.querySelectorAll("[data-count]").forEach(countUp);
+      io.unobserve(e.target);
+    });
+  },{threshold:.18});
+  document.querySelectorAll(".rv").forEach(function(el){io.observe(el);});
+}catch(e){
+  document.querySelectorAll(".rv").forEach(function(el){ el.classList.add("in"); el.querySelectorAll("[data-count]").forEach(countUp); });
+}
+function countUp(el){
+  var to=+el.getAttribute("data-count"); if(reduce){el.textContent=fmt(to);return;}
+  var s=performance.now(), d=1400;
+  (function f(n){ var k=clamp((n-s)/d,0,1), e=1-Math.pow(1-k,4); el.textContent=fmt(to*e); if(k<1) requestAnimationFrame(f); })(s);
+}
+
+/* ---------- scroll loop ---------- */
+var ticking=false;
+function onScroll(){ if(ticking) return; ticking=true; requestAnimationFrame(function(){ onNav(); onHero(); onStatement(); onExplode(); ticking=false; }); }
+window.addEventListener("scroll",onScroll,{passive:true}); window.addEventListener("resize",onScroll);
+onScroll();
+
+/* ================= CALCULATOR ================= */
+var S={svc:"mebel",item:"chair",qty:1,pet:false,odor:false,mat:"synth",area:6,zone:"city",km:10};
+function calc(s){
+  var items=[], work=0;
+  if(s.svc==="mebel"){
+    var it=C.ITEMS[s.item], base=it.v*s.qty;
+    items.push({l:it.l+" × "+s.qty,v:base});
+    work+=base;
+    if(s.pet){ var add=base*C.PET_MULT; items.push({l:"Шерсть питомцев / стойкие пятна +30%",v:add}); work+=add; }
+    if(s.odor){ items.push({l:"Удаление запаха",v:C.ODOR_FEE}); work+=C.ODOR_FEE; }
+  } else {
+    var m=C.CARPET[s.mat], area=clamp(s.area||1,1,60), sum=m.v*area;
+    items.push({l:"Ковёр, "+m.l+" × "+area+" м²",v:sum});
+    work+=sum;
+  }
+  var call;
+  if(s.zone==="outside"){ var km=clamp(s.km||1,1,150); call=km*C.PER_KM; items.push({l:"Выезд за город: "+km+" км × "+C.PER_KM+" ₽",v:call}); }
+  else { call=0; items.push({l:"Выезд в городе",v:0}); }
+  return {items:items,total:work+call};
+}
+var shown=0, anim=null;
+function tweenPrice(to){
+  var el=$("price"), from=shown, s=performance.now(), d=reduce?0:650;
+  cancelAnimationFrame(anim);
+  (function f(n){ var k=d?clamp((n-s)/d,0,1):1, e=1-Math.pow(1-k,3); shown=from+(to-from)*e;
+    el.innerHTML=fmt(shown)+"<small> ₽</small>"; if(k<1) anim=requestAnimationFrame(f); })(s);
+}
+function render(){
+  $("mebelBox").hidden=S.svc!=="mebel"; $("kovryBox").hidden=S.svc==="mebel"; $("kmBox").hidden=S.zone!=="outside";
+  var r=calc(S), box=$("lines"); box.textContent="";
+  r.items.forEach(function(it){ var d=document.createElement("div"); d.className="ln2";
+    var a=document.createElement("span"); a.textContent=it.l; var b=document.createElement("span"); b.textContent=fmt(it.v)+" ₽";
+    d.appendChild(a); d.appendChild(b); box.appendChild(d); });
+  tweenPrice(r.total);
+}
+function press(k,v){ document.querySelectorAll('[data-k="'+k+'"] button').forEach(function(b){ b.setAttribute("aria-pressed", b.getAttribute("data-v")===String(v)?"true":"false"); }); }
+document.querySelectorAll(".seg").forEach(function(g){
+  g.addEventListener("click",function(e){ var b=e.target.closest("button"); if(!b||b.disabled) return;
+    var k=g.getAttribute("data-k"), v=b.getAttribute("data-v"); S[k]=(k==="qty")?+v:v; press(k,v); render(); });
+});
+["pet","odor"].forEach(function(id){ $(id).addEventListener("change",function(){S[id]=this.checked;render();}); });
+$("mat").addEventListener("change",function(){S.mat=this.value;render();});
+$("area").addEventListener("input",function(){S.area=parseInt(this.value,10)||1;render();});
+$("zone").addEventListener("change",function(){S.zone=this.value;render();});
+$("km").addEventListener("input",function(){S.km=parseInt(this.value,10)||1;render();});
+render();
+
+/* ---------- booking ---------- */
+$("send").addEventListener("click",function(){
+  var nm=$("nm").value.trim(), ph=$("ph").value.trim(), ad=$("addr").value.trim(), er=$("err");
+  if(!nm||!ph||!ad){ er.textContent="Заполните имя, телефон и адрес — без них мастер не сможет выехать."; er.hidden=false; return; }
+  er.hidden=true;
+  var r=calc(S), svc=S.svc==="mebel"?(C.ITEMS[S.item].l+" × "+S.qty):("Ковёр, "+C.CARPET[S.mat].l+" × "+S.area+" м²");
+  var zone=S.zone==="outside"?("за городом, "+S.km+" км"):"в городе";
+  var txt="НОВАЯ ЗАЯВКА — "+C.name+"\nУслуга: "+svc+"\nДополнительно: "+($("itm").value.trim()||"не указано")+"\nАдрес: "+ad+", "+C.city+" ("+zone+")\nКогда: "+$("whn").value+"\nКлиент: "+nm+", "+ph+"\nРасчёт по прайсу: "+fmt(r.total)+" ₽";
+  $("ticketTxt").textContent=txt; $("ticket").hidden=false;
+  $("wa").href="https://wa.me/"+C.wa+"?text="+encodeURIComponent(txt);
+  $("ticket").scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"});
+});
+})();
+</script>
+</body>
+</html>
