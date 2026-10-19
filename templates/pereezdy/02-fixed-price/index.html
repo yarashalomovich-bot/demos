@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Демо-пример — переезды: цена фиксируется до приезда бригады</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#0a0b0d;
+  --surface: rgba(255,255,255,.04); --surface-2: rgba(255,255,255,.065); --surface-3: rgba(255,255,255,.1);
+  --line: rgba(255,255,255,.09); --line-soft: rgba(255,255,255,.06);
+  --ink:#f5f6f8; --ink-mid:#a6adb6; --ink-dim:#757d87;
+  --accent-1:#3fa9ff; --accent-2:#6b5bff; --accent-ink:#06101f;
+  --accent-grad: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  --ok:#36d399; --alert:#ff6b6b;
+  --font-display:'Manrope',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,sans-serif;
+  --shadow-card: 0 1px 0 rgba(255,255,255,.05) inset, 0 24px 48px -28px rgba(0,0,0,.75);
+  --shadow-pop: 0 10px 24px -8px rgba(63,169,255,.4);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eef0f3;
+    --surface:#ffffff; --surface-2:#f4f5f7; --surface-3:#e9ebee;
+    --line: rgba(10,15,20,.1); --line-soft: rgba(10,15,20,.06);
+    --ink:#14171a; --ink-mid:#555f68; --ink-dim:#7c858d;
+    --accent-ink:#06101f;
+    --shadow-card: 0 1px 0 rgba(255,255,255,.6) inset, 0 20px 40px -24px rgba(20,23,26,.18);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#eef0f3;
+  --surface:#ffffff; --surface-2:#f4f5f7; --surface-3:#e9ebee;
+  --line: rgba(10,15,20,.1); --line-soft: rgba(10,15,20,.06);
+  --ink:#14171a; --ink-mid:#555f68; --ink-dim:#7c858d;
+  --accent-ink:#06101f;
+  --shadow-card: 0 1px 0 rgba(255,255,255,.6) inset, 0 20px 40px -24px rgba(20,23,26,.18);
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.icon{width:1em; height:1em; display:inline-block; vertical-align:-0.15em; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+
+/* ---------- MOTION (scroll-reveal, respects reduced motion) ----------
+   Fail-open: without JS (or before it runs) .reveal elements render normally —
+   only the ".js" class added by the inline bootstrap script below switches
+   them to the hidden/animate-in state, so a blocked script never hides content. */
+.js .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1)}
+.js .reveal.in{opacity:1; transform:translateY(0)}
+.js .reveal.d1{transition-delay:.06s} .js .reveal.d2{transition-delay:.12s} .js .reveal.d3{transition-delay:.18s}
+@media (prefers-reduced-motion: reduce){
+  .js .reveal{opacity:1!important; transform:none!important; transition:none!important}
+  .herowheel{transform:translateY(-46%)!important}
+}
+.tv.bump{animation:bump .32s ease}
+@keyframes bump{0%{transform:scale(1)} 35%{transform:scale(1.045)} 100%{transform:scale(1)}}
+
+/* ---------- HERO (full-bleed) ---------- */
+.hero{
+  position:relative; width:100%; min-height:320px;
+  display:flex; align-items:flex-end; overflow:hidden;
+  background:
+    radial-gradient(900px 480px at 14% -10%, rgba(63,169,255,.22), transparent 60%),
+    radial-gradient(760px 520px at 104% 6%, rgba(107,91,255,.22), transparent 55%),
+    linear-gradient(180deg, #0f1319 0%, #0b0d10 55%, var(--bg) 100%);
+  padding-top:120px;
+}
+.hero::before{
+  content:""; position:absolute; inset:0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.16) 50%, transparent 52%),
+    radial-gradient(1px 1px at 60% 65%, rgba(255,255,255,.12) 50%, transparent 52%),
+    radial-gradient(1px 1px at 85% 20%, rgba(255,255,255,.14) 50%, transparent 52%),
+    radial-gradient(1px 1px at 40% 85%, rgba(255,255,255,.1) 50%, transparent 52%);
+  background-size:220px 220px; pointer-events:none;
+}
+.herowheel{position:absolute; right:-6%; top:50%; transform:translateY(-46%); width:min(50vw,580px); height:auto; opacity:.9; pointer-events:none; will-change:transform}
+@media (max-width:720px){.herowheel{right:-30%; width:86vw; opacity:.5}}
+.herocap{position:relative; width:100%; max-width:1180px; margin:0 auto; padding:0 20px 26px; display:flex; flex-direction:column; gap:12px; color:#fff}
+.brand{display:flex; align-items:center; gap:10px}
+.brandmark{
+  width:40px; height:40px; border-radius:12px; flex:none;
+  background:var(--accent-grad); box-shadow:var(--shadow-pop);
+  display:flex; align-items:center; justify-content:center; color:var(--accent-ink);
+}
+.brandmark .icon{width:21px; height:21px}
+.brandname{font-family:var(--font-display); font-weight:800; font-size:14.5px; letter-spacing:.02em}
+.brandloc{font-size:12px; color:rgba(255,255,255,.72); margin-top:1px}
+.hero h1{
+  font-family:var(--font-display); font-weight:800; font-size:clamp(28px,4.6vw,46px);
+  line-height:1.1; margin:4px 0 0; letter-spacing:-.01em; text-wrap:balance; max-width:640px;
+  text-shadow:0 2px 24px rgba(0,0,0,.35);
+}
+.hero .sub{color:rgba(255,255,255,.82); font-size:15px; margin:0; max-width:520px}
+.hero .sub b{color:#fff; font-weight:700}
+
+/* ---------- SHELL / GRID ---------- */
+.shell{max-width:1180px; margin:0 auto; padding:26px 20px 60px; display:grid; grid-template-columns:1fr; gap:20px}
+@media (min-width:900px){
+  .shell{grid-template-columns:340px 1fr; align-items:start; gap:28px}
+  .infocol{position:sticky; top:22px; display:flex; flex-direction:column; gap:16px}
+}
+.infocol{display:flex; flex-direction:column; gap:16px}
+
+.demolabel{
+  display:flex; gap:10px; align-items:flex-start;
+  background:var(--surface-2); border:1px solid var(--line); border-radius:12px;
+  padding:11px 13px; font-size:12.5px; color:var(--ink-mid); line-height:1.5;
+}
+.demolabel b{
+  font-family:var(--font-display); font-weight:800; font-size:9.5px; letter-spacing:.09em; text-transform:uppercase;
+  background:var(--accent-grad); color:var(--accent-ink); padding:4px 8px; border-radius:6px; flex:none; margin-top:1px;
+}
+.demolabel.tmpl{border-color:rgba(255,176,32,.45)}
+.demolabel.tmpl b{background:linear-gradient(135deg,#ffb020,#ff5a5f); color:#1a0e02}
+
+.trustrow{display:flex; flex-direction:column; gap:8px}
+.trust{
+  display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink-mid); font-weight:500;
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+}
+.trust .ic{
+  width:28px; height:28px; border-radius:9px; flex:none; display:flex; align-items:center; justify-content:center;
+  background:var(--surface-3); color:var(--ok);
+}
+.trust .ic .icon{width:15px; height:15px}
+.trust b{color:var(--ink); font-weight:700}
+
+.howcard{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:17px; box-shadow:var(--shadow-card)}
+.howcard .httl{font-family:var(--font-display); font-weight:700; font-size:13px; letter-spacing:.01em; margin:0 0 13px; color:var(--ink)}
+.howrow{display:flex; gap:11px; align-items:flex-start}
+.howrow + .howrow{margin-top:12px}
+.hownum{
+  width:22px; height:22px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-weight:800; font-size:11px; background:var(--surface-3); color:var(--ink-mid);
+}
+.howrow:last-child .hownum{background:var(--accent-grad); color:var(--accent-ink)}
+.howtxt{font-size:13px; color:var(--ink-mid); line-height:1.45; padding-top:2px}
+.howtxt b{color:var(--ink); font-weight:600}
+
+/* ---------- STEPS COLUMN ---------- */
+.stepscol{display:flex; flex-direction:column; gap:16px}
+.card{
+  position:relative; background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:20px;
+  display:flex; flex-direction:column; gap:16px; box-shadow:var(--shadow-card);
+}
+
+.ctitle{display:flex; gap:10px; align-items:center; margin:0}
+.ctitle .num{
+  width:24px; height:24px; border-radius:8px; flex:none; display:flex; align-items:center; justify-content:center;
+  background:var(--accent-grad); color:var(--accent-ink); font-family:var(--font-display); font-weight:800; font-size:12px;
+}
+.ctitle .tt{font-family:var(--font-display); font-weight:700; font-size:14.5px; letter-spacing:.01em; color:var(--ink)}
+.ctitle .tt span{display:block; font-family:var(--font-body); font-weight:400; font-size:11.5px; color:var(--ink-dim); margin-top:1px}
+
+.field{display:flex; flex-direction:column; gap:8px}
+label.fl{font-size:12.5px; color:var(--ink-dim); font-weight:600; letter-spacing:.01em}
+
+.tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+@media (min-width:560px){.tiles.three{grid-template-columns:repeat(3,1fr)} .tiles.four{grid-template-columns:repeat(4,1fr)}}
+.tile{
+  display:flex; flex-direction:column; align-items:flex-start; gap:10px; text-align:left;
+  font-family:var(--font-body); font-size:13.5px; font-weight:600; padding:14px 14px 13px; border-radius:14px; cursor:pointer;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.25;
+  transition:border-color .15s, background .15s, transform .15s, box-shadow .15s;
+}
+.tile:hover{border-color:var(--ink-dim); transform:translateY(-1px)}
+.tile .ic{
+  width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+  background:var(--surface-3); color:var(--ink-mid); transition:background .15s, color .15s;
+}
+.tile .ic .icon{width:17px; height:17px}
+.tile[aria-pressed="true"]{
+  background:linear-gradient(160deg, rgba(63,169,255,.16), rgba(107,91,255,.12)); border-color:transparent;
+  box-shadow:0 0 0 1.5px var(--accent-1) inset, var(--shadow-pop); color:var(--ink);
+}
+.tile[aria-pressed="true"] .ic{background:var(--accent-grad); color:var(--accent-ink)}
+.tile:focus-visible{outline:2px solid var(--accent-1); outline-offset:2px}
+
+select{
+  font-family:var(--font-body); font-weight:500; font-size:15px; padding:12px 38px 12px 14px; border-radius:12px;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
+  appearance:none; -webkit-appearance:none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-mid) 50%),
+    linear-gradient(135deg, var(--ink-mid) 50%, transparent 50%);
+  background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+  background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+}
+input[type="text"],input[type="tel"],input[type="number"]{
+  font-family:var(--font-body); font-weight:500; font-size:15px; padding:12px 14px; border-radius:12px;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); width:100%;
+}
+select:focus,input:focus{outline:none; border-color:var(--accent-1); box-shadow:0 0 0 3px rgba(63,169,255,.2)}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:11px}
+
+.hintline{font-size:12px; color:var(--ink-dim); margin:0; line-height:1.55; display:flex; gap:7px}
+.hintline .icon{width:14px; height:14px; flex:none; margin-top:2px; color:var(--ink-dim)}
+
+.readout{
+  background:linear-gradient(160deg, rgba(63,169,255,.1), rgba(107,91,255,.06));
+  border:1px solid var(--line); border-radius:16px; padding:18px 18px 17px;
+  display:flex; flex-direction:column; gap:14px;
+}
+@media (min-width:560px){.readout{flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap}}
+.lines{display:flex; flex-direction:column; gap:7px; flex:1; min-width:220px}
+.pl{display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:var(--ink-mid)}
+.pl span:last-child{font-variant-numeric:tabular-nums; color:var(--ink); font-weight:600; white-space:nowrap}
+.total{display:flex; flex-direction:column; align-items:flex-start; gap:5px}
+.total .tl{font-family:var(--font-display); font-size:12.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--ink-mid)}
+.total .tv{
+  font-family:var(--font-display); font-weight:800; font-size:clamp(26px,4vw,34px); font-variant-numeric:tabular-nums; line-height:1.1;
+  background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap;
+  display:inline-block;
+}
+.pillrow{display:flex; gap:8px; flex-wrap:wrap}
+.pill{
+  display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--ink);
+  background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:6px 11px 6px 9px;
+}
+.pill .icon{width:13px; height:13px; color:var(--ok)}
+
+.btn{
+  font-family:var(--font-display); font-weight:700; font-size:15.5px; letter-spacing:.01em;
+  background:var(--accent-grad); color:var(--accent-ink); border:none; border-radius:14px; padding:15px 18px;
+  cursor:pointer; width:100%; transition:filter .15s, transform .15s; text-align:center; text-decoration:none;
+  display:flex; align-items:center; justify-content:center; gap:9px; box-shadow:var(--shadow-pop);
+}
+.btn .icon{width:17px; height:17px}
+.btn:hover{filter:brightness(1.06); transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+.btn.ghost{background:var(--surface-2); color:var(--ink-mid); border:1.5px solid var(--line); font-size:13.5px; font-weight:600; box-shadow:none}
+.btn.ghost:hover{color:var(--ink); border-color:var(--ink-dim)}
+.btn.wa{background:linear-gradient(135deg,#2bd16a,#1aa352); color:#07230f; box-shadow:0 10px 24px -8px rgba(43,209,106,.4); margin-top:2px}
+.ctarow{display:flex; flex-direction:column; gap:10px}
+@media (min-width:560px){.ctarow{flex-direction:row}}
+
+.ticket{
+  background:var(--surface-2); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:11px;
+  border:1px solid rgba(54,211,153,.35);
+}
+.ticket .th{display:flex; gap:9px; align-items:center; font-family:var(--font-display); font-weight:700; font-size:14.5px; color:var(--ok)}
+.ticket .th .icon{width:17px; height:17px}
+.ticket pre{
+  font-family:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace; font-size:12px; line-height:1.7; margin:0;
+  white-space:pre-wrap; word-break:break-word; color:var(--ink); background:var(--surface); border-radius:10px;
+  padding:13px; border:1px solid var(--line);
+}
+.ticket .hint{font-size:12.5px; color:var(--ink-mid); margin:0}
+.copied{font-size:11.5px; color:var(--ok); font-weight:600}
+
+.err{font-size:13px; color:var(--alert); margin:0; display:flex; gap:7px; align-items:flex-start}
+.err .icon{width:14px; height:14px; flex:none; margin-top:2px}
+
+footer{max-width:1180px; margin:0 auto; padding:0 20px 50px; display:flex; flex-direction:column; gap:8px; font-size:12px; color:var(--ink-dim); line-height:1.6; border-top:1px solid var(--line-soft); padding-top:16px}
+footer b{color:var(--ink-mid)}
+
+@media (max-width:380px){.row2{grid-template-columns:1fr}}
+
+/* ---------- CHIPS ---------- */
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{
+  font-family:var(--font-body); font-size:13px; font-weight:600; padding:9px 13px; border-radius:10px; cursor:pointer;
+  background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink); line-height:1.2;
+  transition:border-color .15s, background .15s;
+}
+.chip:hover{border-color:var(--ink-dim)}
+.chip[aria-pressed="true"]{background:var(--accent-grad); border-color:transparent; color:var(--accent-ink); font-weight:700; box-shadow:var(--shadow-pop)}
+.chip:focus-visible{outline:2px solid var(--accent-1); outline-offset:2px}
+.chip.sm{font-size:12.5px; padding:8px 10px; min-width:46px; text-align:center}
+
+.toggle{display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13px; color:var(--ink-mid); user-select:none; line-height:1.4}
+.toggle input{width:18px; height:18px; accent-color:var(--accent-1); flex:none; margin:0}
+
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+
+<div class="hero">
+  <svg class="herowheel" id="herowheel" viewBox="0 0 400 400" aria-hidden="true">
+    <defs>
+      <linearGradient id="toolgrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#3fa9ff"/>
+        <stop offset="1" stop-color="#6b5bff"/>
+      </linearGradient>
+    </defs>
+    <g opacity="0.9">
+      <rect x="88" y="150" width="224" height="108" rx="14" fill="none" stroke="url(#toolgrad)" stroke-width="3"/>
+      <path d="M150 150 v-26 a14 14 0 0128 0 v26" fill="none" stroke="url(#toolgrad)" stroke-width="3"/>
+      <path d="M250 150 v-26 a14 14 0 0128 0 v26" fill="none" stroke="url(#toolgrad)" stroke-width="3"/>
+      <line x1="88" y1="186" x2="312" y2="186" stroke="url(#toolgrad)" stroke-width="2" opacity=".45"/>
+      <circle cx="140" cy="266" r="16" fill="none" stroke="url(#toolgrad)" stroke-width="3"/>
+      <circle cx="260" cy="266" r="16" fill="none" stroke="url(#toolgrad)" stroke-width="3"/>
+      <path d="M312 190 l30 14 v34 h-30z" fill="none" stroke="url(#toolgrad)" stroke-width="2.6" opacity=".75"/>
+    </g>
+  </svg>
+  <div class="herocap">
+    <div class="brand reveal">
+      <div class="brandmark"><svg class="icon" viewBox="0 0 24 24"><path d="M3 13h13V7H3v6z"/><path d="M16 10h3l2 3v3h-5v-6z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+      <div>
+        <div class="brandname" id="brandname">ПЕРЕЕЗДЫ · ДЕМО-ПРИМЕР</div>
+        <div class="brandloc" id="brandloc">Квартирные и офисные переезды · выезд по городу и области</div>
+      </div>
+    </div>
+    <h1 class="reveal d1">Цена переезда известна до приезда бригады — без доплат на месте</h1>
+    <p class="sub reveal d2">Этаж, лифт и объём вещей <b>уже в расчёте</b>: сумма на экране — это та сумма, которую клиент заплатит бригаде.</p>
+  </div>
+</div>
+
+<div class="shell">
+
+  <div class="infocol">
+    <div class="demolabel tmpl reveal">
+      <b>пример</b>
+      <span>Это демо-пример для компаний по переездам и услуг грузчиков. Он закрывает главный страх клиента: «приедут, посчитают по-другому и попросят больше, чем договаривались по телефону». Этаж без лифта, доп. грузчики и упаковка уже посчитаны в сумме, и клиент видит окончательную цифру ещё до заявки. Цены здесь условные, среднерыночные — для вашей компании ставятся ваш прайс, название, город и телефон.</span>
+    </div>
+
+    <div class="trustrow">
+      <div class="trust reveal"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><span><b>Сумма не меняется на месте</b> — что на экране, то и в чеке</span></div>
+      <div class="trust reveal d1"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg></span><span><b>Цена фиксируется до выезда бригады</b> — доплат на месте нет</span></div>
+    </div>
+
+    <div class="howcard reveal d2">
+      <p class="httl">Как это работает</p>
+      <div class="howrow"><span class="hownum">1</span><span class="howtxt"><b>Клиент указывает честно</b> — тип жилья, этаж, лифт, расстояние и число грузчиков — и видит финальную сумму.</span></div>
+      <div class="howrow"><span class="hownum">2</span><span class="howtxt"><b>Без «на месте скажем по-другому»</b> — доплата за этаж без лифта и за доп. грузчиков уже посчитана в этой сумме, а не добавлена бригадой на пороге.</span></div>
+      <div class="howrow"><span class="hownum">3</span><span class="howtxt"><b>Заявка приходит готовой</b> — бригаде в WhatsApp сразу уходят адреса, этаж и удобное время.</span></div>
+    </div>
+  </div>
+
+  <div class="stepscol">
+
+    <!-- 1. РАСЧЁТ -->
+    <div class="card reveal">
+      <p class="ctitle"><span class="num">1</span><span class="tt">Что переезжаем<span>выберите жильё, расстояние и условия на месте</span></span></p>
+
+      <div class="field">
+        <label class="fl">Тип жилья</label>
+        <div class="tiles four" id="home" role="group" aria-label="Тип жилья">
+          <button type="button" class="tile" data-home="studio" aria-pressed="true">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M4 9l8-5 8 5"/></svg></span>
+            Студия / 1-комн.
+          </button>
+          <button type="button" class="tile" data-home="two" aria-pressed="false">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M4 9l8-5 8 5"/><line x1="12" y1="12" x2="12" y2="20"/></svg></span>
+            2-комнатная
+          </button>
+          <button type="button" class="tile" data-home="three" aria-pressed="false">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="11" rx="1.5"/><path d="M3 9l9-5 9 5"/><line x1="9" y1="12" x2="9" y2="20"/><line x1="15" y1="12" x2="15" y2="20"/></svg></span>
+            3+ комнат / дом
+          </button>
+          <button type="button" class="tile" data-home="office" aria-pressed="false">
+            <span class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1.5"/><line x1="8" y1="8" x2="11" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg></span>
+            Офис / нежилое
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="fl">Расстояние</label>
+        <div class="chips" id="dist" role="group" aria-label="Расстояние">
+          <button type="button" class="chip" data-dist="city" aria-pressed="true">По городу, до 15 км</button>
+          <button type="button" class="chip" data-dist="mid" aria-pressed="false">15–40 км</button>
+          <button type="button" class="chip" data-dist="far" aria-pressed="false">40–80 км</button>
+          <button type="button" class="chip" data-dist="out" aria-pressed="false">Более 80 км</button>
+        </div>
+        <p class="hintline" id="out-hint" hidden><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".4" fill="currentColor"/></svg>Свыше 80 км цена уточняется по точному адресу — ниже показана стартовая стоимость.</p>
+      </div>
+
+      <div class="row2">
+        <div class="field"><label class="fl" for="floor">Этаж</label><input type="number" id="floor" min="1" max="30" value="1" inputmode="numeric"></div>
+        <div class="field" style="justify-content:center"><label class="toggle" for="lift"><input type="checkbox" id="lift" checked><span>Есть грузовой лифт</span></label></div>
+      </div>
+      <p class="hintline" id="lift-hint" hidden><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".4" fill="currentColor"/></svg>Доплата за этаж без лифта уже учтена в сумме ниже — бригада не добавит её на месте.</p>
+
+      <div class="field">
+        <label class="fl">Количество грузчиков</label>
+        <div class="chips" id="crew" role="group" aria-label="Количество грузчиков">
+          <button type="button" class="chip sm" data-crew="2" aria-pressed="true">2</button>
+          <button type="button" class="chip sm" data-crew="3" aria-pressed="false">3</button>
+          <button type="button" class="chip sm" data-crew="4" aria-pressed="false">4</button>
+        </div>
+      </div>
+
+      <label class="toggle" for="pack"><input type="checkbox" id="pack"><span>Упаковка вещей (плёнка, коробки, маркировка)</span></label>
+      <label class="toggle" for="asm"><input type="checkbox" id="asm"><span>Сборка/разборка мебели</span></label>
+    </div>
+
+    <!-- 2. ЦЕНА -->
+    <div class="card reveal">
+      <p class="ctitle"><span class="num">2</span><span class="tt">Стоимость<span>считается по вашему выбору выше</span></span></p>
+      <div class="readout">
+        <div class="lines" id="lines"></div>
+        <div class="total"><span class="tl">Итого</span><span class="tv" id="total">—</span></div>
+      </div>
+      <div class="pillrow">
+        <span class="pill"><svg class="icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Эта сумма зафиксирована</span>
+        <span class="pill" id="citypill"><svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-7.1-7-12a7 7 0 1114 0c0 4.9-7 12-7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>По городу и области</span>
+      </div>
+      <p class="hintline"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".4" fill="currentColor"/></svg>Цены в примере условные. В вашей версии здесь будет ваш прайс — и клиент увидит ровно ту сумму, которую вы готовы зафиксировать.</p>
+    </div>
+
+    <!-- 3. ЗАЯВКА -->
+    <div class="card reveal">
+      <p class="ctitle"><span class="num">3</span><span class="tt">Заказать бригаду<span>заявка уйдёт в WhatsApp</span></span></p>
+      <div class="row2">
+        <div class="field"><label class="fl" for="nm">Имя</label><input type="text" id="nm" placeholder="Как к вам обращаться" autocomplete="name"></div>
+        <div class="field"><label class="fl" for="ph">Телефон</label><input type="tel" id="ph" placeholder="+7 ___ ___-__-__" autocomplete="tel"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label class="fl" for="afrom">Адрес отправления</label><input type="text" id="afrom" placeholder="Откуда забрать"></div>
+        <div class="field"><label class="fl" for="ato">Адрес назначения</label><input type="text" id="ato" placeholder="Куда везём"></div>
+      </div>
+      <div class="field"><label class="fl" for="whn">Когда</label>
+        <select id="whn">
+          <option value="Сегодня, срочно" selected>Сегодня, срочно</option>
+          <option value="Завтра">Завтра</option>
+          <option value="В ближайшие дни">В ближайшие дни</option>
+          <option value="Выбранная дата">Выбранная дата — скажу бригаде</option>
+        </select>
+      </div>
+      <div class="ctarow">
+        <button class="btn" id="send" type="button">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-7-8-3z"/></svg>
+          Собрать заявку
+        </button>
+        <a class="btn wa" id="wa" href="https://wa.me/70000000000" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M20.5 3.5a10 10 0 00-16 12L3 21l5.7-1.5A10 10 0 1020.5 3.5z"/><path d="M8.5 9c.3 3 2.5 5.2 5.5 5.5.8.1 1.2-.9.7-1.5l-1-1.3c-.3-.4-.8-.4-1.2-.2-.5.3-1.3.2-2-.5s-.8-1.5-.5-2c.2-.4.2-.9-.2-1.2L8.5 6.7c-.6-.5-1.6-.1-1.5.7"/></svg>
+          Написать бригаде в WhatsApp
+        </a>
+      </div>
+      <p class="err" id="err" hidden></p>
+      <div id="ticket" hidden></div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span><b>Что это даёт компании.</b> Клиент считает цену сам и не уходит сравнивать с конкурентами, пока ждёт ответа. Заявка приходит бригаде готовой: тип жилья, этаж, расстояние, адреса, дата — без лишних звонков и без споров о сумме на пороге.</span>
+  <span>Демо-пример, собрал Ярослав Хоружий. Название, город, телефон и цены на странице — условные: в рабочей версии стоят данные вашей компании, а заявки уходят вам в WhatsApp.</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // Motion setup runs first and is wrapped defensively, so a later error in the
+  // calculator logic can never leave .reveal blocks permanently hidden (fail-open).
+  try{
+    if ("IntersectionObserver" in window){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if (en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+        });
+      }, {threshold:0.14, rootMargin:"0px 0px -6% 0px"});
+      document.querySelectorAll(".reveal").forEach(function(el){ io.observe(el); });
+    } else {
+      document.querySelectorAll(".reveal").forEach(function(el){ el.classList.add("in"); });
+    }
+  }catch(e){
+    document.querySelectorAll(".reveal").forEach(function(el){ el.classList.add("in"); });
+  }
+
+  // Демонстрационные, среднерыночные цены — не прайс конкретной компании.
+  // Та же ценовая база, что в примере «мгновенный расчёт» этой ниши — здесь просто
+  // другой угол подачи: доплаты уже внутри итога, а не добавляются бригадой на месте.
+  // Базовый тариф включает машину + 2 грузчиков + разъезд по городу (до 15 км).
+  var RATES = { studio: 3500, two: 4500, three: 6000, office: 5500 };
+  var DIST_ADD = { city: 0, mid: 900, far: 2000, out: 4500 };
+  var DIST_LABEL = { city:"по городу, до 15 км", mid:"15–40 км", far:"40–80 км", out:"более 80 км (за город, ориентировочно)" };
+  var HOME_LABEL = { studio:"Студия / 1-комнатная", two:"2-комнатная", three:"3+ комнат / дом", office:"Офис / нежилое" };
+  var EXTRA_CREW = 1300;       // доплата за грузчика сверх включённых 2
+  var NO_LIFT_PER_FLOOR = 250; // доплата за этаж без лифта, начиная с 3-го
+  var PACK_ADD = 1500;
+  var ASM_ADD = 1200;
+  var MIN_ORDER = 3500;        // минимальная стоимость выезда бригады
+
+  var state = { home:"studio", dist:"city", floor:1, lift:true, crew:2, pack:false, asm:false };
+
+  function $(id){ return document.getElementById(id); }
+  function money(n, approx){ return (approx ? "от " : "") + new Intl.NumberFormat("ru-RU").format(Math.round(n)) + " ₽"; }
+
+  function calc(s){
+    var items = [], total = 0;
+
+    var base = RATES[s.home];
+    total += base;
+    items.push({l:"Базовый тариф: " + HOME_LABEL[s.home] + " (машина + 2 грузчика, по городу)", v: base});
+
+    var distAdd = DIST_ADD[s.dist];
+    if (distAdd > 0){
+      total += distAdd;
+      items.push({l:"Расстояние: " + DIST_LABEL[s.dist], v: distAdd});
+    }
+
+    if (!s.lift && s.floor > 2){
+      var extraFloors = s.floor - 2;
+      var liftAdd = extraFloors * NO_LIFT_PER_FLOOR;
+      total += liftAdd;
+      items.push({l:"Без лифта, " + s.floor + " этаж (+" + extraFloors + " эт. пешком)", v: liftAdd});
+    }
+
+    if (s.crew > 2){
+      var crewAdd = (s.crew - 2) * EXTRA_CREW;
+      total += crewAdd;
+      items.push({l:"Доп. грузчики: " + (s.crew - 2) + " чел.", v: crewAdd});
+    }
+
+    if (s.pack){ total += PACK_ADD; items.push({l:"Упаковка вещей", v: PACK_ADD}); }
+    if (s.asm){ total += ASM_ADD; items.push({l:"Сборка/разборка мебели", v: ASM_ADD}); }
+
+    var min = false;
+    if (total < MIN_ORDER){ min = true; total = MIN_ORDER; }
+
+    return { items: items, total: total, approx: (s.dist === "out"), min: min };
+  }
+
+  var prevTotal = null;
+  function animateTotal(el, from, to, approx){
+    var start = null, dur = 380;
+    if (from === null || !isFinite(from)) { el.textContent = money(to, approx); return; }
+    function step(ts){
+      if (!start) start = ts;
+      var p = Math.min(1, (ts - start) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var v = from + (to - from) * eased;
+      el.textContent = money(v, approx && p === 1);
+      if (p < 1) requestAnimationFrame(step);
+      else { el.textContent = money(to, approx); el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function render(){
+    $("out-hint").hidden = (state.dist !== "out");
+    $("lift-hint").hidden = state.lift || state.floor <= 2;
+
+    var r = calc(state);
+    var box = $("lines");
+    box.textContent = "";
+    r.items.forEach(function(it){
+      var row = document.createElement("div");
+      row.className = "pl";
+      var a = document.createElement("span"); a.textContent = it.l;
+      var b = document.createElement("span"); b.textContent = money(it.v);
+      row.appendChild(a); row.appendChild(b); box.appendChild(row);
+    });
+    if (r.min){
+      var mrow = document.createElement("div");
+      mrow.className = "pl";
+      var ma = document.createElement("span"); ma.textContent = "Минимальная стоимость выезда бригады";
+      var mb = document.createElement("span"); mb.textContent = money(MIN_ORDER);
+      mrow.appendChild(ma); mrow.appendChild(mb); box.appendChild(mrow);
+    }
+
+    var totalEl = $("total");
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion){ totalEl.textContent = money(r.total, r.approx); }
+    else { animateTotal(totalEl, prevTotal, r.total, r.approx); }
+    prevTotal = r.total;
+  }
+
+  function group(id, attr, key, cast, after){
+    var root = $(id);
+    if (!root) return;
+    root.addEventListener("click", function(e){
+      var b = e.target.closest("button[" + attr + "]");
+      if (!b) return;
+      Array.prototype.forEach.call(root.querySelectorAll("button[" + attr + "]"), function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      state[key] = cast(b.getAttribute(attr));
+      if (after) after();
+      render();
+    });
+  }
+  group("home","data-home","home",String);
+  group("dist","data-dist","dist",String);
+  group("crew","data-crew","crew",Number);
+
+  $("floor").addEventListener("input", function(){
+    var v = parseInt(this.value, 10);
+    state.floor = isFinite(v) && v > 0 ? v : 1;
+    render();
+  });
+  $("lift").addEventListener("change", function(){ state.lift = this.checked; render(); });
+  $("pack").addEventListener("change", function(){ state.pack = this.checked; render(); });
+  $("asm").addEventListener("change", function(){ state.asm = this.checked; render(); });
+
+  $("send").addEventListener("click", function(){
+    var nm = $("nm").value.trim(), ph = $("ph").value.trim(), afrom = $("afrom").value.trim(), ato = $("ato").value.trim();
+    var err = $("err");
+    if (!nm || !ph || !afrom || !ato){
+      err.textContent = "Заполните имя, телефон и оба адреса — без них бригада не сможет выехать.";
+      err.hidden = false;
+      return;
+    }
+    err.hidden = true;
+
+    var r = calc(state);
+    var txt =
+      "НОВАЯ ЗАЯВКА — ПЕРЕЕЗД, ФИКСИРОВАННАЯ ЦЕНА (демо-пример)\n" +
+      "Тип жилья: " + HOME_LABEL[state.home] + "\n" +
+      "Этаж: " + state.floor + (state.lift ? ", лифт есть" : ", лифта нет") + "\n" +
+      "Расстояние: " + DIST_LABEL[state.dist] + "\n" +
+      "Грузчиков: " + state.crew + (state.pack ? ", + упаковка" : "") + (state.asm ? ", + сборка/разборка мебели" : "") + "\n" +
+      "Откуда: " + afrom + "\n" +
+      "Куда: " + ato + "\n" +
+      "Когда: " + $("whn").value + "\n" +
+      "Клиент: " + nm + ", " + ph + "\n" +
+      "Расчёт: " + money(r.total, r.approx);
+
+    var t = $("ticket");
+    t.textContent = "";
+    t.hidden = false;
+
+    var wrap = document.createElement("div");
+    wrap.className = "ticket";
+
+    var h = document.createElement("div");
+    h.className = "th";
+    h.textContent = "✓ Заявка собрана";
+    wrap.appendChild(h);
+
+    var hint1 = document.createElement("p");
+    hint1.className = "hint";
+    hint1.textContent = "В рабочей версии этот текст уходит бригаде в WhatsApp в момент нажатия кнопки. Здесь, в демо, он просто показан — чтобы было видно, что именно получает бригада.";
+    wrap.appendChild(hint1);
+
+    var pre = document.createElement("pre");
+    pre.textContent = txt;
+    wrap.appendChild(pre);
+
+    var cp = document.createElement("button");
+    cp.className = "btn ghost";
+    cp.type = "button";
+    cp.textContent = "Скопировать заявку";
+    cp.addEventListener("click", function(){
+      var done = document.createElement("span");
+      done.className = "copied";
+      function ok(){ done.textContent = "скопировано"; }
+      function no(){
+        done.textContent = "выделите текст заявки выше и скопируйте вручную";
+        try{
+          var sel = window.getSelection(), rg = document.createRange();
+          rg.selectNodeContents(pre); sel.removeAllRanges(); sel.addRange(rg);
+        }catch(e){}
+      }
+      try{
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(txt).then(ok, no);
+        } else { no(); }
+      }catch(e){ no(); }
+      if (!cp.nextSibling || cp.nextSibling.className !== "copied") cp.after(done);
+    });
+    wrap.appendChild(cp);
+
+    t.appendChild(wrap);
+    wrap.scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
+
+  // ---- motion: light hero parallax (disabled under reduced motion) ----
+  (function(){
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+    var wheel = $("herowheel");
+    if (!wheel) return;
+    var ticking = false;
+    window.addEventListener("scroll", function(){
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function(){
+        var y = window.scrollY || 0;
+        var shift = Math.min(40, y * 0.12);
+        wheel.style.transform = "translateY(calc(-46% + " + shift + "px))";
+        ticking = false;
+      });
+    }, {passive:true});
+  })();
+
+  render();
+})();
+</script>
+
+</body>
+</html>
