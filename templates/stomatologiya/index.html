@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Прикус — имплантация с ценой за 30 секунд</title>
+<meta name="description" content="Демо-лендинг стоматологии: расчёт стоимости имплантации онлайн и запись без звонка.">
+<meta name="theme-color" content="#f5f4ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f5f4ef; --surface:#fff; --ink:#121417; --ink-2:#5b6068; --ink-3:#8b9098;
+  --line:#e3e1da; --acc:#0e7c6b; --acc-2:#0a5f52; --acc-soft:#dcece7; --gum:#f0b8b3; --bone:#efe6d6;
+  --display:'Onest',system-ui,-apple-system,sans-serif; --body:'Inter',system-ui,-apple-system,sans-serif;
+  --ease:cubic-bezier(.2,.7,.1,1); --pad:clamp(16px,4vw,56px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+section{scroll-margin-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+button,input{font:inherit}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.025em;line-height:1.05}
+.wrap{max-width:1240px;margin:0 auto;padding:0 var(--pad)}
+
+/* nav */
+.nav{position:fixed;inset:0 0 auto;z-index:40;transition:background .35s,border-color .35s;border-bottom:1px solid transparent}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav.solid{background:rgba(245,244,239,.82);backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);border-color:var(--line)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--display);font-weight:800;font-size:18px}
+.logo i{width:26px;height:26px;border-radius:8px;background:var(--acc);display:grid;place-items:center}
+.logo i svg{width:15px;height:15px}
+.navlinks{display:flex;gap:28px;font-size:14px;color:var(--ink-2)}
+.navlinks a{text-decoration:none}.navlinks a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:14px 22px;font-weight:600;font-size:15px;text-decoration:none;cursor:pointer;transition:transform .3s var(--ease),background .25s,box-shadow .3s}
+.btn.main{background:var(--acc);color:#fff}
+.btn.main:hover{background:var(--acc-2);transform:translateY(-1px);box-shadow:0 12px 30px -12px rgba(14,124,107,.6)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--ink-3)}
+.btn.sm{padding:9px 16px;font-size:14px}
+@media (max-width:820px){.navlinks{display:none}}
+
+/* hero */
+.hero{min-height:100svh;display:flex;align-items:center;padding:96px 0 48px}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;width:100%}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--acc);background:var(--acc-soft);padding:6px 12px;border-radius:999px}
+.eyebrow b{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.hero h1{font-size:clamp(38px,5vw,70px);font-weight:800;margin:20px 0 20px}
+.hero h1 em{font-style:normal;color:var(--acc)}
+.hero p.lead{font-size:clamp(17px,1.5vw,20px);color:var(--ink-2);max-width:520px;margin:0 0 32px}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+.hero .note{margin-top:22px;font-size:13px;color:var(--ink-3)}
+.hero-art{position:relative;aspect-ratio:1/1.05;border-radius:32px;background:radial-gradient(120% 90% at 50% 100%,#e6efe9 0%,var(--surface) 60%);border:1px solid var(--line);overflow:hidden;display:grid;place-items:center}
+.hero-art svg{width:72%;height:auto}
+.float{animation:float 6s var(--ease) infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+.tag{position:absolute;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13px;box-shadow:0 12px 30px -18px rgba(0,0,0,.25)}
+.tag b{display:block;font-family:var(--display);font-size:15px}
+.tag.t1{left:6%;top:12%}.tag.t2{right:6%;bottom:14%}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr}.hero-art{max-width:460px;width:100%;margin:0 auto}}
+
+/* story (scroll-synced implant) */
+.story{position:relative;height:300vh;background:var(--ink);color:#f3f2ee}
+.story .stick{position:sticky;top:0;height:100svh;display:flex;align-items:center;overflow:hidden}
+.story .wrap{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;width:100%}
+.story .kicker{font-size:13px;color:#8fc9bd;font-weight:600;letter-spacing:.04em}
+.steps{position:relative;min-height:300px}
+.step{position:absolute;inset:0;opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.step.on{opacity:1;transform:none}
+.step h2{font-size:clamp(32px,4.4vw,60px);font-weight:700;margin:14px 0 18px}
+.step p{color:#b4b8bd;font-size:18px;max-width:460px;margin:0}
+.step small{display:block;margin-top:18px;color:#7d8289;font-size:14px}
+.progress{display:flex;gap:8px;margin-top:28px}
+.progress span{height:3px;flex:0 0 48px;border-radius:2px;background:#33363b;overflow:hidden}
+.progress span i{display:block;height:100%;width:0;background:#8fc9bd}
+.implant{display:grid;place-items:center}
+.implant svg{width:min(78%,360px);height:auto;overflow:visible}
+#screw,#abut,#crown{transition:transform .08s linear,opacity .2s}
+@media (max-width:900px){
+  .story .wrap{grid-template-columns:1fr;gap:12px}
+  .implant{order:-1}.implant svg{width:min(52%,220px)}
+  .steps{min-height:250px}.step p{font-size:16px}
+}
+
+/* quiz */
+.section{padding:clamp(72px,10vw,130px) 0}
+.head{display:flex;justify-content:space-between;align-items:end;gap:32px;margin-bottom:44px;flex-wrap:wrap}
+.head h2{font-size:clamp(32px,4.4vw,56px);font-weight:700;max-width:680px}
+.head p{color:var(--ink-2);max-width:380px;margin:0}
+.quiz{display:grid;grid-template-columns:1.2fr .8fr;gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:clamp(22px,3vw,40px)}
+.qbar{display:flex;gap:6px;margin-bottom:28px}
+.qbar span{flex:1;height:4px;border-radius:2px;background:var(--line);transition:background .4s}
+.qbar span.on{background:var(--acc)}
+.q{display:none}.q.on{display:block;animation:in .5s var(--ease)}
+@keyframes in{from{opacity:0;transform:translateX(16px)}}
+.q h3{font-size:clamp(22px,2.4vw,30px);font-weight:700;margin-bottom:22px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{text-align:left;background:var(--bg);border:1.5px solid transparent;border-radius:16px;padding:16px 18px;cursor:pointer;transition:border-color .2s,background .2s,transform .2s}
+.opt:hover{border-color:var(--line);transform:translateY(-1px)}
+.opt.sel{border-color:var(--acc);background:var(--acc-soft)}
+.opt b{display:block;font-weight:600}
+.opt span{font-size:13px;color:var(--ink-2)}
+.qnav{display:flex;justify-content:space-between;margin-top:26px}
+.back{background:none;border:0;color:var(--ink-2);cursor:pointer;padding:8px 0}
+.back[disabled]{visibility:hidden}
+.result{display:flex;flex-direction:column;justify-content:space-between;background:var(--ink);color:#f3f2ee;border-color:var(--ink)}
+.result .lbl{font-size:13px;color:#8fc9bd;font-weight:600}
+.price{font-family:var(--display);font-size:clamp(34px,4vw,52px);font-weight:800;letter-spacing:-.03em;margin:10px 0 6px;transition:opacity .3s}
+.price.dim{opacity:.3}
+.result ul{list-style:none;padding:0;margin:22px 0;display:grid;gap:10px;font-size:15px;color:#c9ccd0}
+.result li{display:flex;gap:10px}
+.result li::before{content:"";flex:0 0 6px;height:6px;margin-top:9px;border-radius:50%;background:#8fc9bd}
+.result .demo{font-size:12px;color:#7d8289}
+@media (max-width:900px){.quiz{grid-template-columns:1fr}.opts{grid-template-columns:1fr}}
+
+/* includes */
+.incl{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+.incl .big{grid-column:span 7;background:var(--acc);color:#fff;border-color:var(--acc)}
+.incl .big h3{font-size:clamp(26px,3vw,40px);margin-bottom:16px}
+.incl .big p{color:#d5ebe5;margin:0;max-width:480px}
+.incl .side{grid-column:span 5}
+.list{list-style:none;padding:0;margin:0}
+.list li{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.list li:last-child{border:0}
+.list li span{color:var(--ink-2)}
+.list li b{font-weight:600;white-space:nowrap}
+.timeline{grid-column:span 12;display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0;overflow:hidden}
+.tl{padding:28px;border-right:1px solid var(--line)}
+.tl:last-child{border:0}
+.tl i{font-style:normal;font-family:var(--display);font-weight:800;color:var(--acc);font-size:14px}
+.tl h3{font-size:20px;margin:10px 0 8px}
+.tl p{margin:0;color:var(--ink-2);font-size:15px}
+@media (max-width:900px){.incl .big,.incl .side{grid-column:span 12}.timeline{grid-template-columns:1fr 1fr}.tl:nth-child(2){border-right:0}.tl:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+@media (max-width:520px){.timeline{grid-template-columns:1fr}.tl{border-right:0;border-bottom:1px solid var(--line)}}
+
+/* booking */
+.book{display:grid;grid-template-columns:.9fr 1.1fr;gap:20px;align-items:stretch}
+.book .info h2{font-size:clamp(32px,4vw,52px);margin-bottom:18px}
+.book .info p{color:var(--ink-2);margin:0 0 24px}
+.contacts{display:grid;gap:12px;font-size:15px}
+.contacts a{text-decoration:none;display:flex;gap:10px;align-items:center}
+.contacts a:hover{color:var(--acc)}
+form{display:grid;gap:14px}
+.field{display:grid;gap:6px}
+.field label{font-size:13px;color:var(--ink-2);font-weight:500}
+.field input{border:1.5px solid var(--line);background:var(--bg);border-radius:14px;padding:14px 16px;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--acc)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.consent{display:flex;gap:10px;font-size:13px;color:var(--ink-2);align-items:flex-start}
+.consent input{margin-top:3px;accent-color:var(--acc);width:16px;height:16px}
+.summary{font-size:14px;background:var(--acc-soft);color:var(--acc-2);border-radius:12px;padding:12px 14px;display:none}
+.summary.on{display:block}
+.ok{display:none;text-align:center;padding:40px 10px}
+.ok.on{display:block;animation:in .5s var(--ease)}
+.ok .check{width:64px;height:64px;border-radius:50%;background:var(--acc);display:grid;place-items:center;margin:0 auto 18px}
+.ok h3{font-size:26px;margin-bottom:8px}.ok p{color:var(--ink-2);margin:0}
+@media (max-width:900px){.book{grid-template-columns:1fr}}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+
+footer{padding:36px 0 110px;color:var(--ink-3);font-size:13px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.mbar{position:fixed;left:12px;right:12px;bottom:12px;z-index:45;display:none;gap:8px;transform:translateY(120%);transition:transform .45s var(--ease)}
+.mbar.show{transform:none}
+.mbar .btn{flex:1;padding:15px}
+@media (max-width:760px){.mbar{display:flex}}
+
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="#top"><i><svg viewBox="0 0 24 24" fill="#fff"><path d="M7 2c-3 0-5 2.4-5 5.6 0 2.6 1 4.4 1.8 6.4.7 1.9 1 4.5 1.6 6.6.4 1.6 2.4 1.6 2.8 0 .5-1.9.8-4.6 3.8-4.6s3.3 2.7 3.8 4.6c.4 1.6 2.4 1.6 2.8 0 .6-2.1.9-4.7 1.6-6.6.8-2 1.8-3.8 1.8-6.4C22 4.4 20 2 17 2c-2.2 0-3.2 1.2-5 1.2S9.2 2 7 2z"/></svg></i>Прикус</a>
+    <nav class="navlinks"><a href="#how">Как это работает</a><a href="#calc">Стоимость</a><a href="#price">Что входит</a><a href="#book">Запись</a></nav>
+    <a class="btn main sm" href="#calc">Рассчитать цену</a>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div class="rv">
+      <span class="eyebrow"><b></b>Свободные окна на консультацию на этой неделе</span>
+      <h1>Имплант под ключ. <em>Цена — за 30 секунд</em>, без звонка.</h1>
+      <p class="lead">Ответьте на 4 вопроса — увидите вилку стоимости с коронкой и запишитесь на КТ и консультацию в удобное время. Администратор напишет в Telegram, а не будет дозваниваться.</p>
+      <div class="ctas"><a class="btn main" href="#calc">Рассчитать стоимость</a><a class="btn ghost" href="#book">Записаться на консультацию</a></div>
+      <div class="note">Расчёт ни к чему не обязывает. Точную цену врач назовёт после снимка.</div>
+    </div>
+    <div class="hero-art rv">
+      <svg class="float" viewBox="0 0 300 360" aria-hidden="true">
+        <defs>
+          <linearGradient id="cr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9ece9"/></linearGradient>
+          <linearGradient id="ti" x1="0" x2="1"><stop offset="0" stop-color="#9aa3aa"/><stop offset=".5" stop-color="#d9dee2"/><stop offset="1" stop-color="#8a939a"/></linearGradient>
+        </defs>
+        <path d="M95 40c-30 0-48 22-48 52 0 24 9 40 16 56h174c7-16 16-32 16-56 0-30-18-52-48-52-20 0-30 11-55 11S115 40 95 40z" transform="translate(0,0) scale(1)" fill="url(#cr)" stroke="#cfd5d2" stroke-width="2"/>
+        <path d="M118 148h64l-8 34h-48z" fill="url(#ti)"/>
+        <g fill="url(#ti)"><rect x="128" y="182" width="44" height="150" rx="10"/></g>
+        <g stroke="#7d868d" stroke-width="3" stroke-linecap="round" opacity=".7">
+          <path d="M126 200l48 8M126 222l48 8M126 244l48 8M126 266l48 8M126 288l48 8M128 310l44 7"/>
+        </g>
+      </svg>
+      <div class="tag t1"><b>КТ в день визита</b>без отдельной поездки</div>
+      <div class="tag t2"><b>Рассрочка 0%</b>до 12 месяцев</div>
+    </div>
+  </div>
+</section>
+
+<section class="story" id="how">
+  <div class="stick">
+    <div class="wrap">
+      <div>
+        <div class="kicker">КАК ЭТО РАБОТАЕТ</div>
+        <div class="steps">
+          <div class="step on" data-i="0"><h2>Сначала — опора.</h2><p>Титановый имплант ставится в кость за один визит под местной анестезией. Это корень будущего зуба.</p><small>Визит 1 · около часа</small></div>
+          <div class="step" data-i="1"><h2>Потом — переходник.</h2><p>Когда имплант прижился, врач устанавливает абатмент: деталь, на которой будет держаться коронка.</p><small>Обычно через 2–4 месяца</small></div>
+          <div class="step" data-i="2"><h2>И зуб, который не отличить.</h2><p>Коронку подбирают по цвету соседних зубов. Жуёте и улыбаетесь как раньше — без съёмных конструкций.</p><small>Финальный визит</small></div>
+        </div>
+        <div class="progress"><span><i></i></span><span><i></i></span><span><i></i></span></div>
+      </div>
+      <div class="implant">
+        <svg viewBox="0 0 300 520" aria-hidden="true">
+          <defs>
+            <linearGradient id="ti2" x1="0" x2="1"><stop offset="0" stop-color="#8e979e"/><stop offset=".5" stop-color="#e3e7ea"/><stop offset="1" stop-color="#7f888f"/></linearGradient>
+            <linearGradient id="cr2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e4e8e5"/></linearGradient>
+          </defs>
+          <rect x="20" y="300" width="260" height="210" rx="28" fill="#2a2d31"/>
+          <path d="M20 300h260v30c-40 14-80 20-130 20S60 344 20 330z" fill="#c98a86" opacity=".85"/>
+          <g id="screw">
+            <rect x="128" y="300" width="44" height="160" rx="10" fill="url(#ti2)"/>
+            <g stroke="#6f777e" stroke-width="3" stroke-linecap="round"><path d="M126 318l48 8M126 340l48 8M126 362l48 8M126 384l48 8M126 406l48 8M128 428l44 7"/></g>
+          </g>
+          <path id="abut" d="M120 262h60l-6 40h-48z" fill="url(#ti2)"/>
+          <path id="crown" d="M95 120c-30 0-48 22-48 52 0 24 9 40 16 56l10 34h154l10-34c7-16 16-32 16-56 0-30-18-52-48-52-20 0-30 11-55 11s-35-11-55-11z" fill="url(#cr2)" stroke="#d6dbd8" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="calc">
+  <div class="wrap">
+    <div class="head rv"><h2>Сколько будет стоить именно вам</h2><p>Четыре вопроса — и вилка цены с коронкой. Цифры в демо условные: на вашем сайте подставим прайс клиники.</p></div>
+    <div class="quiz rv">
+      <div class="card">
+        <div class="qbar"><span class="on"></span><span></span><span></span><span></span></div>
+        <div class="q on" data-q="teeth"><h3>Сколько зубов нужно восстановить?</h3><div class="opts">
+          <button class="opt" data-v="1"><b>Один зуб</b><span>самый частый случай</span></button>
+          <button class="opt" data-v="2"><b>Два-три рядом</b><span>можно мост на имплантах</span></button>
+          <button class="opt" data-v="4"><b>Почти вся челюсть</b><span>протокол на 4–6 имплантах</span></button>
+          <button class="opt" data-v="0"><b>Не знаю</b><span>решим на консультации</span></button></div></div>
+        <div class="q" data-q="when"><h3>Когда удалили зуб?</h3><div class="opts">
+          <button class="opt" data-v="0"><b>Ещё не удалён</b><span>возможна одномоментная имплантация</span></button>
+          <button class="opt" data-v="0"><b>Меньше года назад</b><span></span></button>
+          <button class="opt" data-v="1"><b>Больше года назад</b><span>может понадобиться наращивание кости</span></button>
+          <button class="opt" data-v="0"><b>Не помню</b><span>покажет снимок</span></button></div></div>
+        <div class="q" data-q="crown"><h3>Какая коронка ближе?</h3><div class="opts">
+          <button class="opt" data-v="0"><b>Металлокерамика</b><span>надёжно и доступнее</span></button>
+          <button class="opt" data-v="1"><b>Цирконий</b><span>самый естественный вид</span></button>
+          <button class="opt" data-v="0.5"><b>Подскажет врач</b><span>по месту и нагрузке</span></button>
+          <button class="opt" data-v="0.5"><b>Пока не знаю</b><span></span></button></div></div>
+        <div class="q" data-q="pay"><h3>Как удобнее оплатить?</h3><div class="opts">
+          <button class="opt" data-v="full"><b>Сразу</b><span>фиксируем цену</span></button>
+          <button class="opt" data-v="split"><b>Рассрочка</b><span>покажем платёж в месяц</span></button>
+          <button class="opt" data-v="stage"><b>По этапам</b><span>платите за каждый визит</span></button>
+          <button class="opt" data-v="full"><b>Обсудим</b><span></span></button></div></div>
+        <div class="qnav"><button class="back" id="back" disabled>← Назад</button><span style="font-size:13px;color:var(--ink-3)" id="qnum">Вопрос 1 из 4</span></div>
+      </div>
+      <div class="card result">
+        <div>
+          <div class="lbl">ВАША ВИЛКА СТОИМОСТИ</div>
+          <div class="price dim" id="price">— ₽</div>
+          <div style="color:#b4b8bd;font-size:15px" id="pnote">Ответьте на вопросы слева</div>
+          <ul><li>Имплант, абатмент и коронка</li><li>КТ и консультация хирурга</li><li>Контрольные осмотры после установки</li></ul>
+        </div>
+        <div>
+          <a class="btn main" href="#book" style="width:100%" id="toBook">Записаться с этим расчётом</a>
+          <div class="demo" style="margin-top:12px">Демо-цены. В работе — прайс клиники.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="price" style="padding-top:0">
+  <div class="wrap">
+    <div class="head rv"><h2>Без сюрпризов на кассе</h2><p>Пациент заранее видит, за что платит — и приходит на консультацию уже готовым.</p></div>
+    <div class="incl">
+      <div class="card big rv"><h3>Цена фиксируется в плане лечения до начала работ.</h3><p>Если по ходу понадобится дополнительная процедура, врач согласует её с вами заранее — до того, как что-то делать.</p></div>
+      <div class="card side rv">
+        <ul class="list">
+          <li><span>Консультация и КТ</span><b>от 0 ₽*</b></li>
+          <li><span>Имплант</span><b>от 35 000 ₽</b></li>
+          <li><span>Абатмент</span><b>от 9 000 ₽</b></li>
+          <li><span>Коронка</span><b>от 18 000 ₽</b></li>
+        </ul>
+        <div style="font-size:12px;color:var(--ink-3);margin-top:10px">*демо-значения, заменяются ценами клиники</div>
+      </div>
+      <div class="card timeline rv">
+        <div class="tl"><i>01</i><h3>Заявка</h3><p>Расчёт на сайте — ответ в Telegram в рабочее время.</p></div>
+        <div class="tl"><i>02</i><h3>КТ и план</h3><p>Снимок, разговор с хирургом, точная смета.</p></div>
+        <div class="tl"><i>03</i><h3>Установка</h3><p>Имплант за один визит, контроль приживления.</p></div>
+        <div class="tl"><i>04</i><h3>Коронка</h3><p>Финальный визит — и новый зуб.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="book" style="padding-top:0">
+  <div class="wrap book">
+    <div class="info rv">
+      <h2>Запишитесь на консультацию</h2>
+      <p>Оставьте имя и телефон — администратор пришлёт свободные окна в Telegram или WhatsApp. Звонить не будем, если не попросите.</p>
+      <div class="contacts">
+        <a href="tel:+70000000000">☎ +7 (000) 000-00-00</a>
+        <a href="#">✈ Написать в Telegram</a>
+        <span style="color:var(--ink-2)">Москва, адрес клиники · ежедневно 9:00–21:00</span>
+      </div>
+    </div>
+    <div class="card rv">
+      <form id="form" novalidate>
+        <div class="summary" id="summary"></div>
+        <div class="row2">
+          <div class="field"><label for="n">Имя</label><input id="n" required autocomplete="given-name" placeholder="Как к вам обращаться"></div>
+          <div class="field"><label for="p">Телефон</label><input id="p" required type="tel" autocomplete="tel" placeholder="+7"></div>
+        </div>
+        <div class="field"><label for="t">Удобное время</label><input id="t" placeholder="Например: будни после 18:00"></div>
+        <label class="consent"><input type="checkbox" id="c" required>Согласен на обработку персональных данных в соответствии с политикой конфиденциальности</label>
+        <button class="btn main" type="submit">Отправить заявку</button>
+      </form>
+      <div class="ok" id="ok"><div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></div><h3>Заявка принята</h3><p>Администратор напишет вам в течение 15 минут в рабочее время.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap"><span>Прикус · демо-лендинг стоматологии</span><span>Сайт сделан как пример. Название и цены условные.</span></div></footer>
+<div class="mbar" id="mbar"><a class="btn main" href="#calc">Рассчитать цену</a><a class="btn ghost" href="#book" style="background:var(--surface)">Запись</a></div>
+
+<script>
+(()=>{
+const nav=document.getElementById('nav'),mbar=document.getElementById('mbar');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+// scroll-synced implant
+const story=document.getElementById('how'),steps=[...story.querySelectorAll('.step')],bars=[...story.querySelectorAll('.progress i')];
+const screw=document.getElementById('screw'),abut=document.getElementById('abut'),crown=document.getElementById('crown');
+const cl=v=>Math.max(0,Math.min(1,v)),ease=t=>1-Math.pow(1-t,3);
+function onScroll(){
+  const y=scrollY;nav.classList.toggle('solid',y>20);mbar.classList.toggle('show',y>innerHeight*.6);
+  const r=story.getBoundingClientRect(),total=story.offsetHeight-innerHeight;
+  const p=cl(-r.top/total);
+  const a=ease(cl(p*3)),b=ease(cl(p*3-1)),c=ease(cl(p*3-2));
+  screw.style.transform=`translateY(${(1-a)*220}px)`;screw.style.opacity=.15+a*.85;
+  abut.style.transform=`translateY(${(1-b)*-140}px)`;abut.style.opacity=b;
+  crown.style.transform=`translateY(${(1-c)*-180}px)`;crown.style.opacity=c;
+  const idx=Math.min(2,Math.floor(p*3));
+  steps.forEach((s,i)=>s.classList.toggle('on',i===idx));
+  bars.forEach((bi,i)=>bi.style.width=(cl(p*3-i)*100)+'%');
+}
+if(reduce){screw.style.transform=abut.style.transform=crown.style.transform='none'}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+// quiz
+const qs=[...document.querySelectorAll('.q')],qbar=[...document.querySelectorAll('.qbar span')];
+const back=document.getElementById('back'),qnum=document.getElementById('qnum'),price=document.getElementById('price'),pnote=document.getElementById('pnote');
+const ans={};let cur=0;
+const fmt=n=>Math.round(n/1000)*1000;const rub=n=>fmt(n).toLocaleString('ru-RU')+' ₽';
+function show(i){cur=i;qs.forEach((q,k)=>q.classList.toggle('on',k===i));qbar.forEach((s,k)=>s.classList.toggle('on',k<=i));back.disabled=i===0;qnum.textContent=`Вопрос ${i+1} из 4`}
+function calc(){
+  const t=ans.teeth;if(t===undefined)return;
+  const n=t==='0'?1:+t;
+  let lo,hi;
+  if(n>=4){lo=290000;hi=520000}else{lo=n*62000;hi=n*94000}
+  if(ans.when==='1'){lo+=18000;hi+=45000}
+  if(ans.crown==='1'){lo+=n*8000;hi+=n*14000}else if(ans.crown==='0.5'){hi+=n*8000}
+  price.classList.remove('dim');price.textContent=rub(lo)+' – '+rub(hi);
+  pnote.textContent=ans.pay==='split'?`≈ ${rub(lo/12)} в месяц при рассрочке на 12 мес.`:(t==='0'?'Ориентир для одного зуба':'Ориентир с коронкой, демо-цены');
+  window.__calc=price.textContent;
+}
+qs.forEach((q,i)=>q.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{
+  q.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');
+  ans[q.dataset.q]=o.dataset.v;calc();
+  if(i<qs.length-1)setTimeout(()=>show(i+1),260);else qnum.textContent='Готово — расчёт справа';
+})));
+back.addEventListener('click',()=>cur>0&&show(cur-1));
+
+// form
+const form=document.getElementById('form'),ok=document.getElementById('ok'),summary=document.getElementById('summary');
+document.getElementById('toBook').addEventListener('click',()=>{if(window.__calc){summary.textContent='Ваш расчёт: '+window.__calc;summary.classList.add('on')}});
+form.addEventListener('submit',e=>{
+  e.preventDefault();let bad=false;
+  ['n','p'].forEach(id=>{const el=document.getElementById(id);const v=el.value.trim();const fail=id==='p'?v.replace(/\D/g,'').length<10:!v;el.style.borderColor=fail?'#d9534f':'';bad=bad||fail});
+  const c=document.getElementById('c');c.parentElement.style.color=c.checked?'':'#d9534f';bad=bad||!c.checked;
+  if(bad)return;form.style.display='none';ok.classList.add('on');
+});
+})();
+</script>
+</body>
+</html>
