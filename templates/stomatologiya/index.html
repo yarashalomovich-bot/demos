@@ -4,407 +4,459 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Прикус — имплантация с ценой за 30 секунд</title>
-<meta name="description" content="Демо-лендинг стоматологии: расчёт стоимости имплантации онлайн и запись без звонка.">
+<meta name="description" content="Демо-лендинг стоматологии: 3D-разбор имплантации, расчёт стоимости онлайн и запись без звонка.">
 <meta name="theme-color" content="#f5f4ef">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<link rel="preload" as="image" href="../../assets/clinic.webp">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <style>
+/* Дизайн-система «Прикус»: тёплый светлый + графит, один акцент — медицинский зелёный.
+   Onest — заголовки, Inter — текст. Радиусы 18/28, сетка 1240. */
 :root{
   --bg:#f5f4ef; --surface:#fff; --ink:#121417; --ink-2:#5b6068; --ink-3:#8b9098;
-  --line:#e3e1da; --acc:#0e7c6b; --acc-2:#0a5f52; --acc-soft:#dcece7; --gum:#f0b8b3; --bone:#efe6d6;
+  --dark:#0f1215; --dark-2:#171b1f; --on-dark:#eef0ed; --on-dark-2:#9aa3a6;
+  --line:#e3e1da; --acc:#0e7c6b; --acc-2:#0a5f52; --acc-soft:#dcece7; --acc-glow:#7fd6c3;
   --display:'Onest',system-ui,-apple-system,sans-serif; --body:'Inter',system-ui,-apple-system,sans-serif;
-  --ease:cubic-bezier(.2,.7,.1,1); --pad:clamp(16px,4vw,56px);
+  --ease:cubic-bezier(.2,.7,.1,1); --pad:clamp(16px,4vw,56px); --max:1240px;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-section{scroll-margin-top:72px}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
 a{color:inherit}
-button,input{font:inherit}
-h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.025em;line-height:1.05}
-.wrap{max-width:1240px;margin:0 auto;padding:0 var(--pad)}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height:1.02;margin:0}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
+section{scroll-margin-top:72px}
 
 /* nav */
-.nav{position:fixed;inset:0 0 auto;z-index:40;transition:background .35s,border-color .35s;border-bottom:1px solid transparent}
-.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
-.nav.solid{background:rgba(245,244,239,.82);backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);border-color:var(--line)}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--display);font-weight:800;font-size:18px}
-.logo i{width:26px;height:26px;border-radius:8px;background:var(--acc);display:grid;place-items:center}
-.logo i svg{width:15px;height:15px}
-.navlinks{display:flex;gap:28px;font-size:14px;color:var(--ink-2)}
-.navlinks a{text-decoration:none}.navlinks a:hover{color:var(--ink)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:14px 22px;font-weight:600;font-size:15px;text-decoration:none;cursor:pointer;transition:transform .3s var(--ease),background .25s,box-shadow .3s}
-.btn.main{background:var(--acc);color:#fff}
-.btn.main:hover{background:var(--acc-2);transform:translateY(-1px);box-shadow:0 12px 30px -12px rgba(14,124,107,.6)}
-.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
-.btn.ghost:hover{border-color:var(--ink-3)}
-.btn.sm{padding:9px 16px;font-size:14px}
-@media (max-width:820px){.navlinks{display:none}}
+.nav{position:fixed;inset:0 0 auto;z-index:50;transition:background .4s,backdrop-filter .4s,color .4s}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.nav.solid{background:rgba(245,244,239,.78);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4)}
+.nav.on-dark{color:var(--on-dark)}
+.nav.on-dark.solid{background:rgba(15,18,21,.6)}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:19px;text-decoration:none;letter-spacing:-.02em}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--acc);display:grid;place-items:center}
+.logo i svg{width:17px;height:17px}
+.navlinks{display:flex;gap:30px;font-size:14px;opacity:.75}
+.navlinks a{text-decoration:none}.navlinks a:hover{opacity:1}
+@media (max-width:860px){.navlinks{display:none}}
 
-/* hero */
-.hero{min-height:100svh;display:flex;align-items:center;padding:96px 0 48px}
-.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;width:100%}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--acc);background:var(--acc-soft);padding:6px 12px;border-radius:999px}
-.eyebrow b{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
-@keyframes pulse{50%{opacity:.25}}
-.hero h1{font-size:clamp(38px,5vw,70px);font-weight:800;margin:20px 0 20px}
-.hero h1 em{font-style:normal;color:var(--acc)}
-.hero p.lead{font-size:clamp(17px,1.5vw,20px);color:var(--ink-2);max-width:520px;margin:0 0 32px}
-.hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
-.hero .note{margin-top:22px;font-size:13px;color:var(--ink-3)}
-.hero-art{position:relative;aspect-ratio:1/1.05;border-radius:32px;background:radial-gradient(120% 90% at 50% 100%,#e6efe9 0%,var(--surface) 60%);border:1px solid var(--line);overflow:hidden;display:grid;place-items:center}
+.btn{--mx:0px;--my:0px;display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 24px;border-radius:999px;font-weight:600;font-size:15px;text-decoration:none;border:0;cursor:pointer;font-family:var(--body);transform:translate(var(--mx),var(--my));transition:transform .35s var(--ease),background .25s,box-shadow .3s}
+.btn.main{background:var(--acc);color:#fff;box-shadow:0 10px 30px -12px rgba(14,124,107,.7)}
+.btn.main:hover{background:var(--acc-2)}
+.btn.ghost{background:rgba(255,255,255,.55);border:1px solid var(--line);color:var(--ink);backdrop-filter:blur(8px)}
+.btn.sm{height:42px;padding:0 18px;font-size:14px}
+.btn .arr{transition:transform .3s var(--ease)}.btn:hover .arr{transform:translateX(4px)}
 
-/* live FX */
-.fx-stage{position:relative}
-.fx-img{display:block;width:100%;height:100%;object-fit:cover;will-change:transform;backface-visibility:hidden}
-.fx-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.fx-glow{position:absolute;pointer-events:none;mix-blend-mode:screen;will-change:opacity,transform}
-.fx-shine{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--sx,50%) var(--sy,40%),rgba(255,255,255,.7),transparent 38%);mix-blend-mode:soft-light}
-.hero-art .fx-img{position:absolute;inset:0}
-.hero-art .beam{position:absolute;inset:-20%;pointer-events:none;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);mix-blend-mode:soft-light;animation:beam 7s ease-in-out infinite}
-@keyframes beam{0%,100%{transform:translateX(-30%)}50%{transform:translateX(30%)}}
-@media (prefers-reduced-motion:reduce){.hero-art .beam{animation:none;opacity:0}}
-.hero-art .tag{z-index:3}
-.float{animation:float 6s var(--ease) infinite}
-@keyframes float{50%{transform:translateY(-10px)}}
-.tag{position:absolute;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13px;box-shadow:0 12px 30px -18px rgba(0,0,0,.25)}
-.tag b{display:block;font-family:var(--display);font-size:15px}
-.tag.t1{left:6%;top:12%}.tag.t2{right:6%;bottom:14%}
-@media (max-width:900px){.hero .wrap{grid-template-columns:1fr}.hero-art{max-width:460px;width:100%;margin:0 auto}}
+/* ===== 3D stage ===== */
+.s3d{position:relative;height:520svh;background:var(--bg);transition:none}
+.s3d .stick{position:sticky;top:0;height:100svh;overflow:hidden}
+.s3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.s3d .fallback{position:absolute;right:4%;top:50%;width:min(46vw,560px);transform:translateY(-50%);display:none;border-radius:28px}
+.s3d.nogl .fallback{display:block}
+.layer{position:absolute;inset:0;pointer-events:none}
+.layer .wrap{height:100%;display:flex;align-items:center;padding-top:68px}
+.layer .copy{max-width:560px;pointer-events:auto}
+.hero-copy{transition:opacity .5s,transform .6s var(--ease)}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--acc);background:var(--acc-soft);padding:7px 13px;border-radius:999px}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 0 rgba(14,124,107,.5);animation:ping 2.2s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 9px rgba(14,124,107,0)}100%{box-shadow:0 0 0 0 rgba(14,124,107,0)}}
+.hero-copy h1{font-size:clamp(44px,6.4vw,92px);margin:22px 0 22px}
+.hero-copy h1 .ln{display:block;overflow:hidden;padding-bottom:.06em}
+.hero-copy h1 .ln span{display:block;transform:translateY(110%);transition:transform 1.1s var(--ease)}
+.ready .hero-copy h1 .ln span{transform:none}
+.hero-copy h1 .ln:nth-child(2) span{transition-delay:.1s}.hero-copy h1 .ln:nth-child(3) span{transition-delay:.2s}
+.hero-copy h1 em{font-style:normal;color:var(--acc)}
+.lead{font-size:clamp(17px,1.4vw,19px);color:var(--ink-2);max-width:480px;margin:0 0 30px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.note{margin-top:20px;font-size:13px;color:var(--ink-3)}
+.scrollhint{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);font-size:12px;color:var(--ink-3);display:flex;flex-direction:column;align-items:center;gap:8px;transition:opacity .4s}
+.scrollhint i{width:1px;height:34px;background:linear-gradient(var(--ink-3),transparent);animation:drip 1.8s var(--ease) infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 
-/* story (scroll-synced implant) */
-.story{position:relative;height:300vh;background:var(--ink);color:#f3f2ee}
-.story .stick{position:sticky;top:0;height:100svh;display:flex;align-items:center;overflow:hidden}
-.story .wrap{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;width:100%}
-.story .kicker{font-size:13px;color:#8fc9bd;font-weight:600;letter-spacing:.04em}
-.steps{position:relative;min-height:300px}
-.step{position:absolute;inset:0;opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+/* стеклянные бирки у объекта */
+.gtag{position:absolute;pointer-events:none;padding:12px 16px;border-radius:16px;font-size:13px;color:var(--ink-2);background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 20px 40px -24px rgba(0,0,0,.3);transition:opacity .5s,transform .8s var(--ease)}
+.gtag b{display:block;font-family:var(--display);font-size:15px;color:var(--ink)}
+.gtag.a{left:56%;top:24%}.gtag.b{right:5%;top:58%}
+@media (max-width:900px){.gtag{display:none}}
+
+/* шаги */
+.step{position:absolute;inset:0;opacity:0;transform:translateY(30px);transition:opacity .6s,transform .8s var(--ease);color:var(--on-dark)}
 .step.on{opacity:1;transform:none}
-.step h2{font-size:clamp(32px,4.4vw,60px);font-weight:700;margin:14px 0 18px}
-.step p{color:#b4b8bd;font-size:18px;max-width:460px;margin:0}
-.step small{display:block;margin-top:18px;color:#7d8289;font-size:14px}
-.progress{display:flex;gap:8px;margin-top:28px}
-.progress span{height:3px;flex:0 0 48px;border-radius:2px;background:#33363b;overflow:hidden}
-.progress span i{display:block;height:100%;width:0;background:#8fc9bd}
-.implant{display:grid;place-items:center}
-.implant svg{width:min(78%,360px);height:auto;overflow:visible}
-#screw,#abut,#crown{transition:transform .08s linear,opacity .2s}
+.step .k{font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--acc-glow)}
+.step h2{font-size:clamp(40px,5vw,72px);margin:14px 0 18px}
+.step p{color:var(--on-dark-2);font-size:18px;max-width:440px;margin:0}
+.step .m{margin-top:22px;display:inline-flex;gap:10px;align-items:center;font-size:14px;color:var(--on-dark);border:1px solid rgba(255,255,255,.14);padding:9px 14px;border-radius:999px}
+.rail{position:absolute;left:var(--pad);bottom:40px;display:flex;gap:8px;opacity:0;transition:opacity .5s}
+.rail.on{opacity:1}
+.rail i{width:64px;height:3px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
+.rail i b{display:block;height:100%;width:0;background:var(--acc-glow)}
 @media (max-width:900px){
-  .story .wrap{grid-template-columns:1fr;gap:12px}
-  .implant{order:-1}.implant svg{width:min(52%,220px)}
-  .steps{min-height:250px}.step p{font-size:16px}
+  .layer .wrap{align-items:flex-end;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
+  .hero-copy h1{font-size:clamp(34px,9.6vw,50px);margin:14px 0 12px}
+  .hero-copy .note{display:none}.hero-copy .chip{font-size:12px}
+  .lead{font-size:16px;margin-bottom:22px}
+  .step h2{font-size:clamp(32px,9vw,44px)}.step p{font-size:16px}
+  .step .copy{background:linear-gradient(transparent,rgba(15,18,21,.85) 30%);padding-top:40px}
+  .rail{bottom:auto;top:84px}
+  .scrollhint{display:none}
 }
 
-/* quiz */
-.section{padding:clamp(72px,10vw,130px) 0}
-.head{display:flex;justify-content:space-between;align-items:end;gap:32px;margin-bottom:44px;flex-wrap:wrap}
-.head h2{font-size:clamp(32px,4.4vw,56px);font-weight:700;max-width:680px}
+/* ===== клиника: раскрытие фото ===== */
+.clinic{position:relative;height:200svh;background:var(--dark)}
+.clinic .stick{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;place-items:center}
+.clinic .frame{position:absolute;inset:0;clip-path:inset(var(--ci,14%) var(--ci,14%) round var(--cr,32px));will-change:clip-path}
+.clinic .frame img{width:100%;height:100%;object-fit:cover;transform:scale(var(--cs,1.2));will-change:transform}
+.clinic .frame::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.55))}
+.clinic .txt{position:absolute;left:0;right:0;bottom:7vh;color:#fff;opacity:var(--ct,0);transform:translateY(calc((1 - var(--ct,0)) * 30px))}
+.clinic h2{font-size:clamp(36px,5vw,76px);max-width:820px}
+.facts{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.facts span{font-size:14px;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.14);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22)}
+
+/* ===== общие секции ===== */
+.sec{padding:clamp(80px,12vw,150px) 0}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:44px;flex-wrap:wrap}
+.head h2{font-size:clamp(36px,4.6vw,66px);max-width:680px}
 .head p{color:var(--ink-2);max-width:380px;margin:0}
-.quiz{display:grid;grid-template-columns:1.2fr .8fr;gap:20px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:clamp(22px,3vw,40px)}
-.qbar{display:flex;gap:6px;margin-bottom:28px}
-.qbar span{flex:1;height:4px;border-radius:2px;background:var(--line);transition:background .4s}
-.qbar span.on{background:var(--acc)}
-.q{display:none}.q.on{display:block;animation:in .5s var(--ease)}
-@keyframes in{from{opacity:0;transform:translateX(16px)}}
-.q h3{font-size:clamp(22px,2.4vw,30px);font-weight:700;margin-bottom:22px}
-.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.opt{text-align:left;background:var(--bg);border:1.5px solid transparent;border-radius:16px;padding:16px 18px;cursor:pointer;transition:border-color .2s,background .2s,transform .2s}
-.opt:hover{border-color:var(--line);transform:translateY(-1px)}
-.opt.sel{border-color:var(--acc);background:var(--acc-soft)}
-.opt b{display:block;font-weight:600}
-.opt span{font-size:13px;color:var(--ink-2)}
-.qnav{display:flex;justify-content:space-between;margin-top:26px}
-.back{background:none;border:0;color:var(--ink-2);cursor:pointer;padding:8px 0}
-.back[disabled]{visibility:hidden}
-.result{display:flex;flex-direction:column;justify-content:space-between;background:var(--ink);color:#f3f2ee;border-color:var(--ink)}
-.result .lbl{font-size:13px;color:#8fc9bd;font-weight:600}
-.price{font-family:var(--display);font-size:clamp(34px,4vw,52px);font-weight:800;letter-spacing:-.03em;margin:10px 0 6px;transition:opacity .3s}
-.price.dim{opacity:.3}
-.result ul{list-style:none;padding:0;margin:22px 0;display:grid;gap:10px;font-size:15px;color:#c9ccd0}
-.result li{display:flex;gap:10px}
-.result li::before{content:"";flex:0 0 6px;height:6px;margin-top:9px;border-radius:50%;background:#8fc9bd}
-.result .demo{font-size:12px;color:#7d8289}
-@media (max-width:900px){.quiz{grid-template-columns:1fr}.opts{grid-template-columns:1fr}}
-
-/* includes */
-.incl{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
-.incl .big{grid-column:span 7;background:var(--acc);color:#fff;border-color:var(--acc)}
-.incl .big h3{font-size:clamp(26px,3vw,40px);margin-bottom:16px}
-.incl .big p{color:#d5ebe5;margin:0;max-width:480px}
-.incl .side{grid-column:span 5}
-.list{list-style:none;padding:0;margin:0}
-.list li{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
-.list li:last-child{border:0}
-.list li span{color:var(--ink-2)}
-.list li b{font-weight:600;white-space:nowrap}
-.timeline{grid-column:span 12;display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0;overflow:hidden}
-.tl{padding:28px;border-right:1px solid var(--line)}
-.tl:last-child{border:0}
-.tl i{font-style:normal;font-family:var(--display);font-weight:800;color:var(--acc);font-size:14px}
-.tl h3{font-size:20px;margin:10px 0 8px}
-.tl p{margin:0;color:var(--ink-2);font-size:15px}
-@media (max-width:900px){.incl .big,.incl .side{grid-column:span 12}.timeline{grid-template-columns:1fr 1fr}.tl:nth-child(2){border-right:0}.tl:nth-child(-n+2){border-bottom:1px solid var(--line)}}
-@media (max-width:520px){.timeline{grid-template-columns:1fr}.tl{border-right:0;border-bottom:1px solid var(--line)}}
-
-/* booking */
-.book{display:grid;grid-template-columns:.9fr 1.1fr;gap:20px;align-items:stretch}
-.book .info h2{font-size:clamp(32px,4vw,52px);margin-bottom:18px}
-.book .info p{color:var(--ink-2);margin:0 0 24px}
-.contacts{display:grid;gap:12px;font-size:15px}
-.contacts a{text-decoration:none;display:flex;gap:10px;align-items:center}
-.contacts a:hover{color:var(--acc)}
-form{display:grid;gap:14px}
-.field{display:grid;gap:6px}
-.field label{font-size:13px;color:var(--ink-2);font-weight:500}
-.field input{border:1.5px solid var(--line);background:var(--bg);border-radius:14px;padding:14px 16px;outline:none;transition:border-color .2s}
-.field input:focus{border-color:var(--acc)}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.consent{display:flex;gap:10px;font-size:13px;color:var(--ink-2);align-items:flex-start}
-.consent input{margin-top:3px;accent-color:var(--acc);width:16px;height:16px}
-.summary{font-size:14px;background:var(--acc-soft);color:var(--acc-2);border-radius:12px;padding:12px 14px;display:none}
-.summary.on{display:block}
-.ok{display:none;text-align:center;padding:40px 10px}
-.ok.on{display:block;animation:in .5s var(--ease)}
-.ok .check{width:64px;height:64px;border-radius:50%;background:var(--acc);display:grid;place-items:center;margin:0 auto 18px}
-.ok h3{font-size:26px;margin-bottom:8px}.ok p{color:var(--ink-2);margin:0}
-@media (max-width:900px){.book{grid-template-columns:1fr}}
-@media (max-width:520px){.row2{grid-template-columns:1fr}}
-
-footer{padding:36px 0 110px;color:var(--ink-3);font-size:13px;border-top:1px solid var(--line)}
-footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.mbar{position:fixed;left:12px;right:12px;bottom:12px;z-index:45;display:none;gap:8px;transform:translateY(120%);transition:transform .45s var(--ease)}
-.mbar.show{transform:none}
-.mbar .btn{flex:1;padding:15px}
-@media (max-width:760px){.mbar{display:flex}}
-
-.rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv{opacity:0;transform:translateY(40px);transition:opacity .9s var(--ease),transform 1.1s var(--ease)}
 .rv.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+
+/* квиз */
+.quiz{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:clamp(22px,3vw,40px);min-height:470px;display:flex;flex-direction:column}
+.qbar{display:flex;gap:6px;margin-bottom:30px}
+.qbar span{flex:1;height:4px;border-radius:4px;background:var(--line);position:relative;overflow:hidden}
+.qbar span::after{content:"";position:absolute;inset:0;background:var(--acc);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+.qbar span.on::after{transform:none}
+.q{display:none}.q.on{display:block;animation:qin .55s var(--ease)}
+@keyframes qin{from{opacity:0;transform:translateX(24px)}}
+.q h3{font-size:clamp(24px,2.4vw,34px);margin-bottom:24px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{position:relative;text-align:left;background:var(--bg);border:1.5px solid transparent;border-radius:18px;padding:18px 20px;cursor:pointer;font:inherit;color:inherit;overflow:hidden;transition:border-color .2s,transform .3s var(--ease),background .2s}
+.opt::before{content:"";position:absolute;inset:0;background:radial-gradient(160px circle at var(--x,50%) var(--y,50%),rgba(14,124,107,.12),transparent 70%);opacity:0;transition:opacity .3s}
+.opt:hover::before{opacity:1}
+.opt:hover{transform:translateY(-2px)}
+.opt b{display:block;font-family:var(--display);font-size:17px;margin-bottom:2px;position:relative}
+.opt span{font-size:13px;color:var(--ink-2);position:relative}
+.opt.sel{border-color:var(--acc);background:var(--acc-soft)}
+.qfoot{margin-top:auto;padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--ink-3)}
+.back{background:none;border:0;color:var(--ink-2);cursor:pointer;font:inherit;padding:8px 0}.back:disabled{opacity:.3;cursor:default}
+.result{position:relative;border-radius:28px;padding:clamp(22px,3vw,36px);background:var(--dark);color:var(--on-dark);overflow:hidden;display:flex;flex-direction:column;min-height:470px}
+.result::before{content:"";position:absolute;width:420px;height:420px;right:-160px;top:-160px;background:radial-gradient(closest-side,rgba(127,214,195,.28),transparent);animation:breath 6s ease-in-out infinite}
+@keyframes breath{50%{transform:scale(1.15) translate(-20px,20px)}}
+.result .k{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--acc-glow);position:relative}
+.price{font-family:var(--display);font-weight:700;font-size:clamp(30px,3vw,42px);letter-spacing:-.03em;line-height:1.05;margin:18px 0 8px;position:relative}
+.price.dim{color:#4b5257}
+.pnote{color:var(--on-dark-2);font-size:14px;position:relative}
+.result ul{list-style:none;padding:0;margin:26px 0;display:grid;gap:10px;font-size:14px;position:relative}
+.result li{display:flex;gap:10px;align-items:center}.result li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--acc-glow)}
+.result .btn{margin-top:auto;justify-content:center;position:relative}
+.result small{display:block;margin-top:12px;color:#6d767a;font-size:12px;position:relative}
+@media (max-width:900px){.quiz{grid-template-columns:1fr}.opts{grid-template-columns:1fr}.qcard,.result{min-height:0}}
+
+/* цены + КТ */
+.incl{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+.ctcard{position:relative;border-radius:28px;overflow:hidden;min-height:560px;transform-style:preserve-3d}
+.ctcard .fx-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ctcard .fx-shine{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--sx,50%) var(--sy,40%),rgba(255,255,255,.55),transparent 40%);mix-blend-mode:soft-light}
+.ctcard .cap{position:absolute;left:20px;bottom:20px;right:20px;padding:18px 20px;border-radius:20px;background:rgba(255,255,255,.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.ctcard .cap b{font-family:var(--display);font-size:20px;display:block}
+.ctcard .cap span{font-size:14px;color:var(--ink-2)}
+.plist{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:clamp(22px,3vw,40px);display:flex;flex-direction:column}
+.plist h3{font-size:clamp(26px,2.6vw,36px);margin-bottom:10px}
+.plist>p{color:var(--ink-2);margin:0 0 20px}
+.prow{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:18px 0;border-top:1px solid var(--line);position:relative}
+.prow::after{content:"";position:absolute;left:0;bottom:-1px;height:1px;width:0;background:var(--acc);transition:width .6s var(--ease)}
+.prow:hover::after{width:100%}
+.prow span{font-size:16px}.prow b{font-family:var(--display);font-size:20px;white-space:nowrap}
+.plist small{margin-top:auto;padding-top:18px;color:var(--ink-3);font-size:12px}
+@media (max-width:900px){.incl{grid-template-columns:1fr}.ctcard{min-height:420px}}
+
+/* путь */
+.path{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.path::before{content:"";position:absolute;left:0;right:0;top:22px;height:1px;background:var(--line)}
+.path .ln{position:absolute;left:0;top:22px;height:2px;background:var(--acc);width:var(--pl,0%);transition:width .2s linear}
+.pt{position:relative;padding-top:60px}
+.pt i{position:absolute;top:10px;left:0;width:26px;height:26px;border-radius:50%;background:var(--bg);border:2px solid var(--line);transition:border-color .4s,background .4s}
+.pt.on i{border-color:var(--acc);background:var(--acc);box-shadow:0 0 0 6px var(--acc-soft)}
+.pt small{font-family:var(--display);font-weight:700;color:var(--acc);font-size:14px}
+.pt h3{font-size:24px;margin:6px 0 8px}.pt p{margin:0;color:var(--ink-2);font-size:15px}
+@media (max-width:900px){.path{grid-template-columns:1fr 1fr;row-gap:36px}.path::before,.path .ln{display:none}}
+@media (max-width:520px){.path{grid-template-columns:1fr}}
+
+/* запись */
+.book{background:var(--dark);color:var(--on-dark);border-radius:36px;padding:clamp(26px,5vw,70px);display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,60px);position:relative;overflow:hidden}
+.book::before{content:"";position:absolute;left:-200px;bottom:-260px;width:620px;height:620px;background:radial-gradient(closest-side,rgba(14,124,107,.35),transparent)}
+.book h2{font-size:clamp(34px,4vw,58px);position:relative}
+.book .t p{color:var(--on-dark-2);margin:18px 0 26px;max-width:420px;position:relative}
+.contacts{display:grid;gap:10px;font-size:15px;position:relative}
+.contacts a{text-decoration:none}.contacts span{color:var(--on-dark-2)}
+.chipcalc{display:none;margin-bottom:16px;font-size:14px;color:var(--acc-glow);background:rgba(127,214,195,.1);padding:10px 14px;border-radius:12px}
+.chipcalc.on{display:block}
+form{display:grid;gap:12px;position:relative}
+.field{display:grid;gap:6px}
+.field label{font-size:13px;color:var(--on-dark-2)}
+.field input,.field select{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:15px 16px;outline:none;width:100%;font:inherit;color:var(--on-dark);transition:border-color .2s}
+.field input:focus,.field select:focus{border-color:var(--acc-glow)}
+.field select option{color:#111}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--on-dark-2);cursor:pointer}
+.consent input{margin-top:3px;accent-color:var(--acc)}
+.err{border-color:#e48f6a!important}
+.ok{display:none;text-align:center;padding:40px 10px;position:relative}
+.ok.on{display:block;animation:qin .6s var(--ease)}
+.check{width:64px;height:64px;border-radius:50%;background:var(--acc);display:grid;place-items:center;margin:0 auto 18px;animation:pop .6s var(--ease)}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+.ok h3{font-size:28px}.ok p{color:var(--on-dark-2)}
+@media (max-width:900px){.book{grid-template-columns:1fr}}
+
+footer{padding:40px 0 calc(40px + env(safe-area-inset-bottom));color:var(--ink-3);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.mbar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;display:none;transform:translateY(140%);transition:transform .5s var(--ease)}
+.mbar .btn{width:100%;justify-content:center}
+.mbar.show{transform:none}
+@media (max-width:760px){.mbar{display:block}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.hero-copy h1 .ln span{transform:none}.rv{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-
-<header class="nav" id="nav">
-  <div class="wrap">
-    <a class="logo" href="#top"><i><svg viewBox="0 0 24 24" fill="#fff"><path d="M7 2c-3 0-5 2.4-5 5.6 0 2.6 1 4.4 1.8 6.4.7 1.9 1 4.5 1.6 6.6.4 1.6 2.4 1.6 2.8 0 .5-1.9.8-4.6 3.8-4.6s3.3 2.7 3.8 4.6c.4 1.6 2.4 1.6 2.8 0 .6-2.1.9-4.7 1.6-6.6.8-2 1.8-3.8 1.8-6.4C22 4.4 20 2 17 2c-2.2 0-3.2 1.2-5 1.2S9.2 2 7 2z"/></svg></i>Прикус</a>
-    <nav class="navlinks"><a href="#how">Как это работает</a><a href="#calc">Стоимость</a><a href="#price">Что входит</a><a href="#book">Запись</a></nav>
-    <a class="btn main sm" href="#calc">Рассчитать цену</a>
-  </div>
-</header>
+<header class="nav" id="nav"><div class="wrap">
+  <a class="logo" href="#top"><i><svg viewBox="0 0 24 24" fill="#fff"><path d="M7 2c-3 0-5 2.4-5 5.6 0 2.6 1 4.4 1.8 6.4.7 1.9 1 4.5 1.6 6.6.4 1.6 2.4 1.6 2.8 0 .5-1.9.8-4.6 3.8-4.6s3.3 2.7 3.8 4.6c.4 1.6 2.4 1.6 2.8 0 .6-2.1.9-4.7 1.6-6.6.8-2 1.8-3.8 1.8-6.4C22 4.4 20 2 17 2c-2.2 0-3.2 1.2-5 1.2S9.2 2 7 2z"/></svg></i>Прикус</a>
+  <nav class="navlinks"><a href="#how">Как это работает</a><a href="#calc">Стоимость</a><a href="#incl">Что входит</a><a href="#book">Запись</a></nav>
+  <a class="btn main sm mag" href="#calc">Рассчитать цену</a>
+</div></header>
 
 <main id="top">
-<section class="hero">
-  <div class="wrap">
-    <div class="rv">
-      <span class="eyebrow"><b></b>Свободные окна на консультацию на этой неделе</span>
-      <h1>Имплант под ключ. <em>Цена — за 30 секунд</em>, без звонка.</h1>
-      <p class="lead">Ответьте на 4 вопроса — увидите вилку стоимости с коронкой и запишитесь на КТ и консультацию в удобное время. Администратор напишет в Telegram, а не будет дозваниваться.</p>
-      <div class="ctas"><a class="btn main" href="#calc">Рассчитать стоимость</a><a class="btn ghost" href="#book">Записаться на консультацию</a></div>
-      <div class="note">Расчёт ни к чему не обязывает. Точную цену врач назовёт после снимка.</div>
-    </div>
-    <div class="hero-art rv fx-stage" id="stage">
-      <img class="fx-img" src="../../assets/implant.webp" srcset="../../assets/implant-m.webp 800w, ../../assets/implant.webp 1400w" sizes="(max-width:900px) 92vw, 600px" alt="Зубной имплант с коронкой" fetchpriority="high" decoding="async" width="1400" height="1400"><div class="beam"></div><div class="fx-shine"></div>
-      <div class="tag t1"><b>КТ в день визита</b>без отдельной поездки</div>
-      <div class="tag t2"><b>Рассрочка 0%</b>до 12 месяцев</div>
-    </div>
-  </div>
-</section>
-
-<section class="story" id="how">
+<section class="s3d" id="how">
   <div class="stick">
-    <div class="wrap">
-      <div>
-        <div class="kicker">КАК ЭТО РАБОТАЕТ</div>
-        <div class="steps">
-          <div class="step on" data-i="0"><h2>Сначала — опора.</h2><p>Титановый имплант ставится в кость за один визит под местной анестезией. Это корень будущего зуба.</p><small>Визит 1 · около часа</small></div>
-          <div class="step" data-i="1"><h2>Потом — переходник.</h2><p>Когда имплант прижился, врач устанавливает абатмент: деталь, на которой будет держаться коронка.</p><small>Обычно через 2–4 месяца</small></div>
-          <div class="step" data-i="2"><h2>И зуб, который не отличить.</h2><p>Коронку подбирают по цвету соседних зубов. Жуёте и улыбаетесь как раньше — без съёмных конструкций.</p><small>Финальный визит</small></div>
-        </div>
-        <div class="progress"><span><i></i></span><span><i></i></span><span><i></i></span></div>
-      </div>
-      <div class="implant">
-        <svg viewBox="0 0 300 520" aria-hidden="true">
-          <defs>
-            <linearGradient id="ti2" x1="0" x2="1"><stop offset="0" stop-color="#8e979e"/><stop offset=".5" stop-color="#e3e7ea"/><stop offset="1" stop-color="#7f888f"/></linearGradient>
-            <linearGradient id="cr2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e4e8e5"/></linearGradient>
-          </defs>
-          <rect x="20" y="300" width="260" height="210" rx="28" fill="#2a2d31"/>
-          <path d="M20 300h260v30c-40 14-80 20-130 20S60 344 20 330z" fill="#c98a86" opacity=".85"/>
-          <g id="screw">
-            <rect x="128" y="300" width="44" height="160" rx="10" fill="url(#ti2)"/>
-            <g stroke="#6f777e" stroke-width="3" stroke-linecap="round"><path d="M126 318l48 8M126 340l48 8M126 362l48 8M126 384l48 8M126 406l48 8M128 428l44 7"/></g>
-          </g>
-          <path id="abut" d="M120 262h60l-6 40h-48z" fill="url(#ti2)"/>
-          <path id="crown" d="M95 120c-30 0-48 22-48 52 0 24 9 40 16 56l10 34h154l10-34c7-16 16-32 16-56 0-30-18-52-48-52-20 0-30 11-55 11s-35-11-55-11z" fill="url(#cr2)" stroke="#d6dbd8" stroke-width="2"/>
-        </svg>
-      </div>
-    </div>
+    <canvas id="gl" aria-label="3D-модель зубного импланта"></canvas>
+    <img class="fallback" src="../../assets/implant.webp" alt="Зубной имплант с коронкой">
+    <div class="gtag a" id="ga"><b>КТ в день визита</b>без отдельной поездки</div>
+    <div class="gtag b" id="gb"><b>Цена фиксируется</b>в плане лечения до начала работ</div>
+
+    <div class="layer hero-copy" id="heroCopy"><div class="wrap"><div class="copy">
+      <span class="chip"><i></i>Свободные окна на консультацию на этой неделе</span>
+      <h1><span class="ln"><span>Имплант под ключ.</span></span><span class="ln"><span><em>Цена — за 30 секунд,</em></span></span><span class="ln"><span>без звонка.</span></span></h1>
+      <p class="lead">Ответьте на 4 вопроса — увидите вилку стоимости с коронкой и запишитесь на КТ. Администратор напишет в Telegram, а не будет дозваниваться.</p>
+      <div class="ctas"><a class="btn main mag" href="#calc">Рассчитать стоимость <span class="arr">→</span></a><a class="btn ghost mag" href="#book">Записаться</a></div>
+      <div class="note">Расчёт ни к чему не обязывает. Точную цену врач назовёт после снимка.</div>
+    </div></div></div>
+
+    <div class="layer step" data-s="0"><div class="wrap"><div class="copy">
+      <div class="k">ШАГ 1 ИЗ 3 · ОПОРА</div>
+      <h2>Сначала — корень.</h2>
+      <p>Титановый имплант вкручивается в кость за один визит под местной анестезией. Это опора будущего зуба.</p>
+      <div class="m">Визит 1 · около часа</div>
+    </div></div></div>
+    <div class="layer step" data-s="1"><div class="wrap"><div class="copy">
+      <div class="k">ШАГ 2 ИЗ 3 · ПЕРЕХОДНИК</div>
+      <h2>Потом — абатмент.</h2>
+      <p>Когда имплант прижился, врач ставит абатмент — деталь, на которой держится коронка.</p>
+      <div class="m">Обычно через 2–4 месяца</div>
+    </div></div></div>
+    <div class="layer step" data-s="2"><div class="wrap"><div class="copy">
+      <div class="k">ШАГ 3 ИЗ 3 · КОРОНКА</div>
+      <h2>И зуб, который не отличить.</h2>
+      <p>Коронку подбирают по цвету соседних зубов. Жуёте и улыбаетесь как раньше — без съёмных конструкций.</p>
+      <div class="m">Финальный визит</div>
+    </div></div></div>
+    <div class="rail" id="rail"><i><b></b></i><i><b></b></i><i><b></b></i></div>
+    <div class="scrollhint" id="hint">листайте — соберём имплант<i></i></div>
   </div>
 </section>
 
-<section class="section" id="calc">
-  <div class="wrap">
-    <div class="head rv"><h2>Сколько будет стоить именно вам</h2><p>Четыре вопроса — и вилка цены с коронкой. Цифры в демо условные: на вашем сайте подставим прайс клиники.</p></div>
-    <div class="quiz rv">
-      <div class="card">
-        <div class="qbar"><span class="on"></span><span></span><span></span><span></span></div>
-        <div class="q on" data-q="teeth"><h3>Сколько зубов нужно восстановить?</h3><div class="opts">
-          <button class="opt" data-v="1"><b>Один зуб</b><span>самый частый случай</span></button>
-          <button class="opt" data-v="2"><b>Два-три рядом</b><span>можно мост на имплантах</span></button>
-          <button class="opt" data-v="4"><b>Почти вся челюсть</b><span>протокол на 4–6 имплантах</span></button>
-          <button class="opt" data-v="0"><b>Не знаю</b><span>решим на консультации</span></button></div></div>
-        <div class="q" data-q="when"><h3>Когда удалили зуб?</h3><div class="opts">
-          <button class="opt" data-v="0"><b>Ещё не удалён</b><span>возможна одномоментная имплантация</span></button>
-          <button class="opt" data-v="0"><b>Меньше года назад</b><span></span></button>
-          <button class="opt" data-v="1"><b>Больше года назад</b><span>может понадобиться наращивание кости</span></button>
-          <button class="opt" data-v="0"><b>Не помню</b><span>покажет снимок</span></button></div></div>
-        <div class="q" data-q="crown"><h3>Какая коронка ближе?</h3><div class="opts">
-          <button class="opt" data-v="0"><b>Металлокерамика</b><span>надёжно и доступнее</span></button>
-          <button class="opt" data-v="1"><b>Цирконий</b><span>самый естественный вид</span></button>
-          <button class="opt" data-v="0.5"><b>Подскажет врач</b><span>по месту и нагрузке</span></button>
-          <button class="opt" data-v="0.5"><b>Пока не знаю</b><span></span></button></div></div>
-        <div class="q" data-q="pay"><h3>Как удобнее оплатить?</h3><div class="opts">
-          <button class="opt" data-v="full"><b>Сразу</b><span>фиксируем цену</span></button>
-          <button class="opt" data-v="split"><b>Рассрочка</b><span>покажем платёж в месяц</span></button>
-          <button class="opt" data-v="stage"><b>По этапам</b><span>платите за каждый визит</span></button>
-          <button class="opt" data-v="full"><b>Обсудим</b><span></span></button></div></div>
-        <div class="qnav"><button class="back" id="back" disabled>← Назад</button><span style="font-size:13px;color:var(--ink-3)" id="qnum">Вопрос 1 из 4</span></div>
-      </div>
-      <div class="card result">
-        <div>
-          <div class="lbl">ВАША ВИЛКА СТОИМОСТИ</div>
-          <div class="price dim" id="price">— ₽</div>
-          <div style="color:#b4b8bd;font-size:15px" id="pnote">Ответьте на вопросы слева</div>
-          <ul><li>Имплант, абатмент и коронка</li><li>КТ и консультация хирурга</li><li>Контрольные осмотры после установки</li></ul>
-        </div>
-        <div>
-          <a class="btn main" href="#book" style="width:100%" id="toBook">Записаться с этим расчётом</a>
-          <div class="demo" style="margin-top:12px">Демо-цены. В работе — прайс клиники.</div>
-        </div>
-      </div>
-    </div>
+<section class="clinic" id="clinic">
+  <div class="stick">
+    <div class="frame" id="frame"><img src="../../assets/clinic.webp" srcset="../../assets/clinic-m.webp 800w, ../../assets/clinic.webp 1400w" sizes="100vw" alt="Кабинет стоматологии" loading="lazy" decoding="async"></div>
+    <div class="txt"><div class="wrap">
+      <h2>Кабинет, в котором спокойно.</h2>
+      <div class="facts"><span>КТ на месте</span><span>Хирург и ортопед в одной клинике</span><span>План лечения с ценой — на руки</span></div>
+    </div></div>
   </div>
 </section>
 
-<section class="section" id="price" style="padding-top:0">
-  <div class="wrap">
-    <div class="head rv"><h2>Без сюрпризов на кассе</h2><p>Пациент заранее видит, за что платит — и приходит на консультацию уже готовым.</p></div>
-    <div class="incl">
-      <div class="card big rv"><h3>Цена фиксируется в плане лечения до начала работ.</h3><p>Если по ходу понадобится дополнительная процедура, врач согласует её с вами заранее — до того, как что-то делать.</p></div>
-      <div class="card side rv">
-        <ul class="list">
-          <li><span>Консультация и КТ</span><b>от 0 ₽*</b></li>
-          <li><span>Имплант</span><b>от 35 000 ₽</b></li>
-          <li><span>Абатмент</span><b>от 9 000 ₽</b></li>
-          <li><span>Коронка</span><b>от 18 000 ₽</b></li>
-        </ul>
-        <div style="font-size:12px;color:var(--ink-3);margin-top:10px">*демо-значения, заменяются ценами клиники</div>
-      </div>
-      <div class="card timeline rv">
-        <div class="tl"><i>01</i><h3>Заявка</h3><p>Расчёт на сайте — ответ в Telegram в рабочее время.</p></div>
-        <div class="tl"><i>02</i><h3>КТ и план</h3><p>Снимок, разговор с хирургом, точная смета.</p></div>
-        <div class="tl"><i>03</i><h3>Установка</h3><p>Имплант за один визит, контроль приживления.</p></div>
-        <div class="tl"><i>04</i><h3>Коронка</h3><p>Финальный визит — и новый зуб.</p></div>
-      </div>
+<section class="sec" id="calc"><div class="wrap">
+  <div class="head rv"><h2>Сколько будет стоить именно вам</h2><p>Четыре вопроса — и вилка цены с коронкой. Цифры в демо условные: на вашем сайте подставим прайс клиники.</p></div>
+  <div class="quiz rv">
+    <div class="qcard">
+      <div class="qbar"><span class="on"></span><span></span><span></span><span></span></div>
+      <div class="q on" data-q="teeth"><h3>Сколько зубов нужно восстановить?</h3><div class="opts">
+        <button class="opt" data-v="1"><b>Один зуб</b><span>самый частый случай</span></button>
+        <button class="opt" data-v="2"><b>Два-три рядом</b><span>можно мост на имплантах</span></button>
+        <button class="opt" data-v="4"><b>Почти вся челюсть</b><span>протокол на 4–6 имплантах</span></button>
+        <button class="opt" data-v="0"><b>Не знаю</b><span>решим на консультации</span></button></div></div>
+      <div class="q" data-q="when"><h3>Когда удалили зуб?</h3><div class="opts">
+        <button class="opt" data-v="0"><b>Ещё не удалён</b><span>возможна одномоментная имплантация</span></button>
+        <button class="opt" data-v="0"><b>Меньше года назад</b><span>обычно без наращивания</span></button>
+        <button class="opt" data-v="1"><b>Больше года назад</b><span>может понадобиться наращивание кости</span></button>
+        <button class="opt" data-v="0"><b>Не помню</b><span>покажет снимок</span></button></div></div>
+      <div class="q" data-q="crown"><h3>Какая коронка ближе?</h3><div class="opts">
+        <button class="opt" data-v="0"><b>Металлокерамика</b><span>надёжно и доступнее</span></button>
+        <button class="opt" data-v="1"><b>Цирконий</b><span>самый естественный вид</span></button>
+        <button class="opt" data-v="0.5"><b>Подскажет врач</b><span>по месту и нагрузке</span></button>
+        <button class="opt" data-v="0.5"><b>Пока не знаю</b><span>обсудим на консультации</span></button></div></div>
+      <div class="q" data-q="pay"><h3>Как удобнее оплатить?</h3><div class="opts">
+        <button class="opt" data-v="full"><b>Сразу</b><span>фиксируем цену</span></button>
+        <button class="opt" data-v="split"><b>Рассрочка</b><span>покажем платёж в месяц</span></button>
+        <button class="opt" data-v="stage"><b>По этапам</b><span>платите за каждый визит</span></button>
+        <button class="opt" data-v="full"><b>Обсудим</b><span>на консультации</span></button></div></div>
+      <div class="qfoot"><button class="back" id="back" disabled>← Назад</button><span id="qnum">Вопрос 1 из 4</span></div>
+    </div>
+    <div class="result">
+      <div class="k">ВАША ВИЛКА СТОИМОСТИ</div>
+      <div class="price dim" id="price">— ₽</div>
+      <div class="pnote" id="pnote">Ответьте на вопросы слева</div>
+      <ul><li>Имплант, абатмент и коронка</li><li>КТ и консультация хирурга</li><li>Контрольные осмотры после установки</li></ul>
+      <a class="btn main mag" href="#book" id="toBook">Записаться с этим расчётом <span class="arr">→</span></a>
+      <small>Демо-цены. В работе — прайс клиники.</small>
     </div>
   </div>
-</section>
+</div></section>
 
-<section class="section" id="book" style="padding-top:0">
-  <div class="wrap book">
-    <div class="info rv">
+<section class="sec" id="incl" style="padding-top:0"><div class="wrap">
+  <div class="head rv"><h2>Без сюрпризов на кассе</h2><p>Пациент заранее видит, за что платит, и приходит на консультацию уже готовым.</p></div>
+  <div class="incl">
+    <div class="ctcard rv fx-stage" id="ct"><img class="fx-img" src="../../assets/ct.webp" srcset="../../assets/ct-m.webp 800w, ../../assets/ct.webp 1400w" sizes="(max-width:900px) 92vw, 600px" alt="Компьютерный томограф в клинике" loading="lazy" decoding="async"><div class="fx-shine"></div>
+      <div class="cap"><b>КТ в день консультации</b><span>Снимок и план лечения — за один визит, без поездок в диагностический центр.</span></div></div>
+    <div class="plist rv">
+      <h3>Что входит в цену</h3>
+      <p>Цена фиксируется в плане лечения. Если понадобится дополнительная процедура — врач согласует её заранее.</p>
+      <div class="prow"><span>Консультация и КТ</span><b>от 0 ₽*</b></div>
+      <div class="prow"><span>Имплант</span><b>от 35 000 ₽</b></div>
+      <div class="prow"><span>Абатмент</span><b>от 9 000 ₽</b></div>
+      <div class="prow"><span>Коронка</span><b>от 18 000 ₽</b></div>
+      <small>*демо-значения, заменяются ценами клиники</small>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" style="padding-top:0"><div class="wrap">
+  <div class="head rv"><h2>Путь пациента</h2><p>Четыре точки — и понятно, что будет дальше.</p></div>
+  <div class="path" id="path"><div class="ln"></div>
+    <div class="pt"><i></i><small>01</small><h3>Заявка</h3><p>Расчёт на сайте — ответ в Telegram в рабочее время.</p></div>
+    <div class="pt"><i></i><small>02</small><h3>КТ и план</h3><p>Снимок, разговор с хирургом, точная смета.</p></div>
+    <div class="pt"><i></i><small>03</small><h3>Установка</h3><p>Имплант за один визит, контроль приживления.</p></div>
+    <div class="pt"><i></i><small>04</small><h3>Коронка</h3><p>Финальный визит — и новый зуб.</p></div>
+  </div>
+</div></section>
+
+<section class="sec" id="book" style="padding-top:0"><div class="wrap">
+  <div class="book rv">
+    <div class="t">
       <h2>Запишитесь на консультацию</h2>
       <p>Оставьте имя и телефон — администратор пришлёт свободные окна в Telegram или WhatsApp. Звонить не будем, если не попросите.</p>
-      <div class="contacts">
-        <a href="tel:+70000000000">☎ +7 (000) 000-00-00</a>
-        <a href="#">✈ Написать в Telegram</a>
-        <span style="color:var(--ink-2)">Москва, адрес клиники · ежедневно 9:00–21:00</span>
-      </div>
+      <div class="contacts"><a href="tel:+70000000000">+7 (000) 000-00-00</a><a href="#">Написать в Telegram →</a><span>Москва, адрес клиники · ежедневно 9:00–21:00</span></div>
     </div>
-    <div class="card rv">
+    <div>
+      <div class="chipcalc" id="chip"></div>
       <form id="form" novalidate>
-        <div class="summary" id="summary"></div>
-        <div class="row2">
-          <div class="field"><label for="n">Имя</label><input id="n" required autocomplete="given-name" placeholder="Как к вам обращаться"></div>
-          <div class="field"><label for="p">Телефон</label><input id="p" required type="tel" autocomplete="tel" placeholder="+7"></div>
-        </div>
-        <div class="field"><label for="t">Удобное время</label><input id="t" placeholder="Например: будни после 18:00"></div>
-        <label class="consent"><input type="checkbox" id="c" required>Согласен на обработку персональных данных в соответствии с политикой конфиденциальности</label>
-        <button class="btn main" type="submit">Отправить заявку</button>
+        <div class="field"><label for="n">Имя</label><input id="n" autocomplete="given-name" placeholder="Как к вам обращаться"></div>
+        <div class="field"><label for="p">Телефон</label><input id="p" type="tel" autocomplete="tel" placeholder="+7"></div>
+        <div class="field"><label for="w">Удобное время</label><select id="w"><option>Утро, 9–12</option><option>День, 12–17</option><option>Вечер, 17–21</option></select></div>
+        <label class="consent"><input type="checkbox" id="c">Согласен на обработку персональных данных в соответствии с политикой конфиденциальности</label>
+        <button class="btn main" type="submit" style="justify-content:center">Отправить заявку</button>
       </form>
       <div class="ok" id="ok"><div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></div><h3>Заявка принята</h3><p>Администратор напишет вам в течение 15 минут в рабочее время.</p></div>
     </div>
   </div>
-</section>
+</div></section>
 </main>
-
 <footer><div class="wrap"><span>Прикус · демо-лендинг стоматологии</span><span>Сайт сделан как пример. Название и цены условные.</span></div></footer>
-<div class="mbar" id="mbar"><a class="btn main" href="#calc">Рассчитать цену</a><a class="btn ghost" href="#book" style="background:var(--surface)">Запись</a></div>
+<div class="mbar" id="mbar"><a class="btn main" href="#calc">Рассчитать цену</a></div>
 
+<script src="../../assets/fx.js"></script>
 <script>
 (()=>{
-const nav=document.getElementById('nav'),mbar=document.getElementById('mbar');
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),mix=(a,b,t)=>a.map((x,i)=>Math.round(x+(b[i]-x)*t));
+requestAnimationFrame(()=>document.body.classList.add('ready'));
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
-document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+$$('.rv').forEach(el=>io.observe(el));
 
-// scroll-synced implant
-const story=document.getElementById('how'),steps=[...story.querySelectorAll('.step')],bars=[...story.querySelectorAll('.progress i')];
-const screw=document.getElementById('screw'),abut=document.getElementById('abut'),crown=document.getElementById('crown');
-const cl=v=>Math.max(0,Math.min(1,v)),ease=t=>1-Math.pow(1-t,3);
-function onScroll(){
-  const y=scrollY;nav.classList.toggle('solid',y>20);mbar.classList.toggle('show',y>innerHeight*.6);
-  const r=story.getBoundingClientRect(),total=story.offsetHeight-innerHeight;
-  const p=cl(-r.top/total);
-  const a=ease(cl(p*3)),b=ease(cl(p*3-1)),c=ease(cl(p*3-2));
-  screw.style.transform=`translateY(${(1-a)*220}px)`;screw.style.opacity=.15+a*.85;
-  abut.style.transform=`translateY(${(1-b)*-140}px)`;abut.style.opacity=b;
-  crown.style.transform=`translateY(${(1-c)*-180}px)`;crown.style.opacity=c;
-  const idx=Math.min(2,Math.floor(p*3));
-  steps.forEach((s,i)=>s.classList.toggle('on',i===idx));
-  bars.forEach((bi,i)=>bi.style.width=(cl(p*3-i)*100)+'%');
+// магнитные кнопки + подсветка под курсором
+if(!reduce&&matchMedia('(hover:hover)').matches){
+  $$('.mag').forEach(b=>{b.addEventListener('pointermove',e=>{const r=b.getBoundingClientRect();b.style.setProperty('--mx',(e.clientX-r.left-r.width/2)*.18+'px');b.style.setProperty('--my',(e.clientY-r.top-r.height/2)*.25+'px')});b.addEventListener('pointerleave',()=>{b.style.setProperty('--mx','0px');b.style.setProperty('--my','0px')})});
 }
-if(reduce){screw.style.transform=abut.style.transform=crown.style.transform='none'}
-addEventListener('scroll',onScroll,{passive:true});onScroll();
+$$('.opt').forEach(o=>o.addEventListener('pointermove',e=>{const r=o.getBoundingClientRect();o.style.setProperty('--x',e.clientX-r.left+'px');o.style.setProperty('--y',e.clientY-r.top+'px')}));
 
-// quiz
-const qs=[...document.querySelectorAll('.q')],qbar=[...document.querySelectorAll('.qbar span')];
-const back=document.getElementById('back'),qnum=document.getElementById('qnum'),price=document.getElementById('price'),pnote=document.getElementById('pnote');
-const ans={};let cur=0;
-const fmt=n=>Math.round(n/1000)*1000;const rub=n=>fmt(n).toLocaleString('ru-RU')+' ₽';
+// 3D-сцена
+const s3d=$('#how'),heroCopy=$('#heroCopy'),steps=$$('.step'),rail=$('#rail'),bars=$$('#rail b'),hint=$('#hint'),ga=$('#ga'),gb=$('#gb'),nav=$('#nav');
+const L=[245,244,239],D=[15,18,21];
+window.__p=0;
+function stageScroll(){
+  const r=s3d.getBoundingClientRect(),total=s3d.offsetHeight-innerHeight;const p=cl(-r.top/total);window.__p=p;
+  window.__api&&window.__api.set(p);
+  const d=cl((p-.14)/.14);s3d.style.background=`rgb(${mix(L,D,d)})`;
+  heroCopy.style.opacity=1-cl((p-.06)/.1);heroCopy.style.transform=`translateY(${-cl((p-.06)/.1)*40}px)`;
+  heroCopy.style.pointerEvents=p>.12?'none':'';
+  hint.style.opacity=p>.03?0:1;
+  [ga,gb].forEach((g,i)=>{const o=1-cl((p-.04-i*.02)/.08);g.style.opacity=o;g.style.transform=`translateY(${(1-o)*-30}px)`});
+  const idx=p<.3?-1:p<.54?0:p<.74?1:2;
+  steps.forEach((s,i)=>s.classList.toggle('on',i===idx));
+  rail.classList.toggle('on',p>.28&&p<.995);
+  [[.32,.52],[.55,.72],[.75,.92]].forEach(([a,b],i)=>bars[i].style.width=cl((p-a)/(b-a))*100+'%');
+  const inDark=r.top<=0&&r.bottom>60&&d>.5;nav.classList.toggle('on-dark',inDark);
+}
+
+// раскрытие фото клиники
+const clinic=$('#clinic'),frame=$('#frame');
+function clinicScroll(){
+  const r=clinic.getBoundingClientRect(),total=clinic.offsetHeight-innerHeight;const p=cl(-r.top/total);
+  const e=1-Math.pow(1-cl(p/.7),3);
+  frame.style.setProperty('--ci',(14*(1-e))+'%');frame.style.setProperty('--cr',(32*(1-e))+'px');frame.style.setProperty('--cs',1.2-e*.2);
+  clinic.style.setProperty('--ct',cl((p-.45)/.3));
+  if(r.top<=0&&r.bottom>60)nav.classList.add('on-dark');
+}
+// линия пути
+const path=$('#path'),pts=$$('.pt');
+function pathScroll(){const r=path.getBoundingClientRect();const p=cl((innerHeight*.8-r.top)/(r.height+innerHeight*.3));path.querySelector('.ln').style.setProperty('--pl',p*100+'%');pts.forEach((t,i)=>t.classList.toggle('on',p>=i/4+.05))}
+
+const mbar=$('#mbar');
+function onScroll(){nav.classList.toggle('solid',scrollY>20);mbar.classList.toggle('show',s3d.getBoundingClientRect().bottom<innerHeight*.5);stageScroll();clinicScroll();pathScroll()}
+addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll);onScroll();
+setTimeout(()=>{if(!window.__api)s3d.classList.add('nogl')},7000);
+
+// фото КТ: наклон и блик
+liveFX($('#ct'),{tilt:6,shine:true});
+
+// квиз
+const qs=$$('.q'),qbar=$$('.qbar span'),back=$('#back'),qnum=$('#qnum'),price=$('#price'),pnote=$('#pnote');
+const ans={};let cur=0,shown=[0,0];
+const r1=n=>Math.round(n/1000)*1000,rub=n=>r1(n).toLocaleString('ru-RU')+' ₽';
 function show(i){cur=i;qs.forEach((q,k)=>q.classList.toggle('on',k===i));qbar.forEach((s,k)=>s.classList.toggle('on',k<=i));back.disabled=i===0;qnum.textContent=`Вопрос ${i+1} из 4`}
+function countTo(lo,hi){const a=shown.slice(),t0=performance.now();price.classList.remove('dim');
+  (function f(t){const k=cl((t-t0)/700),e=1-Math.pow(1-k,3);const l=a[0]+(lo-a[0])*e,h=a[1]+(hi-a[1])*e;price.textContent=rub(l)+' – '+rub(h);if(k<1)requestAnimationFrame(f);else shown=[lo,hi]})(t0)}
 function calc(){
-  const t=ans.teeth;if(t===undefined)return;
-  const n=t==='0'?1:+t;
-  let lo,hi;
+  const t=ans.teeth;if(t===undefined)return;const n=t==='0'?1:+t;let lo,hi;
   if(n>=4){lo=290000;hi=520000}else{lo=n*62000;hi=n*94000}
   if(ans.when==='1'){lo+=18000;hi+=45000}
   if(ans.crown==='1'){lo+=n*8000;hi+=n*14000}else if(ans.crown==='0.5'){hi+=n*8000}
-  price.classList.remove('dim');price.textContent=rub(lo)+' – '+rub(hi);
+  countTo(lo,hi);
   pnote.textContent=ans.pay==='split'?`≈ ${rub(lo/12)} в месяц при рассрочке на 12 мес.`:(t==='0'?'Ориентир для одного зуба':'Ориентир с коронкой, демо-цены');
-  window.__calc=price.textContent;
+  window.__calc=rub(lo)+' – '+rub(hi);
 }
 qs.forEach((q,i)=>q.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{
-  q.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');
-  ans[q.dataset.q]=o.dataset.v;calc();
-  if(i<qs.length-1)setTimeout(()=>show(i+1),260);else qnum.textContent='Готово — расчёт справа';
+  q.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');ans[q.dataset.q]=o.dataset.v;calc();
+  if(i<qs.length-1)setTimeout(()=>show(i+1),280);else qnum.textContent='Готово — расчёт справа';
 })));
 back.addEventListener('click',()=>cur>0&&show(cur-1));
+$('#toBook').addEventListener('click',()=>{if(!window.__calc)return;const c=$('#chip');c.textContent='Ваш расчёт: '+window.__calc;c.classList.add('on')});
 
-// form
-const form=document.getElementById('form'),ok=document.getElementById('ok'),summary=document.getElementById('summary');
-document.getElementById('toBook').addEventListener('click',()=>{if(window.__calc){summary.textContent='Ваш расчёт: '+window.__calc;summary.classList.add('on')}});
-form.addEventListener('submit',e=>{
-  e.preventDefault();let bad=false;
-  ['n','p'].forEach(id=>{const el=document.getElementById(id);const v=el.value.trim();const fail=id==='p'?v.replace(/\D/g,'').length<10:!v;el.style.borderColor=fail?'#d9534f':'';bad=bad||fail});
-  const c=document.getElementById('c');c.parentElement.style.color=c.checked?'':'#d9534f';bad=bad||!c.checked;
-  if(bad)return;form.style.display='none';ok.classList.add('on');
-});
+// форма
+$('#form').addEventListener('submit',e=>{e.preventDefault();const n=$('#n'),p=$('#p'),c=$('#c');let bad=false;
+  [[n,!n.value.trim()],[p,p.value.replace(/\D/g,'').length<10]].forEach(([el,f])=>{el.classList.toggle('err',f);bad=bad||f});
+  c.parentElement.style.color=c.checked?'':'#e48f6a';bad=bad||!c.checked;if(bad)return;
+  $('#form').style.display='none';$('#chip').classList.remove('on');$('#ok').classList.add('on')});
 })();
 </script>
-<script src="../../assets/fx.js"></script>
-<script>liveFX(document.getElementById('stage'),{smoke:0,embers:0,tilt:9,shine:true,float:8});</script>
+<script type="module">
+import {mountImplant} from '../../assets/implant3d.js';
+const s=document.getElementById('how');
+try{const api=mountImplant(document.getElementById('gl'),{lq:location.search.includes('lq'),onFail:()=>s.classList.add('nogl')});if(api){window.__api=api;api.set(window.__p||0,1)}else s.classList.add('nogl')}
+catch(e){s.classList.add('nogl')}
+</script>
+<noscript><style>.s3d .fallback{display:block}.rv{opacity:1;transform:none}.hero-copy h1 .ln span{transform:none}</style></noscript>
 </body>
 </html>
