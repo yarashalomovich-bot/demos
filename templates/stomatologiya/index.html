@@ -54,7 +54,18 @@ h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.025em;line-height:
 .hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
 .hero .note{margin-top:22px;font-size:13px;color:var(--ink-3)}
 .hero-art{position:relative;aspect-ratio:1/1.05;border-radius:32px;background:radial-gradient(120% 90% at 50% 100%,#e6efe9 0%,var(--surface) 60%);border:1px solid var(--line);overflow:hidden;display:grid;place-items:center}
-.hero-art svg{width:72%;height:auto}
+
+/* live FX */
+.fx-stage{position:relative}
+.fx-img{display:block;width:100%;height:100%;object-fit:cover;will-change:transform;backface-visibility:hidden}
+.fx-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.fx-glow{position:absolute;pointer-events:none;mix-blend-mode:screen;will-change:opacity,transform}
+.fx-shine{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--sx,50%) var(--sy,40%),rgba(255,255,255,.7),transparent 38%);mix-blend-mode:soft-light}
+.hero-art .fx-img{position:absolute;inset:0}
+.hero-art .beam{position:absolute;inset:-20%;pointer-events:none;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);mix-blend-mode:soft-light;animation:beam 7s ease-in-out infinite}
+@keyframes beam{0%,100%{transform:translateX(-30%)}50%{transform:translateX(30%)}}
+@media (prefers-reduced-motion:reduce){.hero-art .beam{animation:none;opacity:0}}
+.hero-art .tag{z-index:3}
 .float{animation:float 6s var(--ease) infinite}
 @keyframes float{50%{transform:translateY(-10px)}}
 .tag{position:absolute;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13px;box-shadow:0 12px 30px -18px rgba(0,0,0,.25)}
@@ -193,19 +204,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div class="ctas"><a class="btn main" href="#calc">Рассчитать стоимость</a><a class="btn ghost" href="#book">Записаться на консультацию</a></div>
       <div class="note">Расчёт ни к чему не обязывает. Точную цену врач назовёт после снимка.</div>
     </div>
-    <div class="hero-art rv">
-      <svg class="float" viewBox="0 0 300 360" aria-hidden="true">
-        <defs>
-          <linearGradient id="cr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9ece9"/></linearGradient>
-          <linearGradient id="ti" x1="0" x2="1"><stop offset="0" stop-color="#9aa3aa"/><stop offset=".5" stop-color="#d9dee2"/><stop offset="1" stop-color="#8a939a"/></linearGradient>
-        </defs>
-        <path d="M95 40c-30 0-48 22-48 52 0 24 9 40 16 56h174c7-16 16-32 16-56 0-30-18-52-48-52-20 0-30 11-55 11S115 40 95 40z" transform="translate(0,0) scale(1)" fill="url(#cr)" stroke="#cfd5d2" stroke-width="2"/>
-        <path d="M118 148h64l-8 34h-48z" fill="url(#ti)"/>
-        <g fill="url(#ti)"><rect x="128" y="182" width="44" height="150" rx="10"/></g>
-        <g stroke="#7d868d" stroke-width="3" stroke-linecap="round" opacity=".7">
-          <path d="M126 200l48 8M126 222l48 8M126 244l48 8M126 266l48 8M126 288l48 8M128 310l44 7"/>
-        </g>
-      </svg>
+    <div class="hero-art rv fx-stage" id="stage">
+      <img class="fx-img" src="../../assets/implant.webp" srcset="../../assets/implant-m.webp 800w, ../../assets/implant.webp 1400w" sizes="(max-width:900px) 92vw, 600px" alt="Зубной имплант с коронкой" fetchpriority="high" decoding="async" width="1400" height="1400"><div class="beam"></div><div class="fx-shine"></div>
       <div class="tag t1"><b>КТ в день визита</b>без отдельной поездки</div>
       <div class="tag t2"><b>Рассрочка 0%</b>до 12 месяцев</div>
     </div>
@@ -404,5 +404,7 @@ form.addEventListener('submit',e=>{
 });
 })();
 </script>
+<script src="../../assets/fx.js"></script>
+<script>liveFX(document.getElementById('stage'),{smoke:0,embers:0,tilt:9,shine:true,float:8});</script>
 </body>
 </html>

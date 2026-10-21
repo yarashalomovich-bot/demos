@@ -37,7 +37,17 @@ h1,h2,h3{font-family:var(--display);margin:0;font-weight:600;letter-spacing:-.01
 .btn.sm{padding:9px 16px;font-size:14px}
 @media (max-width:820px){.navlinks{display:none}}
 
-/* hero with scroll-rotating plate */
+
+/* live FX */
+.fx-stage{position:relative}
+.fx-img{display:block;width:100%;height:100%;object-fit:cover;will-change:transform;backface-visibility:hidden}
+.fx-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.fx-glow{position:absolute;pointer-events:none;mix-blend-mode:screen;will-change:opacity,transform}
+.fx-shine{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--sx,50%) var(--sy,40%),rgba(255,255,255,.7),transparent 38%);mix-blend-mode:soft-light}
+
+.plate .fx-stage{width:min(112%,680px);aspect-ratio:1;margin-right:-6%;-webkit-mask-image:radial-gradient(closest-side,#000 58%,transparent 100%);mask-image:radial-gradient(closest-side,#000 58%,transparent 100%);will-change:transform}
+.plate .fx-glow{left:22%;right:22%;bottom:12%;height:40%;background:radial-gradient(closest-side,rgba(255,110,20,.55),transparent)}
+/* hero with scroll-zoom steak */
 .hero{position:relative;height:190vh}
 .hero .stick{position:sticky;top:0;height:100svh;display:flex;align-items:center;overflow:hidden}
 .hero .wrap{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
@@ -54,7 +64,7 @@ h1,h2,h3{font-family:var(--display);margin:0;font-weight:600;letter-spacing:-.01
 .hl::before{content:"";width:28px;height:1px;background:var(--acc)}
 .hl.on{opacity:1}
 .hl.a{left:-4%;top:6%}.hl.b{right:0;top:52%}.hl.c{left:6%;bottom:12%}
-@media (max-width:900px){.hero{height:auto}.hero .stick{position:relative;height:auto;padding:110px 0 40px}.hero .wrap{grid-template-columns:1fr}.plate svg{width:min(88%,420px)}.hl{display:none}}
+@media (max-width:900px){.hero{height:auto}.hero .stick{position:relative;height:auto;padding:110px 0 40px}.hero .wrap{grid-template-columns:1fr}.plate{order:-1;margin:-36px -16px -56px}.plate .fx-stage{width:min(100%,400px);margin:0 auto}.hl{display:none}}
 
 .section{padding:clamp(72px,10vw,130px) 0}
 .head{display:flex;justify-content:space-between;align-items:end;gap:32px;margin-bottom:44px;flex-wrap:wrap}
@@ -150,20 +160,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div class="ctas"><a class="btn main" href="#calc">Посчитать банкет</a><a class="btn ghost" href="#reserve">Забронировать стол</a></div>
     </div>
     <div class="plate">
-      <svg viewBox="0 0 600 600" aria-hidden="true">
-        <circle cx="300" cy="300" r="270" fill="#0e1a15"/>
-        <circle cx="300" cy="300" r="250" fill="#f3ede1"/>
-        <circle cx="300" cy="300" r="250" fill="none" stroke="#d8ceb9" stroke-width="2"/>
-        <circle cx="300" cy="300" r="190" fill="#ebe3d3"/>
-        <g id="dish">
-          <ellipse cx="300" cy="300" rx="120" ry="104" fill="#8b4a2b"/>
-          <ellipse cx="292" cy="290" rx="98" ry="80" fill="#a85a33"/>
-          <path d="M220 270c30-20 60-26 90-20M235 312c35-16 75-18 110-6M250 345c25-8 55-8 80 0" stroke="#6e3820" stroke-width="7" stroke-linecap="round" fill="none" opacity=".8"/>
-          <g fill="#4e7a3a"><ellipse cx="380" cy="230" rx="22" ry="10" transform="rotate(-30 380 230)"/><ellipse cx="400" cy="256" rx="20" ry="9" transform="rotate(10 400 256)"/><ellipse cx="364" cy="214" rx="16" ry="7" transform="rotate(-70 364 214)"/></g>
-          <g fill="#d89b2b"><circle cx="200" cy="380" r="9"/><circle cx="222" cy="398" r="7"/><circle cx="186" cy="356" r="6"/><circle cx="420" cy="352" r="8"/><circle cx="404" cy="378" r="6"/></g>
-          <path d="M170 210c20 40 10 60-8 70M440 410c-24-10-30-30-24-48" stroke="#b03a2e" stroke-width="5" stroke-linecap="round" fill="none" opacity=".7"/>
-        </g>
-      </svg>
+      <div class="fx-stage" id="stage" aria-hidden="true"><img class="fx-img" src="../../assets/steak.webp" srcset="../../assets/steak-m.webp 800w, ../../assets/steak.webp 1400w" sizes="(max-width:900px) 92vw, 680px" alt="" fetchpriority="high" decoding="async" width="1400" height="1400"><div class="fx-glow" id="fire"></div></div>
       <div class="hl a" id="h1">Шеф собирает сет под ваш бюджет</div>
       <div class="hl b" id="h2">Меню согласуем за 3 дня до вечера</div>
       <div class="hl c" id="h3">Зал до 60 гостей</div>
@@ -250,11 +247,11 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
 $$('.rv').forEach(el=>io.observe(el));
-const hero=$('.hero'),dish=$('#dish'),hls=[$('#h1'),$('#h2'),$('#h3')],nav=$('#nav'),mbar=$('#mbar');
+const hero=$('.hero'),stage=$('#stage'),hls=[$('#h1'),$('#h2'),$('#h3')],nav=$('#nav'),mbar=$('#mbar');
 function onScroll(){
   const y=scrollY;nav.classList.toggle('solid',y>20);mbar.classList.toggle('show',y>innerHeight*.7);
   const total=hero.offsetHeight-innerHeight;const p=total>0?Math.max(0,Math.min(1,y/total)):0;
-  if(!reduce)dish.style.transform=`rotate(${p*150}deg) scale(${1+p*.06})`;
+  if(!reduce)stage.style.transform=`scale(${1+p*.14}) translateY(${p*-24}px)`;
   hls.forEach((h,i)=>h.classList.toggle('on',p>=i*.3));
 }
 addEventListener('scroll',onScroll,{passive:true});onScroll();
@@ -284,5 +281,7 @@ $('#form').addEventListener('submit',e=>{
 });
 })();
 </script>
+<script src="../../assets/fx.js"></script>
+<script>liveFX(document.getElementById('stage'),{smoke:34,embers:46,srcX:.5,srcY:.5,srcW:.55,smokeColor:'235,230,225',emberColor:'255,150,50',glow:'#fire',tilt:7});</script>
 </body>
 </html>
