@@ -1,0 +1,30 @@
+name: fetch-assets
+on:
+  push:
+    paths: ['assets/sources.txt']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and compress
+        run: |
+          sudo apt-get -qq update && sudo apt-get -qq install -y webp imagemagick >/dev/null
+          while read -r name url; do
+            [ -z "$name" ] && continue
+            [ -f "assets/$name.webp" ] && continue
+            curl -fsSL "$url" -o "/tmp/$name.src"
+            convert "/tmp/$name.src" -resize 1400x1400\> -quality 92 "/tmp/$name.png"
+            cwebp -quiet -q 80 "/tmp/$name.png" -o "assets/$name.webp"
+            convert "/tmp/$name.src" -resize 800x800\> -quality 92 "/tmp/$name-m.png"
+            cwebp -quiet -q 78 "/tmp/$name-m.png" -o "assets/$name-m.webp"
+          done < assets/sources.txt
+          ls -la assets
+      - name: Commit
+        run: |
+          git config user.name "assets-bot"; git config user.email "actions@users.noreply.github.com"
+          git add assets/*.webp
+          git diff --cached --quiet || (git commit -m "Add compressed hero assets" && git push)
