@@ -1,3 +1,10 @@
 steak https://cdn.gamma.app/6w94nzk96rmuu6n/design-anything/BOmioqm3EcHyskAyJUWAH/7UAQGMw2j2KJdOFSxYI0Y.jpg
 razor https://cdn.gamma.app/6w94nzk96rmuu6n/design-anything/uC91hh2mPipe4I9Jf4ami/ZCK5wNWoZhCbqzsfWLcKB.jpg
 implant https://cdn.gamma.app/6w94nzk96rmuu6n/design-anything/2Q1t3tGPq7yOVkmIoCF0X/uQ3Uhmp9xWItLC3_Fuc_t.jpg
+hall https://www.figma.com/api/mcp/asset/07dd2704-1640-4757-a407-0f49f3bd4151.png
+f-birthday https://www.figma.com/api/mcp/asset/f7df6691-f63d-4694-aae1-b2413c5b4d07.png
+f-corporate https://www.figma.com/api/mcp/asset/580589af-73aa-4d2f-aa0e-76972d04e6a2.png
+f-furshet https://www.figma.com/api/mcp/asset/562854bd-5549-4461-ba7f-d007c7de668a.png
+f-family https://www.figma.com/api/mcp/asset/0171aebc-149b-43af-bd3a-7ac714b7fa7f.png
+clinic https://www.figma.com/api/mcp/asset/c4b9a486-394a-4b8a-a1d9-6f8881bf4d90.png
+ct https://www.figma.com/api/mcp/asset/f91663ef-c46f-42b9-ae11-474a2ffcebff.png
