@@ -93,6 +93,7 @@ section{scroll-margin-top:72px}
 .rail.on{opacity:1}
 .rail i{width:64px;height:3px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
 .rail i b{display:block;height:100%;width:0;background:var(--acc-glow)}
+@media (max-height:760px){.scrollhint{display:none}}
 @media (max-width:900px){
   .layer .wrap{align-items:flex-end;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
   .hero-copy h1{font-size:clamp(34px,9.6vw,50px);margin:14px 0 12px}
@@ -149,12 +150,13 @@ section{scroll-margin-top:72px}
 .result .k{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--acc-glow);position:relative}
 .price{font-family:var(--display);font-weight:700;font-size:clamp(30px,3vw,42px);letter-spacing:-.03em;line-height:1.05;margin:18px 0 8px;position:relative}
 .price.dim{color:#4b5257}
+.price .nw{white-space:nowrap}
 .pnote{color:var(--on-dark-2);font-size:14px;position:relative}
 .result ul{list-style:none;padding:0;margin:26px 0;display:grid;gap:10px;font-size:14px;position:relative}
 .result li{display:flex;gap:10px;align-items:center}.result li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--acc-glow)}
 .result .btn{margin-top:auto;justify-content:center;position:relative}
 .result small{display:block;margin-top:12px;color:#6d767a;font-size:12px;position:relative}
-@media (max-width:900px){.quiz{grid-template-columns:1fr}.opts{grid-template-columns:1fr}.qcard,.result{min-height:0}}
+@media (max-width:900px){.price{font-size:28px}.quiz{grid-template-columns:1fr}.opts{grid-template-columns:1fr}.qcard,.result{min-height:0}}
 
 /* цены + КТ */
 .incl{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
@@ -238,7 +240,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="layer hero-copy" id="heroCopy"><div class="wrap"><div class="copy">
       <span class="chip"><i></i>Свободные окна на консультацию на этой неделе</span>
       <h1><span class="ln"><span>Имплант под ключ.</span></span><span class="ln"><span><em>Цена — за 30 секунд,</em></span></span><span class="ln"><span>без звонка.</span></span></h1>
-      <p class="lead">Ответьте на 4 вопроса — увидите вилку стоимости с коронкой и запишитесь на КТ. Администратор напишет в Telegram, а не будет дозваниваться.</p>
+      <p class="lead">Ответьте на 4 вопроса — увидите вилку стоимости с коронкой и запишитесь на КТ. Администратор напишет в Telegram или MAX, а не будет дозваниваться.</p>
       <div class="ctas"><a class="btn main mag" href="#calc">Рассчитать стоимость <span class="arr">→</span></a><a class="btn ghost mag" href="#book">Записаться</a></div>
       <div class="note">Расчёт ни к чему не обязывает. Точную цену врач назовёт после снимка.</div>
     </div></div></div>
@@ -334,7 +336,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <section class="sec" style="padding-top:0"><div class="wrap">
   <div class="head rv"><h2>Путь пациента</h2><p>Четыре точки — и понятно, что будет дальше.</p></div>
   <div class="path" id="path"><div class="ln"></div>
-    <div class="pt"><i></i><small>01</small><h3>Заявка</h3><p>Расчёт на сайте — ответ в Telegram в рабочее время.</p></div>
+    <div class="pt"><i></i><small>01</small><h3>Заявка</h3><p>Расчёт на сайте — ответ в Telegram или MAX в рабочее время.</p></div>
     <div class="pt"><i></i><small>02</small><h3>КТ и план</h3><p>Снимок, разговор с хирургом, точная смета.</p></div>
     <div class="pt"><i></i><small>03</small><h3>Установка</h3><p>Имплант за один визит, контроль приживления.</p></div>
     <div class="pt"><i></i><small>04</small><h3>Коронка</h3><p>Финальный визит — и новый зуб.</p></div>
@@ -345,8 +347,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   <div class="book rv">
     <div class="t">
       <h2>Запишитесь на консультацию</h2>
-      <p>Оставьте имя и телефон — администратор пришлёт свободные окна в Telegram или WhatsApp. Звонить не будем, если не попросите.</p>
-      <div class="contacts"><a href="tel:+70000000000">+7 (000) 000-00-00</a><a href="#">Написать в Telegram →</a><span>Москва, адрес клиники · ежедневно 9:00–21:00</span></div>
+      <p>Оставьте имя и телефон — администратор пришлёт свободные окна в Telegram или MAX. Звонить не будем, если не попросите.</p>
+      <div class="contacts"><a href="tel:+70000000000">+7 (000) 000-00-00</a><a href="#">Написать в Telegram →</a><a href="#">Написать в MAX →</a><span>Москва, адрес клиники · ежедневно 9:00–21:00</span></div>
     </div>
     <div>
       <div class="chipcalc" id="chip"></div>
@@ -419,7 +421,7 @@ addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onS
 setTimeout(()=>{if(!window.__api)s3d.classList.add('nogl')},7000);
 
 // фото КТ: наклон и блик
-liveFX($('#ct'),{tilt:6,shine:true});
+window.liveFX&&liveFX($('#ct'),{tilt:6,shine:true});
 
 // квиз
 const qs=$$('.q'),qbar=$$('.qbar span'),back=$('#back'),qnum=$('#qnum'),price=$('#price'),pnote=$('#pnote');
@@ -427,7 +429,7 @@ const ans={};let cur=0,shown=[0,0];
 const r1=n=>Math.round(n/1000)*1000,rub=n=>r1(n).toLocaleString('ru-RU')+' ₽';
 function show(i){cur=i;qs.forEach((q,k)=>q.classList.toggle('on',k===i));qbar.forEach((s,k)=>s.classList.toggle('on',k<=i));back.disabled=i===0;qnum.textContent=`Вопрос ${i+1} из 4`}
 function countTo(lo,hi){const a=shown.slice(),t0=performance.now();price.classList.remove('dim');
-  (function f(t){const k=cl((t-t0)/700),e=1-Math.pow(1-k,3);const l=a[0]+(lo-a[0])*e,h=a[1]+(hi-a[1])*e;price.textContent=rub(l)+' – '+rub(h);if(k<1)requestAnimationFrame(f);else shown=[lo,hi]})(t0)}
+  (function f(t){const k=cl((t-t0)/700),e=1-Math.pow(1-k,3);const l=a[0]+(lo-a[0])*e,h=a[1]+(hi-a[1])*e;price.innerHTML='<span class="nw">'+rub(l)+' –</span> <span class="nw">'+rub(h)+'</span>';if(k<1)requestAnimationFrame(f);else shown=[lo,hi]})(t0)}
 function calc(){
   const t=ans.teeth;if(t===undefined)return;const n=t==='0'?1:+t;let lo,hi;
   if(n>=4){lo=290000;hi=520000}else{lo=n*62000;hi=n*94000}
