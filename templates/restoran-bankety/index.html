@@ -106,6 +106,8 @@ section{scroll-margin-top:70px}
   .track{overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;transform:none!important}
   .track::-webkit-scrollbar{display:none}
   .fcard{flex-basis:82vw;height:480px;scroll-snap-align:center}.fbar{display:none}
+  .fcard::before{background:linear-gradient(180deg,transparent 22%,rgba(10,18,14,.75) 48%,rgba(10,18,14,.96))}
+  .fcard h3,.fcard p{text-shadow:0 1px 18px rgba(0,0,0,.6)}
 }
 
 /* ===== зал ===== */
@@ -191,7 +193,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <header class="nav" id="nav"><div class="wrap">
   <a class="logo" href="#top">Веранда<sup>12</sup></a>
   <nav class="navlinks"><a href="#formats">Форматы</a><a href="#hall">Зал</a><a href="#calc">Расчёт банкета</a><a href="#reserve">Бронь</a></nav>
-  <a class="btn sm mag" href="#calc">Рассчитать банкет</a>
+  <a class="btn sm mag" href="#calc">Посчитать банкет</a>
 </div></header>
 
 <main id="top">
@@ -266,8 +268,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 <section class="sec" id="reserve" style="padding-top:0"><div class="wrap">
   <div class="reserve rv">
-    <div class="rtxt"><h2>Бронь даты</h2><p>Оставьте контакты — менеджер пришлёт меню и счёт на предоплату в Telegram или WhatsApp. Ответ в течение 15 минут в рабочее время.</p>
-      <div class="contacts"><a href="tel:+70000000000">+7 (000) 000-00-00</a><a href="#">Написать в Telegram →</a><span>Москва, адрес ресторана · 12:00–00:00</span></div></div>
+    <div class="rtxt"><h2>Бронь даты</h2><p>Оставьте контакты — менеджер пришлёт меню и счёт на предоплату в Telegram или MAX. Ответ в течение 15 минут в рабочее время.</p>
+      <div class="contacts"><a href="tel:+70000000000">+7 (000) 000-00-00</a><a href="#">Написать в Telegram →</a><a href="#">Написать в MAX →</a><span>Москва, адрес ресторана · 12:00–00:00</span></div></div>
     <div class="panel">
       <div class="chipcalc" id="chip"></div>
       <form id="form" novalidate>
@@ -299,7 +301,7 @@ if(!reduce&&matchMedia('(hover:hover)').matches){
 $$('.fcard').forEach(c=>c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--x',e.clientX-r.left+'px');c.style.setProperty('--y',e.clientY-r.top+'px')}));
 
 // огонь, дым, искры в герое
-liveFX($('#stage'),{smoke:36,embers:52,srcX:.55,srcY:.48,srcW:.5,smokeColor:'235,230,225',emberColor:'255,150,50',glow:'#fire',tilt:5});
+window.liveFX&&liveFX($('#stage'),{smoke:36,embers:52,srcX:.55,srcY:.48,srcW:.5,smokeColor:'235,230,225',emberColor:'255,150,50',glow:'#fire',tilt:5});
 
 // слова загораются
 const wEl=$('#words');
@@ -316,7 +318,7 @@ let t=0;(function flick(){t++;if(!reduce)F.forEach((d,i)=>{const f=.55+.25*Math.
 const fm=$('#formats'),track=$('#track'),fbar=$('#fbar i'),fi=$('#fi');
 const nav=$('#nav'),mbar=$('#mbar'),stage=$('#stage');
 function onScroll(){
-  const y=scrollY,vh=innerHeight;nav.classList.toggle('solid',y>20);mbar.classList.toggle('show',y>vh*.8);
+  const y=scrollY,vh=innerHeight;nav.classList.toggle('solid',y>20);const cr=$('#calc').getBoundingClientRect(),rr=$('#reserve').getBoundingClientRect();mbar.classList.toggle('show',y>vh*.8&&!(cr.top<vh&&rr.bottom>0));
   if(!reduce)stage.style.transform=`translateY(${y*.25}px) scale(${1+cl(y/vh)*.08})`;
   const r=wEl.getBoundingClientRect();const p=cl((vh*.85-r.top)/(r.height+vh*.35));const n=Math.round(p*ws.length);ws.forEach((s,i)=>s.classList.toggle('lit',i<n));
   if(innerWidth>760){const fr=fm.getBoundingClientRect(),tot=fm.offsetHeight-vh,fp=cl(-fr.top/tot);
