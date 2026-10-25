@@ -8,3 +8,4 @@ f-furshet https://www.figma.com/api/mcp/asset/562854bd-5549-4461-ba7f-d007c7de66
 f-family https://www.figma.com/api/mcp/asset/0171aebc-149b-43af-bd3a-7ac714b7fa7f.png
 clinic https://www.figma.com/api/mcp/asset/c4b9a486-394a-4b8a-a1d9-6f8881bf4d90.png
 ct https://www.figma.com/api/mcp/asset/f91663ef-c46f-42b9-ae11-474a2ffcebff.png
+detail https://cdn.gamma.app/6w94nzk96rmuu6n/design-anything/pO4IQLGS78OPSLEzQrCjP/WzPU_Bc_uXLTgcjpQ0N1k.jpg
